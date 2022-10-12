@@ -4,7 +4,7 @@ from pprint import pprint
 from bs4 import BeautifulSoup
 import yaml
 
-class SessionManager:
+class Browser:
     def __init__(self):
         self.client = cloudscraper.create_scraper(
             browser={
@@ -36,16 +36,21 @@ class SessionManager:
                 
                 res = self.client.post("https://login.leagueoflegends.com/sso/callback", data=data)
 
-                # Get access token for the first time
-                
-                headers= {"Origin": "https://lolesports.com", "Referrer": "https://lolesports.com", "x-api-key":"0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"}
-                res = self.client.get("https://esports-api.lolesports.com/persisted/gw/getLive?hl=en-GB", headers=headers)
-
-                headers= {"Origin": "https://lolesports.com", "Referrer": "https://lolesports.com"}
-                res = self.client.get("https://account.rewards.lolesports.com/v1/session/token", headers=headers) # Why is it returning 400???
-            
-        # pprint(self.client.cookies.get_dict())
+                # Get access and entitlement tokens for the first time
+                headers = {"Origin": "https://lolesports.com", "Referrer": "https://lolesports.com"}
+                res = self.client.get("https://account.rewards.lolesports.com/v1/session/token", headers=headers)
+                res = self.client.get("https://entitlements.rewards.lolesports.com/v1/entitlements/?token=true", headers=headers)
     
+    def refreshTokens():
+        pass
+
+    def exportSession():
+        pass
+    
+    def getLiveMatches(self):
+        headers= {"Origin": "https://lolesports.com", "Referrer": "https://lolesports.com", "x-api-key":"0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"}
+        res = self.client.get("https://esports-api.lolesports.com/persisted/gw/getLive?hl=en-GB", headers=headers)
+
     def __getLoginTokens(self, form):
         page = BeautifulSoup(form)
         if tokenInput := page.find("input", {"name" : "token"}):
@@ -55,7 +60,7 @@ class SessionManager:
         return token, state
 
 
-sm = SessionManager()
+sm = Browser()
 
 with open("config.yaml", "r",  encoding='utf-8') as f:
     config = yaml.safe_load(f)
