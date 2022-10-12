@@ -37,9 +37,14 @@ class SessionManager:
                 res = self.client.post("https://login.leagueoflegends.com/sso/callback", data=data)
 
                 # Get access token for the first time
-                res = self.client.get("https://account.rewards.lolesports.com/v1/session/token") # Why is it returning 400???
+                
+                headers= {"Origin": "https://lolesports.com", "Referrer": "https://lolesports.com", "x-api-key":"0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"}
+                res = self.client.get("https://esports-api.lolesports.com/persisted/gw/getLive?hl=en-GB", headers=headers)
+
+                headers= {"Origin": "https://lolesports.com", "Referrer": "https://lolesports.com"}
+                res = self.client.get("https://account.rewards.lolesports.com/v1/session/token", headers=headers) # Why is it returning 400???
             
-        pprint(self.client.cookies.get_dict())
+        # pprint(self.client.cookies.get_dict())
     
     def __getLoginTokens(self, form):
         page = BeautifulSoup(form)
