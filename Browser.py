@@ -1,16 +1,9 @@
-from Config import Config
 from Match import Match
-from Logger.Logger import Logger
 import cloudscraper
-import asyncio
 from pprint import pprint
 from bs4 import BeautifulSoup
-import yaml
-import logging
-from datetime import timedelta, datetime
-import time
+from datetime import datetime
 import threading
-
 
 class Browser:
     SESSION_REFRESH_INTERVAL = 1800.0
@@ -116,13 +109,13 @@ class Browser:
                                 break
                         self.liveMatches[tournamentId] = Match(tournamentId, league, streamChannel, streamSource)
         except (KeyError, TypeError):
-            log.error("Could not get live matches")
+            self.log.error("Could not get live matches")
     
     def startWatchingNewMatches(self):
         for tid in self.liveMatches:
             if tid not in self.currentlyWatching:
                 self.watch(self.liveMatches[tid])
-                log.info(f"Started watching {self.liveMatches[tid].league}")
+                self.log.info(f"Started watching {self.liveMatches[tid].league}")
 
     def watch(self, match: Match):
         self.currentlyWatching[match.tournamentId] = threading.Timer(
@@ -169,24 +162,3 @@ class Browser:
         if tokenInput := page.find("input", {"name": "state"}):
             state = tokenInput.get("value", "")
         return token, state
-
-
-log = Logger().createLogger()
-config = Config()
-browser = Browser(log, config)
-
-if browser.login(config.username, config.password):
-    log.info("Successfully logged in")
-    while True:
-        try:
-            browser.getLiveMatches()
-            browser.cleanUpWatchlist()
-            browser.startWatchingNewMatches()
-            log.debug(f"Currently watching: {', '.join([m.league for m in browser.liveMatches.values()])}")
-            time.sleep(60)
-        except KeyboardInterrupt:
-            browser.stopMaintaininingSession()
-            browser.stopWatchingAll()
-            break
-else:
-    log.error("Login FAILED")
