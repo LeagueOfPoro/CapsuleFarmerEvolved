@@ -15,8 +15,8 @@ class CustomFormatter(logging.Formatter):
     format = "%(levelname)s: %(asctime)s - %(message)s"
 
     FORMATS = {
-        logging.DEBUG: green + format + reset,
-        logging.INFO: grey + format + reset, 
+        logging.DEBUG: grey + format + reset,
+        logging.INFO: green + format + reset, 
         logging.WARNING: yellow + format + reset,
         logging.ERROR: red + format + reset,
         logging.CRITICAL: bold_red + format + reset

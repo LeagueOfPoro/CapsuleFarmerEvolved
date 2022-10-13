@@ -23,7 +23,7 @@ class Browser:
                 'platform': 'windows',
                 'desktop': True
             },
-            debug=True)
+            debug=config.debug)
         self.log = log
         self.config = config
         self.currentlyWatching = {}
@@ -122,6 +122,7 @@ class Browser:
         for tid in self.liveMatches:
             if tid not in self.currentlyWatching:
                 self.watch(self.liveMatches[tid])
+                log.info(f"Started watching {self.liveMatches[tid].league}")
 
     def watch(self, match: Match):
         self.currentlyWatching[match.tournamentId] = threading.Timer(
@@ -178,10 +179,10 @@ if browser.login(config.username, config.password):
     log.info("Successfully logged in")
     while True:
         try:
-            log.debug("Beat")
             browser.getLiveMatches()
             browser.cleanUpWatchlist()
             browser.startWatchingNewMatches()
+            log.debug(f"Currently watching: {', '.join([m.league for m in browser.liveMatches.values()])}")
             time.sleep(60)
         except KeyboardInterrupt:
             browser.stopMaintaininingSession()

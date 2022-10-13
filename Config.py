@@ -6,6 +6,7 @@ class Config:
             config = yaml.safe_load(f)
             self.username = config["username"]
             self.password = config["password"]
+            self.debug = config.get("debug", False)
 
         with open("bestStreams.txt", "r",  encoding='utf-8') as f:
             self.bestStreams = f.read().splitlines()
