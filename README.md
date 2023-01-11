@@ -14,9 +14,14 @@ Are you tired of watching professional League of Legends games? Do you watch onl
 ## Configuration
 Fill out your username and password in `config.yaml`
 ```yaml
-username: "username"
-password: "password"
-debug: False
+account1:
+  username: "username"
+  password: "password"
+  debug: False
+account2:
+  username: "username"
+  password: "password"
+  debug: False
 ```
 
 ## Installation (advanced)
