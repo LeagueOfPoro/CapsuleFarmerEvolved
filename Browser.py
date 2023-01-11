@@ -53,15 +53,18 @@ class Browser:
                 res = self.client.post(
                     "https://login.leagueoflegends.com/sso/callback", data=data)
 
+                res =  self.client.get("https://auth.riotgames.com/authorize?client_id=esports-rna-prod&redirect_uri=https://account.rewards.lolesports.com/v1/session/oauth-callback&response_type=code&scope=openid&prompt=none&state=https://lolesports.com/?memento=na.en_GB", allow_redirects=True)
+
                 # Get access and entitlement tokens for the first time
                 headers = {"Origin": "https://lolesports.com",
                            "Referrer": "https://lolesports.com"}
                 for i in range(5):
                     resAccessToken = self.client.get(
                         "https://account.rewards.lolesports.com/v1/session/token", headers=headers)
-                    sleep(1)
                     if resAccessToken.status_code == 200:
                         break
+                    else:
+                        sleep(1)
 
                 # resEntitlementToken = self.client.get(
                 #     "https://entitlements.rewards.lolesports.com/v1/entitlements/?token=true", headers=headers)
@@ -69,6 +72,7 @@ class Browser:
                     "https://account.rewards.lolesports.com/v1/session/clientconfig/rms", headers=headers)
                 if resAccessToken.status_code == 200:
                     self.maintainSession()
+                    print(username)
                     return True
         return False
 
