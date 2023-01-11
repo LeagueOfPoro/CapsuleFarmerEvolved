@@ -4,19 +4,20 @@ from pprint import pprint
 from bs4 import BeautifulSoup
 from datetime import datetime
 import threading
+from time import sleep
 
 class Browser:
     SESSION_REFRESH_INTERVAL = 1800.0
     STREAM_WATCH_INTERVAL = 60.0
 
-    def __init__(self, log, config):
+    def __init__(self, log, config, account):
         self.client = cloudscraper.create_scraper(
             browser={
                 'browser': 'chrome',
                 'platform': 'windows',
                 'desktop': True
             },
-            debug=config.debug)
+            debug=config.getAccount(account).get("debug", False))
         self.log = log
         self.config = config
         self.currentlyWatching = {}
@@ -55,13 +56,18 @@ class Browser:
                 # Get access and entitlement tokens for the first time
                 headers = {"Origin": "https://lolesports.com",
                            "Referrer": "https://lolesports.com"}
-                resAccessToken = self.client.get(
-                    "https://account.rewards.lolesports.com/v1/session/token", headers=headers)
-                resEntitlementToken = self.client.get(
-                    "https://entitlements.rewards.lolesports.com/v1/entitlements/?token=true", headers=headers)
+                for i in range(5):
+                    resAccessToken = self.client.get(
+                        "https://account.rewards.lolesports.com/v1/session/token", headers=headers)
+                    sleep(1)
+                    if resAccessToken.status_code == 200:
+                        break
+
+                # resEntitlementToken = self.client.get(
+                #     "https://entitlements.rewards.lolesports.com/v1/entitlements/?token=true", headers=headers)
                 resPasToken = self.client.get(
                     "https://account.rewards.lolesports.com/v1/session/clientconfig/rms", headers=headers)
-                if resAccessToken.status_code == 200 and resEntitlementToken.status_code == 200:
+                if resAccessToken.status_code == 200:
                     self.maintainSession()
                     return True
         return False
@@ -72,9 +78,9 @@ class Browser:
                    "Referrer": "https://lolesports.com"}
         resAccessToken = self.client.get(
             "https://account.rewards.lolesports.com/v1/session/refresh", headers=headers)
-        resEntitlementToken = self.client.get(
-            "https://entitlements.rewards.lolesports.com/v1/entitlements/?token=true", headers=headers)
-        if resAccessToken.status_code == 200 and resEntitlementToken.status_code == 200:
+        # resEntitlementToken = self.client.get(
+        #     "https://entitlements.rewards.lolesports.com/v1/entitlements/?token=true", headers=headers)
+        if resAccessToken.status_code == 200:
             self.maintainSession()
         else:
             self.log.error("Failed to refresh session")
@@ -131,6 +137,13 @@ class Browser:
         for t in self.currentlyWatching.values():
             t.cancel()
     
+    
+    
+    def sendWatchToLive(self):
+        for tid in self.liveMatches:
+            self.__sendWatch(self.liveMatches[tid])
+            self.log.info(f"Started watching {self.liveMatches[tid].league}")
+    
     def cleanUpWatchlist(self):
         removed = []
         for tid in self.currentlyWatching:
@@ -149,9 +162,8 @@ class Browser:
                 "tournament_id": match.tournamentId}
         headers = {"Origin": "https://lolesports.com",
                    "Referrer": "https://lolesports.com"}
-        self.client.post(
+        res = self.client.post(
             "https://rex.rewards.lolesports.com/v1/events/watch", headers=headers, json=data)
-        self.watch(match)
 
     def __getLoginTokens(self, form):
         page = BeautifulSoup(form, features="html.parser")
