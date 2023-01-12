@@ -23,6 +23,17 @@ accounts:
 debug: True
 ```
 
+## CLI
+```
+usage: CapsuleFarmerEvolved.exe [-h] [-c CONFIGPATH]
+
+Farm Esports Capsules by watching all matches on lolesports.com.
+
+options:
+  -h, --help            show this help message and exit
+  -c CONFIGPATH, --config CONFIGPATH
+                        Path to a custom config file
+```                        
 ## Installation (advanced)
 
 ### Prerequisities
