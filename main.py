@@ -6,8 +6,8 @@ from Browser import Browser
 import sys
 
 
-log = Logger().createLogger()
 config = Config()
+log = Logger().createLogger(config.debug)
 
 farmThreads = []
 
@@ -16,18 +16,13 @@ for account in config.accounts:
     thread.start()
     farmThreads.append(thread)
 
-for thread in farmThreads: 
+for thread in farmThreads:
     try:
-        while thread.is_alive(): 
-            print("xx")
+        while thread.is_alive():
             thread.join(1)
     except (KeyboardInterrupt, SystemExit):
         print('Exitting. Thank you for farming with us!')
         for thread in farmThreads:
-            if thread.is_alive(): 
+            if thread.is_alive():
                 thread.stop()
         sys.exit()
-        # print('Exitting. Thank you for farming with us!')
-
-
-

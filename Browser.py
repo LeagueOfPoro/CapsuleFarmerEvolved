@@ -5,12 +5,21 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 import threading
 from time import sleep
+from Config import Config
+
 
 class Browser:
     SESSION_REFRESH_INTERVAL = 1800.0
     STREAM_WATCH_INTERVAL = 60.0
 
-    def __init__(self, log, config, account):
+    def __init__(self, log, config: Config, account: str):
+        """
+        Initialize the Browser class
+
+        :param log: log variable
+        :param config: Config class object
+        :param account: account string
+        """
         self.client = cloudscraper.create_scraper(
             browser={
                 'browser': 'chrome',
@@ -23,8 +32,14 @@ class Browser:
         self.currentlyWatching = {}
         self.liveMatches = {}
 
-    # Initial login
-    def login(self, username, password):
+    def login(self, username: str, password: str) -> bool:
+        """
+        Login to the website using given credentials. Obtain necessary tokens.
+
+        :param username: string, username of the account
+        :param password: string, password of the account
+        :return: boolean, login successful or not
+        """
         # Get necessary cookies from the main page
         self.client.get(
             "https://login.leagueoflegends.com/?redirect_uri=https://lolesports.com/&lang=en")
@@ -53,11 +68,14 @@ class Browser:
                 res = self.client.post(
                     "https://login.leagueoflegends.com/sso/callback", data=data)
 
-                res =  self.client.get("https://auth.riotgames.com/authorize?client_id=esports-rna-prod&redirect_uri=https://account.rewards.lolesports.com/v1/session/oauth-callback&response_type=code&scope=openid&prompt=none&state=https://lolesports.com/?memento=na.en_GB", allow_redirects=True)
+                res = self.client.get(
+                    "https://auth.riotgames.com/authorize?client_id=esports-rna-prod&redirect_uri=https://account.rewards.lolesports.com/v1/session/oauth-callback&response_type=code&scope=openid&prompt=none&state=https://lolesports.com/?memento=na.en_GB", allow_redirects=True)
 
                 # Get access and entitlement tokens for the first time
                 headers = {"Origin": "https://lolesports.com",
                            "Referrer": "https://lolesports.com"}
+
+                # This requests sometimes returns 404
                 for i in range(5):
                     resAccessToken = self.client.get(
                         "https://account.rewards.lolesports.com/v1/session/token", headers=headers)
@@ -66,8 +84,7 @@ class Browser:
                     else:
                         sleep(1)
 
-                # resEntitlementToken = self.client.get(
-                #     "https://entitlements.rewards.lolesports.com/v1/entitlements/?token=true", headers=headers)
+                # Currently unused but the call might be important server-side
                 resPasToken = self.client.get(
                     "https://account.rewards.lolesports.com/v1/session/clientconfig/rms", headers=headers)
                 if resAccessToken.status_code == 200:
@@ -76,33 +93,43 @@ class Browser:
                     return True
         return False
 
-    # Refresh access and entitlement tokens
     def refreshTokens(self):
+        """
+        Refresh access and entitlement tokens
+        """
         headers = {"Origin": "https://lolesports.com",
                    "Referrer": "https://lolesports.com"}
         resAccessToken = self.client.get(
             "https://account.rewards.lolesports.com/v1/session/refresh", headers=headers)
-        # resEntitlementToken = self.client.get(
-        #     "https://entitlements.rewards.lolesports.com/v1/entitlements/?token=true", headers=headers)
         if resAccessToken.status_code == 200:
             self.maintainSession()
         else:
             self.log.error("Failed to refresh session")
 
     def maintainSession(self):
+        """
+        Periodically maintain the session by refreshing the tokens
+        """
         self.refreshTimer = threading.Timer(
             Browser.SESSION_REFRESH_INTERVAL, self.refreshTokens)
         self.refreshTimer.start()
 
     def stopMaintaininingSession(self):
+        """
+        Stops refreshing the tokens
+        """
         self.refreshTimer.cancel()
 
     def getLiveMatches(self):
+        """
+        Retrieve data about currently live matches and store them.
+        """
         headers = {"Origin": "https://lolesports.com", "Referrer": "https://lolesports.com",
                    "x-api-key": "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"}
         res = self.client.get(
             "https://esports-api.lolesports.com/persisted/gw/getLive?hl=en-GB", headers=headers)
         resJson = res.json()
+        self.liveMatches = {}
         try:
             events = resJson["data"]["schedule"].get("events", [])
             for event in events:
@@ -117,48 +144,27 @@ class Browser:
                                 streamChannel = stream["parameter"]
                                 streamSource = stream["provider"]
                                 break
-                        self.liveMatches[tournamentId] = Match(tournamentId, league, streamChannel, streamSource)
+                        self.liveMatches[tournamentId] = Match(
+                            tournamentId, league, streamChannel, streamSource)
         except (KeyError, TypeError):
             self.log.error("Could not get live matches")
-    
-    def startWatchingNewMatches(self):
-        for tid in self.liveMatches:
-            if tid not in self.currentlyWatching:
-                self.watch(self.liveMatches[tid])
-                self.log.info(f"Started watching {self.liveMatches[tid].league}")
 
-    def watch(self, match: Match):
-        self.currentlyWatching[match.tournamentId] = threading.Timer(
-            Browser.STREAM_WATCH_INTERVAL, self.__sendWatch, [match])
-        self.currentlyWatching[match.tournamentId].start()
-
-    def stopWatching(self, tournamentId):
-        t = self.currentlyWatching.get(tournamentId, None)
-        if t:
-            t.cancel()
-
-    def stopWatchingAll(self):
-        for t in self.currentlyWatching.values():
-            t.cancel()
-    
-    
-    
     def sendWatchToLive(self):
+        """
+        Send watch event for all the live matches
+        """
         for tid in self.liveMatches:
-            self.__sendWatch(self.liveMatches[tid])
-            self.log.info(f"Started watching {self.liveMatches[tid].league}")
-    
-    def cleanUpWatchlist(self):
-        removed = []
-        for tid in self.currentlyWatching:
-            if tid not in self.liveMatches:
-                self.stopWatching(tid)
-                removed.append(tid)
+            res = self.__sendWatch(self.liveMatches[tid])
+            self.log.debug(
+                f"Status of {self.liveMatches[tid].league}: {res.json()}")
 
-        for tid in removed:
-            self.currentlyWatching.pop(tid)        
+    def __sendWatch(self, match: Match) -> object:
+        """
+        Sends watch event for a match
 
-    def __sendWatch(self, match: Match):
+        :param match: Match object
+        :return: object, response of the request
+        """
         data = {"stream_id": match.streamChannel,
                 "source": match.streamSource,
                 "stream_position_time": datetime.utcnow().isoformat(sep='T', timespec='milliseconds')+'Z',
@@ -166,10 +172,16 @@ class Browser:
                 "tournament_id": match.tournamentId}
         headers = {"Origin": "https://lolesports.com",
                    "Referrer": "https://lolesports.com"}
-        res = self.client.post(
+        return self.client.post(
             "https://rex.rewards.lolesports.com/v1/events/watch", headers=headers, json=data)
 
-    def __getLoginTokens(self, form):
+    def __getLoginTokens(self, form: str) -> tuple[str, str]:
+        """
+        Extract token and state from login page html
+
+        :param html: string, html of the login page
+        :return: tuple, token and state
+        """
         page = BeautifulSoup(form, features="html.parser")
         token = None
         state = None
