@@ -1,6 +1,8 @@
-account1:
-  username: "username"
-  password: "password"
-account2:
-  username: "username"
-  password: "password"
+accounts:
+  accountname:
+    username: "username"
+    password: "password"
+  anotheraccountname:
+    username: "username"
+    password: "password"
+debug: True
