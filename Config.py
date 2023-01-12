@@ -6,21 +6,28 @@ class Config:
     A class that loads and stores the configuration
     """
 
-    def __init__(self) -> None:
+    def __init__(self, configPath: str) -> None:
         """
         Loads the configuration file into the Config object
+
+        :param configPath: string, path to the configuration file
         """
         self.accounts = {}
-        with open("config.yaml", "r",  encoding='utf-8') as f:
-            config = yaml.safe_load(f)
-            accs = config.get("accounts")
-            for account in accs:
-                self.accounts[account] = {
-                    "username": accs[account]["username"],
-                    "password": accs[account]["password"],
+        try:
+            with open(configPath, "r",  encoding='utf-8') as f:
+                config = yaml.safe_load(f)
+                accs = config.get("accounts")
+                for account in accs:
+                    self.accounts[account] = {
+                        "username": accs[account]["username"],
+                        "password": accs[account]["password"],
 
-                }
-            self.debug = config.get("debug", False)
+                    }
+                self.debug = config.get("debug", False)
+        except FileNotFoundError as ex:
+            print(f"ERROR: The configuration file cannot be found at {configPath}")
+            raise ex
+            
         with open("bestStreams.txt", "r",  encoding='utf-8') as f:
             self.bestStreams = f.read().splitlines()
 
