@@ -27,6 +27,7 @@ farmThreads = []
 
 for account in config.accounts:
     thread = FarmThread(log, config, account)
+    thread.daemon = True
     thread.start()
     farmThreads.append(thread)
 
@@ -36,7 +37,4 @@ for thread in farmThreads:
             thread.join(1)
     except (KeyboardInterrupt, SystemExit):
         print('Exitting. Thank you for farming with us!')
-        for thread in farmThreads:
-            if thread.is_alive():
-                thread.stop()
         sys.exit()
