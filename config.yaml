@@ -1,2 +1,6 @@
-username: "username"
-password: "password"
+account1:
+  username: "username"
+  password: "password"
+account2:
+  username: "username"
+  password: "password"
