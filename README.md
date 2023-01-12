@@ -10,6 +10,13 @@ Are you tired of watching professional League of Legends games? Do you watch onl
 - Lightweight
 - No web browser needed
 
+## Installation
+1. Download and run the latest CapsuleFarmerEvolved.zip from [Releases tab](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases)
+2. Extract the archive
+3. Edit the configuration file `config.yaml` with a text editor (e.g. Notepad) - see [Configuration](#configuration) for details
+4. Run `CapsuleFarmer.exe`
+5. If you do not use the autologin feature - log into your account 
+
 ## Configuration
 Fill out your username and password in `config.yaml`. Name of the account groups is not important but I recommend entering something recognizable to better detect problems with the account. 
 ```yaml
@@ -49,3 +56,6 @@ options:
 
 ### Update
 In the CapsuleFarmerEvolved, run `git pull`
+
+## Known Issues
+- 2FA is not supported
