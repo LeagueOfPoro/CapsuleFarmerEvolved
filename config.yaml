@@ -1,2 +1,8 @@
-username: "username"
-password: "password"
+accounts:
+  accountname:
+    username: "username"
+    password: "password"
+  anotheraccountname:
+    username: "username"
+    password: "password"
+debug: True

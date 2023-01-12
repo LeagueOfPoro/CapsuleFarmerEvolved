@@ -1,25 +1,42 @@
-from time import sleep
+
+from FarmThread import FarmThread
 from Logger.Logger import Logger
 from Config import Config
-from Browser import Browser
+import sys
+import argparse
 
+CURRENT_VERSION = 0.1
 
-log = Logger().createLogger()
-config = Config()
-browser = Browser(log, config)
+parser = argparse.ArgumentParser(description='Farm Esports Capsules by watching all matches on lolesports.com.')
+parser.add_argument('-c', '--config', dest="configPath", default="./config.yaml",
+                    help='Path to a custom config file')
+args = parser.parse_args()
 
-if browser.login(config.username, config.password):
-    log.info("Successfully logged in")
-    while True:
-        try:
-            browser.getLiveMatches()
-            browser.cleanUpWatchlist()
-            browser.startWatchingNewMatches()
-            log.debug(f"Currently watching: {', '.join([m.league for m in browser.liveMatches.values()])}")
-            sleep(60)
-        except KeyboardInterrupt:
-            browser.stopMaintaininingSession()
-            browser.stopWatchingAll()
-            break
-else:
-    log.error("Login FAILED")
+print("*********************************************************")
+print(f"*        Thank you for using Capsule Farmer v{CURRENT_VERSION}!       *")
+print("* Please consider supporting League of Poro on YouTube. *")
+print("*    If you need help with the app, join our Discord    *")
+print("*             https://discord.gg/ebm5MJNvHU             *")
+print("*********************************************************")
+print()
+
+config = Config(args.configPath)
+log = Logger().createLogger(config.debug)
+
+farmThreads = []
+
+for account in config.accounts:
+    thread = FarmThread(log, config, account)
+    thread.start()
+    farmThreads.append(thread)
+
+for thread in farmThreads:
+    try:
+        while thread.is_alive():
+            thread.join(1)
+    except (KeyboardInterrupt, SystemExit):
+        print('Exitting. Thank you for farming with us!')
+        for thread in farmThreads:
+            if thread.is_alive():
+                thread.stop()
+        sys.exit()

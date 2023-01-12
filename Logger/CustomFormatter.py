@@ -1,8 +1,9 @@
 import logging
 
-#need to import os cause of this https://stackoverflow.com/a/64222858
+# need to import os cause of this https://stackoverflow.com/a/64222858
 import os
 os.system("")
+
 
 class CustomFormatter(logging.Formatter):
 
@@ -16,7 +17,7 @@ class CustomFormatter(logging.Formatter):
 
     FORMATS = {
         logging.DEBUG: grey + format + reset,
-        logging.INFO: green + format + reset, 
+        logging.INFO: green + format + reset,
         logging.WARNING: yellow + format + reset,
         logging.ERROR: red + format + reset,
         logging.CRITICAL: bold_red + format + reset
@@ -24,5 +25,5 @@ class CustomFormatter(logging.Formatter):
 
     def format(self, record):
         log_fmt = self.FORMATS.get(record.levelno)
-        formatter = logging.Formatter(log_fmt,"%Y/%m/%d %H:%M:%S")
+        formatter = logging.Formatter(log_fmt, "%Y/%m/%d %H:%M:%S")
         return formatter.format(record)
