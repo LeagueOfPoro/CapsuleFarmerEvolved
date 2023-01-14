@@ -1,6 +1,6 @@
 # Capsule Farmer Evolved
 
-Are you tired of watching professional League of Legends games? Do you watch only for the drops? This is an revolution in farming of League of Legends Esports capsules!
+Are you tired of watching professional League of Legends games? Do you watch only for the drops? This is a revolution in the farming of League of Legends Esports capsules!
 
 **NO WEB BROWSER NEEDED!** The old [EsportsCapsuleFarmer](https://github.com/LeagueOfPoro/EsportsCapsuleFarmer) relied on a web browser to watch videos. *Capsule Farmer Evolved* simulates traffic to lolesports.com servers and tricks it into thinking the account is watching a stream. This approach drastically lowers the hardware requirements.
 
