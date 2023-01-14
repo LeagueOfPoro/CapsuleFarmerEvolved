@@ -57,5 +57,9 @@ options:
 ### Update
 In the CapsuleFarmerEvolved, run `git pull`
 
+### Create EXE
+1.  `pipenv install --dev`
+2.  `pipenv run pyinstaller -F --icon=poro.ico ./main.py --collect-all charset_normalizer -n CapsuleFarmerEvolved`
+
 ## Known Issues
 - 2FA is not supported
