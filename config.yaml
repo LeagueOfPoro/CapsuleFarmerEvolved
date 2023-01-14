@@ -5,4 +5,3 @@ accounts:
   anotheraccountname:
     username: "username"
     password: "password"
-debug: True
