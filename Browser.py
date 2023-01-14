@@ -50,47 +50,47 @@ class Browser:
         res = self.client.put(
             "https://auth.riotgames.com/api/v1/authorization", json=data)
         resJson = res.json()
-        if resJson.get("type", "") and resJson["response"].get("parameters", "") and resJson["response"]["parameters"].get("uri", ""):
+        try:
             # Finish OAuth2 login
             res = self.client.get(resJson["response"]["parameters"]["uri"])
+        except KeyError:
+            return False
+        # Login to lolesports.com, riotgames.com, and playvalorant.com
+        token, state = self.__getLoginTokens(res.text)
+        if token and state:
+            data = {"token": token, "state": state}
+            self.client.post(
+                "https://login.riotgames.com/sso/login", data=data)
+            self.client.post(
+                "https://login.lolesports.com/sso/login", data=data)
+            self.client.post(
+                "https://login.playvalorant.com/sso/login", data=data)
 
-            # Login to lolesports.com, riotgames.com, and playvalorant.com
-            token, state = self.__getLoginTokens(res.text)
-            if token and state:
-                data = {"token": token, "state": state}
-                self.client.post(
-                    "https://login.riotgames.com/sso/login", data=data)
-                self.client.post(
-                    "https://login.lolesports.com/sso/login", data=data)
-                self.client.post(
-                    "https://login.playvalorant.com/sso/login", data=data)
+            res = self.client.post(
+                "https://login.leagueoflegends.com/sso/callback", data=data)
 
-                res = self.client.post(
-                    "https://login.leagueoflegends.com/sso/callback", data=data)
+            res = self.client.get(
+                "https://auth.riotgames.com/authorize?client_id=esports-rna-prod&redirect_uri=https://account.rewards.lolesports.com/v1/session/oauth-callback&response_type=code&scope=openid&prompt=none&state=https://lolesports.com/?memento=na.en_GB", allow_redirects=True)
 
-                res = self.client.get(
-                    "https://auth.riotgames.com/authorize?client_id=esports-rna-prod&redirect_uri=https://account.rewards.lolesports.com/v1/session/oauth-callback&response_type=code&scope=openid&prompt=none&state=https://lolesports.com/?memento=na.en_GB", allow_redirects=True)
+            # Get access and entitlement tokens for the first time
+            headers = {"Origin": "https://lolesports.com",
+                        "Referrer": "https://lolesports.com"}
 
-                # Get access and entitlement tokens for the first time
-                headers = {"Origin": "https://lolesports.com",
-                           "Referrer": "https://lolesports.com"}
-
-                # This requests sometimes returns 404
-                for i in range(5):
-                    resAccessToken = self.client.get(
-                        "https://account.rewards.lolesports.com/v1/session/token", headers=headers)
-                    if resAccessToken.status_code == 200:
-                        break
-                    else:
-                        sleep(1)
-
-                # Currently unused but the call might be important server-side
-                resPasToken = self.client.get(
-                    "https://account.rewards.lolesports.com/v1/session/clientconfig/rms", headers=headers)
+            # This requests sometimes returns 404
+            for i in range(5):
+                resAccessToken = self.client.get(
+                    "https://account.rewards.lolesports.com/v1/session/token", headers=headers)
                 if resAccessToken.status_code == 200:
-                    self.maintainSession()
-                    print(username)
-                    return True
+                    break
+                else:
+                    sleep(1)
+
+            # Currently unused but the call might be important server-side
+            resPasToken = self.client.get(
+                "https://account.rewards.lolesports.com/v1/session/clientconfig/rms", headers=headers)
+            if resAccessToken.status_code == 200:
+                self.maintainSession()
+                return True
         return False
 
     def refreshTokens(self):

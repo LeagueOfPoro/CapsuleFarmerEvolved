@@ -9,6 +9,7 @@ cloudscraper = "*"
 httpx = {extras = ["http2"], version = "*"}
 beautifulsoup4 = "*"
 pyyaml = "*"
+rich = "*"
 
 [dev-packages]
 autopep8 = "*"

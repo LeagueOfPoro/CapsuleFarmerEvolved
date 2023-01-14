@@ -1,11 +1,15 @@
 
 from FarmThread import FarmThread
+from GuiThread import GuiThread
 from Logger.Logger import Logger
 from Config import Config
 import sys
 import argparse
+from rich import print
 
-CURRENT_VERSION = 0.1
+from Stats import Stats
+
+CURRENT_VERSION = 0.2
 
 parser = argparse.ArgumentParser(description='Farm Esports Capsules by watching all matches on lolesports.com.')
 parser.add_argument('-c', '--config', dest="configPath", default="./config.yaml",
@@ -14,7 +18,7 @@ args = parser.parse_args()
 
 print("*********************************************************")
 print(f"*        Thank you for using Capsule Farmer v{CURRENT_VERSION}!       *")
-print("* Please consider supporting League of Poro on YouTube. *")
+print("* [steel_blue1]Please consider supporting League of Poro on YouTube.[/] *")
 print("*    If you need help with the app, join our Discord    *")
 print("*             https://discord.gg/ebm5MJNvHU             *")
 print("*********************************************************")
@@ -22,16 +26,22 @@ print()
 
 config = Config(args.configPath)
 log = Logger().createLogger(config.debug)
+farmThreads = {}
+stats = Stats(farmThreads)
+for account in config.accounts:
+    stats.initNewAccount(account)
 
-farmThreads = []
+gui = GuiThread(log, config, stats)
+gui.daemon = True
+gui.start()
 
 for account in config.accounts:
-    thread = FarmThread(log, config, account)
+    thread = FarmThread(log, config, account, stats)
     thread.daemon = True
     thread.start()
-    farmThreads.append(thread)
+    farmThreads[account] = thread
 
-for thread in farmThreads:
+for thread in farmThreads.values():
     try:
         while thread.is_alive():
             thread.join(1)
