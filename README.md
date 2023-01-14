@@ -61,5 +61,14 @@ In the CapsuleFarmerEvolved, run `git pull`
 1.  `pipenv install --dev`
 2.  `pipenv run pyinstaller -F --icon=poro.ico ./main.py --collect-all charset_normalizer -n CapsuleFarmerEvolved`
 
+## Docker
+If you want to build image locally:
+1. Clone this repo and move to it's direcotry
+2. Build the image: `docker build -t capsulefarmerevolved .`
+3. Edit the `/path/to/config.yaml` to absolute path to your configuration file and run the container in the background:
+```docker
+docker run -it --rm -d -v /path/to/config.yam:/config/config.yaml  capsulefarmerevolved
+```
+
 ## Known Issues
 - 2FA is not supported
