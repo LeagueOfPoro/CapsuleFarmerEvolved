@@ -17,7 +17,7 @@ parser.add_argument('-c', '--config', dest="configPath", default="./config.yaml"
 args = parser.parse_args()
 
 print("*********************************************************")
-print(f"*        Thank you for using Capsule Farmer v{CURRENT_VERSION}!       *")
+print(f"*   Thank you for using Capsule Farmer Evolved v{CURRENT_VERSION}!    *")
 print("* [steel_blue1]Please consider supporting League of Poro on YouTube.[/] *")
 print("*    If you need help with the app, join our Discord    *")
 print("*             https://discord.gg/ebm5MJNvHU             *")
