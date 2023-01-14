@@ -32,7 +32,9 @@ jobs:
       id: meta
       uses: docker/metadata-action@v4
       with:
-        images: leagueofporo/capsulefarmer
+        images: |
+          leagueofporo/capsulefarmer
+          ghcr.io/${{ github.repository }}
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v3
