@@ -155,8 +155,8 @@ class Browser:
         """
         for tid in self.liveMatches:
             res = self.__sendWatch(self.liveMatches[tid])
-            self.log.debug(
-                f"Status of {self.liveMatches[tid].league}: {res.json()}")
+            # self.log.debug(
+            #     f"Status of {self.liveMatches[tid].league}: {res.json()}")
 
     def __sendWatch(self, match: Match) -> object:
         """
