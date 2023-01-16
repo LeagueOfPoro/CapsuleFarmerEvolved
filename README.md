@@ -1,6 +1,6 @@
 # Capsule Farmer Evolved
 
-Are you tired of watching professional League of Legends games? Do you watch only for the drops? This is an revolution in farming of League of Legends Esports capsules!
+Are you tired of watching professional League of Legends games? Do you watch only for the drops? This is a revolution in the farming of League of Legends Esports capsules!
 
 **NO WEB BROWSER NEEDED!** The old [EsportsCapsuleFarmer](https://github.com/LeagueOfPoro/EsportsCapsuleFarmer) relied on a web browser to watch videos. *Capsule Farmer Evolved* simulates traffic to lolesports.com servers and tricks it into thinking the account is watching a stream. This approach drastically lowers the hardware requirements.
 
@@ -62,7 +62,14 @@ In the CapsuleFarmerEvolved, run `git pull`
 2.  `pipenv run pyinstaller -F --icon=poro.ico ./main.py --collect-all charset_normalizer -n CapsuleFarmerEvolved`
 
 ## Docker
-If you want to build image locally:
+Pre-built image:
+
+Edit the `/path/to/config.yaml` to absolute path to your configuration file and run the container in the background:
+```
+docker run -it --rm --name CapsuleFarmer -d -v /path/to/config.yaml:/config/config.yaml  leagueofporo/capsulefarmer:master
+```
+
+If you want to build the image locally:
 1. Clone this repo and move to it's direcotry
 2. Build the image: `docker build -t capsulefarmerevolved .`
 3. Edit the `/path/to/config.yaml` to absolute path to your configuration file and run the container in the background:
