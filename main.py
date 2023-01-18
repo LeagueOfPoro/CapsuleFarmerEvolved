@@ -9,7 +9,7 @@ from rich import print
 
 from Stats import Stats
 
-CURRENT_VERSION = 0.2
+CURRENT_VERSION = 0.3
 
 parser = argparse.ArgumentParser(description='Farm Esports Capsules by watching all matches on lolesports.com.')
 parser.add_argument('-c', '--config', dest="configPath", default="./config.yaml",

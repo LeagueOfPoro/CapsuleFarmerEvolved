@@ -25,8 +25,14 @@ class Logger:
         # ch.setFormatter(CustomFormatter())
         # log.addHandler(ch)
 
+        if (debug):
+            level = logging.DEBUG
+        else:
+            level = logging.WARNING
         
-        logging.basicConfig(filename=f'capsulefarmer-{datetime.now().strftime("%Y-%m-%d")}.log', filemode="a+", format='%(asctime)s %(message)s', level=logging.DEBUG)
+        logging.basicConfig(filename=f'capsulefarmer-{datetime.now().strftime("%Y-%m-%d")}.log', filemode="a+", format='%(asctime)s %(message)s', level=level)
         log = logging.getLogger("League of Poro")
-
+        log.info("-------------------------------------------------")
+        log.info("---------------- Program started ----------------")
+        log.info("-------------------------------------------------")
         return log
