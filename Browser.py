@@ -31,6 +31,7 @@ class Browser:
         self.config = config
         self.currentlyWatching = {}
         self.liveMatches = {}
+        self.account = account
 
     def login(self, username: str, password: str) -> bool:
         """
@@ -155,8 +156,8 @@ class Browser:
         """
         for tid in self.liveMatches:
             res = self.__sendWatch(self.liveMatches[tid])
-            # self.log.debug(
-            #     f"Status of {self.liveMatches[tid].league}: {res.json()}")
+            self.log.debug(
+                f"{self.account} - {self.liveMatches[tid].league}: {res.json()}")
 
     def __sendWatch(self, match: Match) -> object:
         """
