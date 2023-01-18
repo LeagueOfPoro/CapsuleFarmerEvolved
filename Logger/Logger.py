@@ -30,7 +30,7 @@ class Logger:
         else:
             level = logging.WARNING
         
-        logging.basicConfig(filename=f'capsulefarmer-{datetime.now().strftime("%Y-%m-%d")}.log', filemode="a+", format='%(asctime)s %(message)s', level=level)
+        logging.basicConfig(filename=f'capsulefarmer-{datetime.now().strftime("%Y-%m-%d")}.log', filemode="a+", format='%(asctime)s %(levelname)s: %(message)s', level=level)
         log = logging.getLogger("League of Poro")
         log.info("-------------------------------------------------")
         log.info("---------------- Program started ----------------")

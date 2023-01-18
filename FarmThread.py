@@ -34,14 +34,19 @@ class FarmThread(Thread):
             self.stats.updateStatus(self.account, "[green]LIVE")
             while True:
                 self.browser.getLiveMatches()
-                self.browser.sendWatchToLive()
+                dropsAvailable = self.browser.sendWatchToLive()
                 if self.browser.liveMatches:
-                    liveMatchesMsg = f"{', '.join([m.league for m in self.browser.liveMatches.values()])}"
+                    liveMatchesStatus = []
+                    for m in self.browser.liveMatches.values():
+                        status = dropsAvailable.get(m.league, False)
+                        liveMatchesStatus.append(f"{'[green_yellow]' if status else '[orange1]'}{m.league}{'[/]'}")    
+                    liveMatchesMsg = f"{', '.join(liveMatchesStatus)}"
                 else:
                     liveMatchesMsg = "None"
                 self.stats.update(self.account, 0, liveMatchesMsg)
                 sleep(Browser.STREAM_WATCH_INTERVAL)
         else:
+            self.log.error(f"Login for {self.account} FAILED!")
             self.stats.updateStatus(self.account, "[red]LOGIN FAILED")
 
     def stop(self):

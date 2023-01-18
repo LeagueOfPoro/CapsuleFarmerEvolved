@@ -8,6 +8,7 @@ import argparse
 from rich import print
 
 from Stats import Stats
+from VersionManager import VersionManager
 
 CURRENT_VERSION = 0.3
 
@@ -24,8 +25,13 @@ print("*             https://discord.gg/ebm5MJNvHU             *")
 print("*********************************************************")
 print()
 
+
 config = Config(args.configPath)
 log = Logger().createLogger(config.debug)
+if not VersionManager.isLatestVersion(CURRENT_VERSION):
+    log.warning("!!! NEW VERSION AVAILABLE !!! Download it from: https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest")
+    print("[bold red]!!! NEW VERSION AVAILABLE !!!\nDownload it from: https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest\n")
+
 farmThreads = {}
 stats = Stats(farmThreads)
 for account in config.accounts:

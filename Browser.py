@@ -154,10 +154,16 @@ class Browser:
         """
         Send watch event for all the live matches
         """
+        dropsAvailable = {}
         for tid in self.liveMatches:
             res = self.__sendWatch(self.liveMatches[tid])
             self.log.debug(
                 f"{self.account} - {self.liveMatches[tid].league}: {res.json()}")
+            if res.json()["droppability"] == "on":   
+                dropsAvailable[self.liveMatches[tid].league] = True
+            else:
+                dropsAvailable[self.liveMatches[tid].league] = False
+        return dropsAvailable
 
     def __sendWatch(self, match: Match) -> object:
         """
