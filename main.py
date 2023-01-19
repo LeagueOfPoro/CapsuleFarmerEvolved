@@ -1,7 +1,7 @@
 
 from FarmThread import FarmThread
 from GuiThread import GuiThread
-from Logger.Logger import Logger
+from Logger import Logger
 from Config import Config
 import sys
 import argparse

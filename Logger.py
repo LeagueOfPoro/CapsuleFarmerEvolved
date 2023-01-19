@@ -1,6 +1,5 @@
 import logging
 import logging.config
-from Logger.CustomFormatter import CustomFormatter
 from datetime import datetime
 
 
