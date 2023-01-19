@@ -28,7 +28,6 @@ class FarmThread(Thread):
         """
         Start watching every live match
         """
-        # self.log.info(f"Creating a farm for {self.account}")
         self.stats.updateStatus(self.account, "[green]LOGIN")
         if self.browser.login(self.config.getAccount(self.account)["username"], self.config.getAccount(self.account)["password"]):
             self.stats.updateStatus(self.account, "[green]LIVE")

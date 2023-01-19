@@ -37,20 +37,33 @@ stats = Stats(farmThreads)
 for account in config.accounts:
     stats.initNewAccount(account)
 
+log.info(f"Starting a GUI thread.")
 gui = GuiThread(log, config, stats)
 gui.daemon = True
 gui.start()
 
-for account in config.accounts:
-    thread = FarmThread(log, config, account, stats)
-    thread.daemon = True
-    thread.start()
-    farmThreads[account] = thread
+try:
+    while True:
+        for account in config.accounts:
+            if account not in farmThreads:
+                log.info(f"Starting a thread for {account}.")
+                thread = FarmThread(log, config, account, stats)
+                thread.daemon = True
+                thread.start()
+                farmThreads[account] = thread
+                log.info(f"Thread for {account} was created.")
+        if not farmThreads:
+            break
 
-for thread in farmThreads.values():
-    try:
-        while thread.is_alive():
-            thread.join(1)
-    except (KeyboardInterrupt, SystemExit):
+        toDelete = []
+        for account in farmThreads:
+            if farmThreads[account].is_alive():
+                farmThreads[account].join(1)
+            else:
+                toDelete.append(account)
+                log.warning(f"Thread {account} has finished.")
+        for account in toDelete:
+            del farmThreads[account]
+except (KeyboardInterrupt, SystemExit):
         print('Exitting. Thank you for farming with us!')
         sys.exit()
