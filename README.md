@@ -4,7 +4,7 @@ Are you tired of watching professional League of Legends games? Do you watch onl
 
 **NO WEB BROWSER NEEDED!** The old [EsportsCapsuleFarmer](https://github.com/LeagueOfPoro/EsportsCapsuleFarmer) relied on a web browser to watch videos. *Capsule Farmer Evolved* simulates traffic to lolesports.com servers and tricks it into thinking the account is watching a stream. This approach drastically lowers the hardware requirements.
 
-[Learn more about the esports drops directly from Riot game.](https://lolesports.com/article/lol-esports-2022-season-rewards-and-drops-update!/blt4ae38b4643f45741)
+[Learn more about the esports drops directly from Riot games.](https://lolesports.com/article/lol-esports-2022-season-rewards-and-drops-update!/blt4ae38b4643f45741)
 
 ### Features
 - Automatically logs user in
