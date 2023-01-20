@@ -36,7 +36,7 @@ class Browser:
         self.liveMatches = {}
         self.account = account
 
-    def login(self, username: str, password: str) -> bool:
+    def login(self, username: str, password: str, refreshLock) -> bool:
         """
         Login to the website using given credentials. Obtain necessary tokens.
 
@@ -55,6 +55,10 @@ class Browser:
             "https://auth.riotgames.com/api/v1/authorization", json=data)
         resJson = res.json()
         try:
+            if "multifactor" in resJson.get("type", ""):
+                refreshLock.acquire()
+                twoFactorCode = input(f"Enter 2FA code for {self.account}:\n")
+                refreshLock.release()
             # Finish OAuth2 login
             res = self.client.get(resJson["response"]["parameters"]["uri"])
         except KeyError:

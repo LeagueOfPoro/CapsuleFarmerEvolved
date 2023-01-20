@@ -9,7 +9,7 @@ class GuiThread(Thread):
     A thread that creates a capsule farm for a given account
     """
 
-    def __init__(self, log, config, stats):
+    def __init__(self, log, config, stats, locks):
         """
         Initializes the FarmThread
 
@@ -21,6 +21,7 @@ class GuiThread(Thread):
         self.log = log
         self.config = config
         self.stats = stats
+        self.locks = locks
     
     def generateTable(self):
         table = Table()
@@ -41,10 +42,13 @@ class GuiThread(Thread):
         """
         Report the status of all accounts
         """
-        with Live(self.generateTable(), refresh_per_second=1) as live:
+        with Live(self.generateTable(), auto_refresh=False) as live:
             while True:
                 live.update(self.generateTable())
                 sleep(1)
+                self.locks["refreshLock"].acquire()
+                live.refresh()
+                self.locks["refreshLock"].release()
                 
     def stop(self):
         """
