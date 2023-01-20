@@ -40,7 +40,10 @@ class FarmThread(Thread):
                         liveMatchesStatus = []
                         for m in self.browser.liveMatches.values():
                             status = dropsAvailable.get(m.league, False)
-                            liveMatchesStatus.append(f"{'[green1]' if status else '[orange1]'}{m.league}{'[/]'}")
+                            if status:
+                                liveMatchesStatus.append(f"[green]{m.league}[/]")
+                            else: 
+                                liveMatchesStatus.append(f"{m.league}")
                         self.log.debug(f"{', '.join(liveMatchesStatus)}")    
                         liveMatchesMsg = f"{', '.join(liveMatchesStatus)}"
                     else:
