@@ -44,16 +44,24 @@ gui.start()
 
 try:
     while True:
+        toDelete = []
         for account in config.accounts:
             if account not in farmThreads:
-                log.info(f"Starting a thread for {account}.")
-                thread = FarmThread(log, config, account, stats)
-                thread.daemon = True
-                thread.start()
-                farmThreads[account] = thread
-                log.info(f"Thread for {account} was created.")
+                if stats.getFailedLogins(account) < 3:
+                    log.info(f"Starting a thread for {account}.")
+                    thread = FarmThread(log, config, account, stats)
+                    thread.daemon = True
+                    thread.start()
+                    farmThreads[account] = thread
+                    log.info(f"Thread for {account} was created.")
+                else:
+                    stats.updateStatus(account, "[red]LOGIN FAILED")
+                    log.error(f"Maximum login retries reached for account {account}")
+                    toDelete.append(account)
         if not farmThreads:
             break
+        for account in toDelete:
+            del config.accounts[account]    
 
         toDelete = []
         for account in farmThreads:

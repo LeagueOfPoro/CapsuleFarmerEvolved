@@ -6,7 +6,7 @@ class Stats:
         self.accountData = {}
 
     def initNewAccount(self, accountName: str):
-        self.accountData[accountName] = {"lastCheck": "", "totalDrops": 0, "lastDrop": "", "liveMatches": "", "status": ""}
+        self.accountData[accountName] = {"lastCheck": "", "totalDrops": 0, "lastDrop": "", "liveMatches": "", "status": "[yellow]WAIT", "failedLoginCounter": 0}
     
     def update(self, accountName: str, newDrops: int = 0, liveMatches: str = ""):
         self.accountData[accountName]["lastCheck"] = datetime.now().strftime("%H:%M:%S %d/%m")
@@ -17,4 +17,13 @@ class Stats:
     
     def updateStatus(self, accountName: str, msg: str):
         self.accountData[accountName]["status"] = msg
+
+    def addLoginFailed(self, accountName: str):
+        self.accountData[accountName]["failedLoginCounter"] += 1
+
+    def resetLoginFailed(self, accountName: str):
+        self.accountData[accountName]["failedLoginCounter"] = 0
+    
+    def getFailedLogins(self, accountName: str):
+        return self.accountData[accountName]["failedLoginCounter"]
     

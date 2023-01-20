@@ -32,10 +32,7 @@ class GuiThread(Thread):
         # table.add_column("Drops")
 
         for acc in self.stats.accountData:
-            if acc not in self.stats.farmThreads :
-                status = "[yellow]WAIT"
-            else:
-                status = self.stats.accountData[acc]["status"] if self.stats.farmThreads[acc].is_alive() else "[red]ERROR"
+            status = self.stats.accountData[acc]["status"]
             # table.add_row(f"{acc}", f"{status}", f"{self.stats.accountData[acc]['liveMatches']}", f"{self.stats.accountData[acc]['lastCheck']}", f"{self.stats.accountData[acc]['lastDrop']}", f"{self.stats.accountData[acc]['totalDrops']}")
             table.add_row(f"{acc}", f"{status}", f"{self.stats.accountData[acc]['liveMatches']}", f"{self.stats.accountData[acc]['lastCheck']}")
         return table
