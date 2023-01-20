@@ -59,6 +59,10 @@ class Browser:
                 refreshLock.acquire()
                 twoFactorCode = input(f"Enter 2FA code for {self.account}:\n")
                 refreshLock.release()
+                data = {"type": "multifactor", "code": twoFactorCode, "rememberDevice": True}
+                res = self.client.put(
+                    "https://auth.riotgames.com/api/v1/authorization", json=data)
+                resJson = res.json()
             # Finish OAuth2 login
             res = self.client.get(resJson["response"]["parameters"]["uri"])
         except KeyError:
