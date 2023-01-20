@@ -1,7 +1,7 @@
 
 from FarmThread import FarmThread
 from GuiThread import GuiThread
-from Logger.Logger import Logger
+from Logger import Logger
 from Config import Config
 import sys
 import argparse
@@ -10,7 +10,7 @@ from rich import print
 from Stats import Stats
 from VersionManager import VersionManager
 
-CURRENT_VERSION = 0.3
+CURRENT_VERSION = 0.4
 
 parser = argparse.ArgumentParser(description='Farm Esports Capsules by watching all matches on lolesports.com.')
 parser.add_argument('-c', '--config', dest="configPath", default="./config.yaml",
@@ -37,20 +37,41 @@ stats = Stats(farmThreads)
 for account in config.accounts:
     stats.initNewAccount(account)
 
+log.info(f"Starting a GUI thread.")
 gui = GuiThread(log, config, stats)
 gui.daemon = True
 gui.start()
 
-for account in config.accounts:
-    thread = FarmThread(log, config, account, stats)
-    thread.daemon = True
-    thread.start()
-    farmThreads[account] = thread
+try:
+    while True:
+        toDelete = []
+        for account in config.accounts:
+            if account not in farmThreads:
+                if stats.getFailedLogins(account) < 3:
+                    log.info(f"Starting a thread for {account}.")
+                    thread = FarmThread(log, config, account, stats)
+                    thread.daemon = True
+                    thread.start()
+                    farmThreads[account] = thread
+                    log.info(f"Thread for {account} was created.")
+                else:
+                    stats.updateStatus(account, "[red]LOGIN FAILED")
+                    log.error(f"Maximum login retries reached for account {account}")
+                    toDelete.append(account)
+        if not farmThreads:
+            break
+        for account in toDelete:
+            del config.accounts[account]    
 
-for thread in farmThreads.values():
-    try:
-        while thread.is_alive():
-            thread.join(1)
-    except (KeyboardInterrupt, SystemExit):
+        toDelete = []
+        for account in farmThreads:
+            if farmThreads[account].is_alive():
+                farmThreads[account].join(1)
+            else:
+                toDelete.append(account)
+                log.warning(f"Thread {account} has finished.")
+        for account in toDelete:
+            del farmThreads[account]
+except (KeyboardInterrupt, SystemExit):
         print('Exitting. Thank you for farming with us!')
         sys.exit()

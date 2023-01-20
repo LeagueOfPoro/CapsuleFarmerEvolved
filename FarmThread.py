@@ -28,27 +28,35 @@ class FarmThread(Thread):
         """
         Start watching every live match
         """
-        # self.log.info(f"Creating a farm for {self.account}")
-        self.stats.updateStatus(self.account, "[green]LOGIN")
-        if self.browser.login(self.config.getAccount(self.account)["username"], self.config.getAccount(self.account)["password"]):
-            self.stats.updateStatus(self.account, "[green]LIVE")
-            while True:
-                self.browser.getLiveMatches()
-                dropsAvailable = self.browser.sendWatchToLive()
-                if self.browser.liveMatches:
-                    liveMatchesStatus = []
-                    for m in self.browser.liveMatches.values():
-                        status = dropsAvailable.get(m.league, False)
-                        liveMatchesStatus.append(f"{'[green1]' if status else '[orange1]'}{m.league}{'[/]'}")
-                    self.log.debug(f"{', '.join(liveMatchesStatus)}")    
-                    liveMatchesMsg = f"{', '.join(liveMatchesStatus)}"
-                else:
-                    liveMatchesMsg = "None"
-                self.stats.update(self.account, 0, liveMatchesMsg)
-                sleep(Browser.STREAM_WATCH_INTERVAL)
-        else:
-            self.log.error(f"Login for {self.account} FAILED!")
-            self.stats.updateStatus(self.account, "[red]LOGIN FAILED")
+        try:
+            self.stats.updateStatus(self.account, "[green]LOGIN")
+            if self.browser.login(self.config.getAccount(self.account)["username"], self.config.getAccount(self.account)["password"]):
+                self.stats.updateStatus(self.account, "[green]LIVE")
+                self.stats.resetLoginFailed(self.account)
+                while True:
+                    self.browser.getLiveMatches()
+                    dropsAvailable = self.browser.sendWatchToLive()
+                    if self.browser.liveMatches:
+                        liveMatchesStatus = []
+                        for m in self.browser.liveMatches.values():
+                            status = dropsAvailable.get(m.league, False)
+                            if status:
+                                liveMatchesStatus.append(f"[green]{m.league}[/]")
+                            else: 
+                                liveMatchesStatus.append(f"{m.league}")
+                        self.log.debug(f"{', '.join(liveMatchesStatus)}")    
+                        liveMatchesMsg = f"{', '.join(liveMatchesStatus)}"
+                    else:
+                        liveMatchesMsg = "None"
+                    self.stats.update(self.account, 0, liveMatchesMsg)
+                    sleep(Browser.STREAM_WATCH_INTERVAL)
+            else:
+                self.log.error(f"Login for {self.account} FAILED!")
+                self.stats.updateStatus(self.account, "[red]LOGIN FAILED")
+                self.stats.addLoginFailed(self.account)
+        except Exception:
+            self.log.exception(f"Error in {self.account}. The program will try to recover.")
+
 
     def stop(self):
         """

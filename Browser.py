@@ -6,6 +6,7 @@ from datetime import datetime
 import threading
 from time import sleep
 from Config import Config
+from StatusCodeAssertException import StatusCodeAssertException
 
 
 class Browser:
@@ -106,6 +107,7 @@ class Browser:
             self.maintainSession()
         else:
             self.log.error("Failed to refresh session")
+            raise StatusCodeAssertException(200, resAccessToken.status_code, resAccessToken.request.url) 
 
     def maintainSession(self):
         """
@@ -129,6 +131,8 @@ class Browser:
                    "x-api-key": "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"}
         res = self.client.get(
             "https://esports-api.lolesports.com/persisted/gw/getLive?hl=en-GB", headers=headers)
+        if res.status_code != 200:
+            raise StatusCodeAssertException(200, res.status_code, res.request.url)
         resJson = res.json()
         self.liveMatches = {}
         try:
@@ -179,8 +183,11 @@ class Browser:
                 "tournament_id": match.tournamentId}
         headers = {"Origin": "https://lolesports.com",
                    "Referrer": "https://lolesports.com"}
-        return self.client.post(
+        res = self.client.post(
             "https://rex.rewards.lolesports.com/v1/events/watch", headers=headers, json=data)
+        if res.status_code != 201:
+            raise StatusCodeAssertException(201, res.status_code, res.request.url)
+        return res
 
     def __getLoginTokens(self, form: str) -> tuple[str, str]:
         """
