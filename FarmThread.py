@@ -8,7 +8,7 @@ class FarmThread(Thread):
     A thread that creates a capsule farm for a given account
     """
 
-    def __init__(self, log, config, account, stats):
+    def __init__(self, log, config, account, stats, locks):
         """
         Initializes the FarmThread
 
@@ -23,6 +23,7 @@ class FarmThread(Thread):
         self.account = account
         self.stats = stats
         self.browser = Browser(self.log, self.config, self.account)
+        self.locks = locks
 
     def run(self):
         """
@@ -30,7 +31,7 @@ class FarmThread(Thread):
         """
         try:
             self.stats.updateStatus(self.account, "[green]LOGIN")
-            if self.browser.login(self.config.getAccount(self.account)["username"], self.config.getAccount(self.account)["password"]):
+            if self.browser.login(self.config.getAccount(self.account)["username"], self.config.getAccount(self.account)["password"], self.locks["refreshLock"]):
                 self.stats.updateStatus(self.account, "[green]LIVE")
                 self.stats.resetLoginFailed(self.account)
                 while True:
