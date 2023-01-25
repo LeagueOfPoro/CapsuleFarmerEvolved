@@ -53,7 +53,7 @@ options:
 1. Clone this repo - `git clone https://github.com/LeagueOfPoro/CapsuleFarmerEvolved.git`
 2. Move to the directory -  `cd CapsuleFarmerEvolved`
 3. Install the Python virtual environment - `pipenv install`
-4. (Optional) Edit the configuration file
+4. (Optional) Edit the configuration file - `config.yaml`
 5. Run the tool - `pipenv run python ./main.py`
 
 ### Update
@@ -79,5 +79,37 @@ If you want to build the image locally:
 docker run -it --rm -d -v /path/to/config.yaml:/config/config.yaml  capsulefarmerevolved
 ```
 
-## Known Issues
-- 2FA is not supported
+Docker-Compose:
+
+Edit the `/path/to/config.yaml` to absolute path to your configuration file.
+```
+services:
+  capsulefarmerevolved:
+    image: leagueofporo/capsulefarmer:master
+    container_name: capsulefarmerevolved
+    volumes:
+      - /path/to/config.yaml:/config/config.yaml
+    restart: unless-stopped
+```
+
+Remember to edit your configuration file - see [Configuration](#configuration) for details.
+
+
+## Example of Gui
+```
+*********************************************************
+*   Thank you for using Capsule Farmer Evolved v0.4!    *
+* Please consider supporting League of Poro on YouTube. *
+*    If you need help with the app, join our Discord    *
+*             https://discord.gg/ebm5MJNvHU             *
+*********************************************************
+
+┏━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━┓
+┃ Account     ┃ Status ┃ Live matches                                   ┃ Last check     ┃
+┡━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━┩
+│ accountname │ LIVE   │ La Ligue Française, Esports Balkan League, LLA │ 00:00:00 00/00 │
+└─────────────┴────────┴────────────────────────────────────────────────┴────────────────┘
+```
+
+## Experimental 2FA
+Experimental 2FA build avaliable in [Releases v.0.5-alpha](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/tag/v.0.5-alpha)
