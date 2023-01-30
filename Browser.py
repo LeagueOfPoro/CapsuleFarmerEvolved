@@ -48,17 +48,17 @@ class Browser:
         self.client.get(
             "https://login.leagueoflegends.com/?redirect_uri=https://lolesports.com/&lang=en")
         self.__loadCookies()
-        # Submit credentials
-        data = {"type": "auth", "username": username,
-                "password": password, "remember": True, "language": "en_US"}
-        res = self.client.put(
-            "https://auth.riotgames.com/api/v1/authorization", json=data)
-        resJson = res.json()
         try:
+            refreshLock.acquire()
+            # Submit credentials
+            data = {"type": "auth", "username": username,
+                    "password": password, "remember": True, "language": "en_US"}
+            res = self.client.put(
+                "https://auth.riotgames.com/api/v1/authorization", json=data)
+            resJson = res.json()
             if "multifactor" in resJson.get("type", ""):
-                refreshLock.acquire()
                 twoFactorCode = input(f"Enter 2FA code for {self.account}:\n")
-                refreshLock.release()
+                print("Code sent")
                 data = {"type": "multifactor", "code": twoFactorCode, "rememberDevice": True}
                 res = self.client.put(
                     "https://auth.riotgames.com/api/v1/authorization", json=data)
@@ -67,6 +67,8 @@ class Browser:
             res = self.client.get(resJson["response"]["parameters"]["uri"])
         except KeyError:
             return False
+        finally:
+            refreshLock.release()
         # Login to lolesports.com, riotgames.com, and playvalorant.com
         token, state = self.__getLoginTokens(res.text)
         if token and state:
