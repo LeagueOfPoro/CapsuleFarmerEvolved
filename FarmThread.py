@@ -48,8 +48,8 @@ class FarmThread(Thread):
                                 liveMatchesStatus.append(f"{m.league}")
                         self.log.debug(f"{', '.join(liveMatchesStatus)}")    
                         liveMatchesMsg = f"{', '.join(liveMatchesStatus)}"
-                        newDrops = self.browser.checkNewDrops(self.stats.getLastDropCheck())
-                        self.stats.updateLastDropCheck(int(datetime.now().timestamp()*1e3))
+                        newDrops = self.browser.checkNewDrops(self.stats.getLastDropCheck(self.account))
+                        self.stats.updateLastDropCheck(self.account, int(datetime.now().timestamp()*1e3))
                     else:
                         liveMatchesMsg = "None"
                     self.stats.update(self.account, len(newDrops), liveMatchesMsg)
