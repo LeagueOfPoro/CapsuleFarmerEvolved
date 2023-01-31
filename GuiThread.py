@@ -27,7 +27,7 @@ class GuiThread(Thread):
         table.add_column("Account")
         table.add_column("Status")
         table.add_column("Live matches")
-        table.add_column("Last check")
+        table.add_column("Heartbeat")
         table.add_column("Last drop")
         table.add_column("Drops")
 
