@@ -12,7 +12,7 @@ from pathlib import Path
 from Stats import Stats
 from VersionManager import VersionManager
 
-CURRENT_VERSION = 1.0
+CURRENT_VERSION = 1.1
 
 parser = argparse.ArgumentParser(description='Farm Esports Capsules by watching all matches on lolesports.com.')
 parser.add_argument('-c', '--config', dest="configPath", default="./config.yaml",
