@@ -12,6 +12,7 @@ class Config:
 
         :param configPath: string, path to the configuration file
         """
+        
         self.accounts = {}
         try:
             with open(configPath, "r",  encoding='utf-8') as f:
@@ -24,6 +25,7 @@ class Config:
 
                     }
                 self.debug = config.get("debug", False)
+                self.connectorDrops = config.get("connectorDropsUrl", "")
         except FileNotFoundError as ex:
             print(f"ERROR: The configuration file cannot be found at {configPath}")
             raise ex

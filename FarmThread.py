@@ -1,7 +1,8 @@
+from datetime import datetime
 from threading import Thread
 from time import sleep
 from Browser import Browser
-
+import requests
 
 class FarmThread(Thread):
     """
@@ -36,19 +37,25 @@ class FarmThread(Thread):
                 while True:
                     self.browser.getLiveMatches()
                     dropsAvailable = self.browser.sendWatchToLive()
+                    newDrops = []
                     if self.browser.liveMatches:
                         liveMatchesStatus = []
                         for m in self.browser.liveMatches.values():
-                            status = dropsAvailable.get(m.league, False)
-                            if status:
-                                liveMatchesStatus.append(f"[green]{m.league}[/]")
-                            else: 
-                                liveMatchesStatus.append(f"{m.league}")
+                            # Color code "drops available"
+                            # status = dropsAvailable.get(m.league, False)
+                            # if status:
+                            #     liveMatchesStatus.append(f"[green]{m.league}[/]")
+                            # else: 
+                            liveMatchesStatus.append(f"{m.league}")
                         self.log.debug(f"{', '.join(liveMatchesStatus)}")    
                         liveMatchesMsg = f"{', '.join(liveMatchesStatus)}"
+                        newDrops = self.browser.checkNewDrops(self.stats.getLastDropCheck(self.account))
+                        self.stats.updateLastDropCheck(self.account, int(datetime.now().timestamp()*1e3))
                     else:
                         liveMatchesMsg = "None"
-                    self.stats.update(self.account, 0, liveMatchesMsg)
+                    self.stats.update(self.account, len(newDrops), liveMatchesMsg)
+                    if self.config.connectorDrops:
+                        self.__notifyConnectorDrops(newDrops)
                     sleep(Browser.STREAM_WATCH_INTERVAL)
             else:
                 self.log.error(f"Login for {self.account} FAILED!")
@@ -57,9 +64,13 @@ class FarmThread(Thread):
         except Exception:
             self.log.exception(f"Error in {self.account}. The program will try to recover.")
 
-
     def stop(self):
         """
         Try to stop gracefully
         """
         self.browser.stopMaintaininingSession()
+
+    def __notifyConnectorDrops(self, newDrops: list):
+        if newDrops:
+            requests.post(self.config.connectorDrops, json=newDrops)
+

@@ -168,6 +168,18 @@ class Browser:
             else:
                 dropsAvailable[self.liveMatches[tid].league] = False
         return dropsAvailable
+    
+    def checkNewDrops(self, lastCheckTime):
+        try:
+            headers = {"Origin": "https://lolesports.com",
+                   "Referrer": "https://lolesports.com",
+                   "Authorization": "Cookie access_token"}
+            res = self.client.get("https://account.service.lolesports.com/fandom-account/v1/earnedDrops?locale=en_GB&site=LOLESPORTS", headers=headers)
+            resJson = res.json()
+            return [drop for drop in resJson if lastCheckTime <= drop["unlockedDateMillis"]]
+        except KeyError:
+            self.log.debug("Drop check failed")
+            return []
 
     def __sendWatch(self, match: Match) -> object:
         """
