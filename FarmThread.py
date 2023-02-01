@@ -41,11 +41,12 @@ class FarmThread(Thread):
                     if self.browser.liveMatches:
                         liveMatchesStatus = []
                         for m in self.browser.liveMatches.values():
-                            status = dropsAvailable.get(m.league, False)
-                            if status:
-                                liveMatchesStatus.append(f"[green]{m.league}[/]")
-                            else: 
-                                liveMatchesStatus.append(f"{m.league}")
+                            # Color code "drops available"
+                            # status = dropsAvailable.get(m.league, False)
+                            # if status:
+                            #     liveMatchesStatus.append(f"[green]{m.league}[/]")
+                            # else: 
+                            liveMatchesStatus.append(f"{m.league}")
                         self.log.debug(f"{', '.join(liveMatchesStatus)}")    
                         liveMatchesMsg = f"{', '.join(liveMatchesStatus)}"
                         newDrops = self.browser.checkNewDrops(self.stats.getLastDropCheck(self.account))
