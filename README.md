@@ -13,6 +13,9 @@ This is a successor to the old [EsportsCapsuleFarmer](https://github.com/LeagueO
 - Simple GUI
 - 2FA (experimental) - programs prompts for the code on startup
 
+### Discord
+Share your drops or just come hangout to League of Poro's Discord server: https://discord.gg/c2Qs9Y83hh 
+
 ## Installation
 1. Download and run the latest CapsuleFarmerEvolved.zip from [Releases tab](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases)
 2. Extract the archive
@@ -99,5 +102,7 @@ If you want to build the image locally:
 docker run -it --rm -d -v /path/to/config.yaml:/config/config.yaml  capsulefarmerevolved
 ```
 
-## Known Issues
-- 2FA is not supported
+## Support my work
+[Subscribe to my channel on YouTube](https://www.youtube.com/channel/UCwgpdTScSd788qILhLnyyyw?sub_confirmation=1) or even
+
+<a href='https://www.youtube.com/channel/UCwgpdTScSd788qILhLnyyyw/join' target='_blank'><img height='35' style='border:0px;height:46px;' src='https://share.leagueofporo.com/yt_member.png' border='0' alt='Become a channel member on YouTube' />
