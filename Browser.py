@@ -7,6 +7,8 @@ import threading
 from time import sleep
 from Config import Config
 from StatusCodeAssertException import StatusCodeAssertException
+import pickle
+from pathlib import Path
 
 
 class Browser:
@@ -34,7 +36,7 @@ class Browser:
         self.liveMatches = {}
         self.account = account
 
-    def login(self, username: str, password: str) -> bool:
+    def login(self, username: str, password: str, refreshLock) -> bool:
         """
         Login to the website using given credentials. Obtain necessary tokens.
 
@@ -45,18 +47,28 @@ class Browser:
         # Get necessary cookies from the main page
         self.client.get(
             "https://login.leagueoflegends.com/?redirect_uri=https://lolesports.com/&lang=en")
-
-        # Submit credentials
-        data = {"type": "auth", "username": username,
-                "password": password, "remember": True, "language": "en_US"}
-        res = self.client.put(
-            "https://auth.riotgames.com/api/v1/authorization", json=data)
-        resJson = res.json()
+        self.__loadCookies()
         try:
+            refreshLock.acquire()
+            # Submit credentials
+            data = {"type": "auth", "username": username,
+                    "password": password, "remember": True, "language": "en_US"}
+            res = self.client.put(
+                "https://auth.riotgames.com/api/v1/authorization", json=data)
+            resJson = res.json()
+            if "multifactor" in resJson.get("type", ""):
+                twoFactorCode = input(f"Enter 2FA code for {self.account}:\n")
+                print("Code sent")
+                data = {"type": "multifactor", "code": twoFactorCode, "rememberDevice": True}
+                res = self.client.put(
+                    "https://auth.riotgames.com/api/v1/authorization", json=data)
+                resJson = res.json()
             # Finish OAuth2 login
             res = self.client.get(resJson["response"]["parameters"]["uri"])
         except KeyError:
             return False
+        finally:
+            refreshLock.release()
         # Login to lolesports.com, riotgames.com, and playvalorant.com
         token, state = self.__getLoginTokens(res.text)
         if token and state:
@@ -92,6 +104,7 @@ class Browser:
                 "https://account.rewards.lolesports.com/v1/session/clientconfig/rms", headers=headers)
             if resAccessToken.status_code == 200:
                 self.maintainSession()
+                self.__dumpCookies()
                 return True
         return False
 
@@ -105,6 +118,7 @@ class Browser:
             "https://account.rewards.lolesports.com/v1/session/refresh", headers=headers)
         if resAccessToken.status_code == 200:
             self.maintainSession()
+            self.__dumpCookies()
         else:
             self.log.error("Failed to refresh session")
             raise StatusCodeAssertException(200, resAccessToken.status_code, resAccessToken.request.url) 
@@ -216,3 +230,14 @@ class Browser:
         if tokenInput := page.find("input", {"name": "state"}):
             state = tokenInput.get("value", "")
         return token, state
+
+    def __dumpCookies(self):
+        with open(f'./sessions/{self.account}.saved', 'wb') as f:
+            pickle.dump(self.client.cookies, f)
+
+    def __loadCookies(self):
+        if Path(f'./sessions/{self.account}.saved').exists():
+            with open(f'{self.account}.saved', 'rb') as f:
+                self.client.cookies.update(pickle.load(f))
+                return True
+        return False

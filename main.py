@@ -1,11 +1,13 @@
 
 from FarmThread import FarmThread
 from GuiThread import GuiThread
+from threading import Lock
 from Logger import Logger
 from Config import Config
 import sys
 import argparse
 from rich import print
+from pathlib import Path
 
 from Stats import Stats
 from VersionManager import VersionManager
@@ -25,7 +27,8 @@ print("*             https://discord.gg/ebm5MJNvHU             *")
 print("*********************************************************")
 print()
 
-
+Path("./logs/").mkdir(parents=True, exist_ok=True)
+Path("./sessions/").mkdir(parents=True, exist_ok=True)
 config = Config(args.configPath)
 log = Logger().createLogger(config.debug)
 if not VersionManager.isLatestVersion(CURRENT_VERSION):
@@ -33,12 +36,14 @@ if not VersionManager.isLatestVersion(CURRENT_VERSION):
     print("[bold red]!!! NEW VERSION AVAILABLE !!!\nDownload it from: https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest\n")
 
 farmThreads = {}
+refreshLock = Lock()
+locks = {"refreshLock": refreshLock}
 stats = Stats(farmThreads)
 for account in config.accounts:
     stats.initNewAccount(account)
 
 log.info(f"Starting a GUI thread.")
-gui = GuiThread(log, config, stats)
+gui = GuiThread(log, config, stats, locks)
 gui.daemon = True
 gui.start()
 
@@ -49,7 +54,7 @@ try:
             if account not in farmThreads:
                 if stats.getFailedLogins(account) < 3:
                     log.info(f"Starting a thread for {account}.")
-                    thread = FarmThread(log, config, account, stats)
+                    thread = FarmThread(log, config, account, stats, locks)
                     thread.daemon = True
                     thread.start()
                     farmThreads[account] = thread
