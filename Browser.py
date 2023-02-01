@@ -237,7 +237,7 @@ class Browser:
 
     def __loadCookies(self):
         if Path(f'./sessions/{self.account}.saved').exists():
-            with open(f'{self.account}.saved', 'rb') as f:
+            with open(f'./sessions/{self.account}.saved', 'rb') as f:
                 self.client.cookies.update(pickle.load(f))
                 return True
         return False
