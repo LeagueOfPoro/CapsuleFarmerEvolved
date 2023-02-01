@@ -232,11 +232,11 @@ class Browser:
         return token, state
 
     def __dumpCookies(self):
-        with open(f'{self.account}.saved', 'wb') as f:
+        with open(f'./sessions/{self.account}.saved', 'wb') as f:
             pickle.dump(self.client.cookies, f)
 
     def __loadCookies(self):
-        if Path(f'{self.account}.saved').exists():
+        if Path(f'./sessions/{self.account}.saved').exists():
             with open(f'{self.account}.saved', 'rb') as f:
                 self.client.cookies.update(pickle.load(f))
                 return True

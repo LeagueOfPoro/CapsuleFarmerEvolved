@@ -7,6 +7,7 @@ from Config import Config
 import sys
 import argparse
 from rich import print
+from pathlib import Path
 
 from Stats import Stats
 from VersionManager import VersionManager
@@ -26,7 +27,8 @@ print("*             https://discord.gg/ebm5MJNvHU             *")
 print("*********************************************************")
 print()
 
-
+Path("./logs/").mkdir(parents=True, exist_ok=True)
+Path("./sessions/").mkdir(parents=True, exist_ok=True)
 config = Config(args.configPath)
 log = Logger().createLogger(config.debug)
 if not VersionManager.isLatestVersion(CURRENT_VERSION):
