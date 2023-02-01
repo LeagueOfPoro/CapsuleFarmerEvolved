@@ -2,22 +2,22 @@
 
 Are you tired of watching professional League of Legends games? Do you watch only for the drops? This is a revolution in the farming of League of Legends Esports capsules!
 
-**NO WEB BROWSER NEEDED!** The old [EsportsCapsuleFarmer](https://github.com/LeagueOfPoro/EsportsCapsuleFarmer) relied on a web browser to watch videos. *Capsule Farmer Evolved* simulates traffic to lolesports.com servers and tricks it into thinking the account is watching a stream. This approach drastically lowers the hardware requirements.
+This is a successor to the old [EsportsCapsuleFarmer](https://github.com/LeagueOfPoro/EsportsCapsuleFarmer) which relied on a web browser to watch videos. *Capsule Farmer Evolved* simulates traffic to lolesports.com servers and tricks it into thinking the account is watching a stream. This approach drastically lowers the hardware requirements.
 
 [Learn more about the esports drops directly from Riot games.](https://lolesports.com/article/lol-esports-2022-season-rewards-and-drops-update!/blt4ae38b4643f45741)
 
 ### Features
-- Automatically logs user in
-- Watches every live match
-- Lightweight
-- No web browser needed
+- Watch every live match
+- Show how many drops each account received during the program run
+- Very lightweight - no external browser needed
+- Simple GUI
+- 2FA (experimental) - programs prompts for the code on startup
 
 ## Installation
 1. Download and run the latest CapsuleFarmerEvolved.zip from [Releases tab](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases)
 2. Extract the archive
 3. Edit the configuration file `config.yaml` with a text editor (e.g. Notepad) - see [Configuration](#configuration) for details
 4. Run `CapsuleFarmer.exe`
-5. If you do not use the autologin feature - log into your account 
 
 ## Configuration
 Fill out your username and password in `config.yaml`. Name of the account groups is not important but I recommend entering something recognizable to better detect problems with the account. 
@@ -26,11 +26,31 @@ accounts:
   accountname:
     username: "username"
     password: "password"
-  anotheraccountname:
+```
+You can add as many accounts as you want. _(But be reasonable)_ Example:
+```yaml
+accounts:
+  accountname:
     username: "username"
     password: "password"
-debug: True
+  changethistowhatever:
+    username: "Riot Poro"
+    password: "1234"
 ```
+
+In case of problem, enable debugging mode to invrease verbosity of the log:
+`debug: True`
+
+You can select a non-default configuration file, see [CLI](#cli)
+```bash
+capsulefarmerevolved.exe --config secret.yaml
+```
+
+## Notes
+- I recommend disabling 2FA on accounts using the bot. It will be way more stable, and it won't ask you for a code in the middle of a random night.
+- Not every account receives every drop. That is normal, and it would happen even if you watched it on the web.
+![image](https://user-images.githubusercontent.com/95635582/215994461-4f613b76-0e96-4b1a-b138-f1caa748df65.png)
+- Regularly check if the "Heartbeat" happened within the last few minutes. If not, restart the program.
 
 ## CLI
 ```
@@ -53,7 +73,7 @@ options:
 1. Clone this repo - `git clone https://github.com/LeagueOfPoro/CapsuleFarmerEvolved.git`
 2. Move to the directory -  `cd CapsuleFarmerEvolved`
 3. Install the Python virtual environment - `pipenv install`
-4. (Optional) Edit the configuration file
+4. Edit the configuration file
 5. Run the tool - `pipenv run python ./main.py`
 
 ### Update
