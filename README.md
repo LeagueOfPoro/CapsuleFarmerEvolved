@@ -12,6 +12,7 @@ This is a successor to the old [EsportsCapsuleFarmer](https://github.com/LeagueO
 - Very lightweight - no external browser needed
 - Simple GUI
 - 2FA (experimental) - programs prompts for the code on startup
+- ARM supported (Raspberry Pi)
 
 ### Discord
 Share your drops or just come hangout to League of Poro's Discord server: https://discord.gg/c2Qs9Y83hh 
