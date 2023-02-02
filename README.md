@@ -23,6 +23,8 @@ Share your drops or just come hangout to League of Poro's Discord server: https:
 3. Edit the configuration file `config.yaml` with a text editor (e.g. Notepad) - see [Configuration](#configuration) for details
 4. Run `CapsuleFarmer.exe`
 
+There's a [Quickstart guide](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/wiki/Quickstart-guide) if you have issues
+
 ## Configuration
 Fill out your username and password in `config.yaml`. Name of the account groups is not important but I recommend entering something recognizable to better detect problems with the account. 
 ```yaml
