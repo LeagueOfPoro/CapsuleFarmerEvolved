@@ -1,4 +1,4 @@
-FROM python:3.10-slim as base
+FROM python:3.10-slim-buster as base
 
 # Setup env
 ENV LANG C.UTF-8
@@ -24,9 +24,9 @@ COPY --from=python-deps /.venv /.venv
 ENV PATH="/.venv/bin:$PATH"
 
 # Create and switch to a new user
-RUN useradd --create-home appuser
-WORKDIR /home/appuser
-USER appuser
+# RUN useradd --create-home appuser
+# WORKDIR /home/appuser
+# USER appuser
 
 # Install application into container
 COPY . .
