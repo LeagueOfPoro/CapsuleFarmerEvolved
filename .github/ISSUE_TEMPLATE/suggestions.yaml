@@ -1,0 +1,33 @@
+name: Feature Request
+description: Suggest an idea for this project
+title: "[Suggestion]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this feature request! Please ensure this issue is not already reported by searching the [issue tracker](https://https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/issues) for a similar issue. Please do not use this template for questions! If you have a question, please ask it our Discord server. If you have a bug report, please use the bug report template.
+  - type: textarea
+    id: your-idea
+    attributes:
+      label: What is your idea?
+      description: Please be as descriptive as possible. Explain what you want to happen, and why you think it would be a good addition to Capsule Farmer.
+      placeholder: Tell us what you want!
+    validations:
+      required: true
+  - type: textarea
+    id: what-should-happen
+    attributes:
+      label: What should happen?
+      description: What you expected to happen. If you have a suggestion, tell us how you think it should work.
+      placeholder: Tell us what you expect!
+    validations:
+      required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: My request is not a question
+      description: Please ensure that you are not asking a question. If you have a question, please ask it our Discord server. If you have a bug report, please use the issue request template. By submitting this suggestion, you agree this request is not a question or a bug report. Your issue will be closed if it is a question or a bug report.
+      options:
+        - label: I acknowledge that this issue is not a question or a bug request.
+          required: true
