@@ -33,4 +33,4 @@ COPY . .
 
 # Run the application
 ENTRYPOINT ["python", "main.py"]
-CMD ["--config", "/config/config.yaml"]
+CMD ["--config", "config.yaml"]
