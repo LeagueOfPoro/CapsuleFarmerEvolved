@@ -18,7 +18,7 @@ This is a successor to the old [EsportsCapsuleFarmer](https://github.com/LeagueO
 Share your drops or just come hangout to League of Poro's Discord server: https://discord.gg/c2Qs9Y83hh 
 
 ## Installation
-1. Download and run the latest CapsuleFarmerEvolved.zip from [Releases tab](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases)
+1. Download and run the latest CapsuleFarmerEvolved.zip from [Releases tab](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest)
 2. Extract the archive
 3. Edit the configuration file `config.yaml` with a text editor (e.g. Notepad) - see [Configuration](#configuration) for details
 4. Run `CapsuleFarmer.exe`
