@@ -94,7 +94,7 @@ Pre-built image:
 
 Edit the `/path/to/config.yaml` to absolute path to your configuration file and run the container in the background:
 ```
-docker run -it --rm --restart unless-stopped --name CapsuleFarmer -d -v /path/to/config.yaml:/config/config.yaml  leagueofporo/capsulefarmer:master
+docker run -it --restart unless-stopped --name CapsuleFarmer -d -v /path/to/config.yaml:/config/config.yaml  leagueofporo/capsulefarmer:master
 ```
 
 If you want to build the image locally:
@@ -102,7 +102,7 @@ If you want to build the image locally:
 2. Build the image: `docker build -t capsulefarmerevolved .`
 3. Edit the `/path/to/config.yaml` to absolute path to your configuration file and run the container in the background:
 ```docker
-docker run -it --rm --restart unless-stopped -d -v /path/to/config.yaml:/config/config.yaml  capsulefarmerevolved
+docker run -it --restart unless-stopped -d -v /path/to/config.yaml:/config/config.yaml  capsulefarmerevolved
 ```
 
 ## Support my work
