@@ -6,7 +6,7 @@ from datetime import datetime
 import threading
 from time import sleep
 from Config import Config
-from StatusCodeAssertException import StatusCodeAssertException
+from Exceptions.StatusCodeAssertException import StatusCodeAssertException
 import pickle
 from pathlib import Path
 
