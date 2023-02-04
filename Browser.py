@@ -97,13 +97,13 @@ class Browser:
                 if resAccessToken.status_code == 200:
                     break
                 else:
-                    sleep(1)
+                    sleep(3)
 
             # Currently unused but the call might be important server-side
             resPasToken = self.client.get(
                 "https://account.rewards.lolesports.com/v1/session/clientconfig/rms", headers=headers)
             if resAccessToken.status_code == 200:
-                self.maintainSession()
+                #self.maintainSession()
                 self.__dumpCookies()
                 return True
         return False
@@ -191,7 +191,7 @@ class Browser:
             res = self.client.get("https://account.service.lolesports.com/fandom-account/v1/earnedDrops?locale=en_GB&site=LOLESPORTS", headers=headers)
             resJson = res.json()
             return [drop for drop in resJson if lastCheckTime <= drop["unlockedDateMillis"]]
-        except KeyError:
+        except (KeyError, TypeError):
             self.log.debug("Drop check failed")
             return []
 
