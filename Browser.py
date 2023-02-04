@@ -1,3 +1,4 @@
+from Exceptions.RateLimitException import RateLimitException
 from Match import Match
 import cloudscraper
 from pprint import pprint
@@ -55,6 +56,10 @@ class Browser:
                     "password": password, "remember": True, "language": "en_US"}
             res = self.client.put(
                 "https://auth.riotgames.com/api/v1/authorization", json=data)
+            if res.status_code == 429:
+                retryAfter = res.headers['Retry-after']
+                raise RateLimitException(retryAfter)
+                
             resJson = res.json()
             if "multifactor" in resJson.get("type", ""):
                 twoFactorCode = input(f"Enter 2FA code for {self.account}:\n")
