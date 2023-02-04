@@ -81,7 +81,7 @@ class FarmThread(Thread):
                     rewardImage = newDrops[x]["inventory"][0]["localizedInventory"]["inventory"]["imageUrl"]
 
                     embed = {
-                        "title": f"{title}",
+                        "title": f"[{self.account}] {title}",
                         "description": f"We claimed an **{reward}** from <https://lolesports.com/rewards>",
                         "image" : {"url": f"{thumbnail}"},
                         "thumbnail": {"url": f"{rewardImage}"},
@@ -89,8 +89,7 @@ class FarmThread(Thread):
                     }
 
                     params = {
-                        "username" : "LoL Esports",
-                        "avatar_url": "http://assets.lolesports.com/watch/lolesports-icon-ice.png",
+                        "username" : "CapsuleFarmerEvolved",
                         "embeds": [embed]
                     }
                     requests.post(self.config.connectorDrops, headers={"Content-type":"application/json"}, json=params)
