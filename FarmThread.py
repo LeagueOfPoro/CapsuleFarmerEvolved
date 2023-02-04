@@ -60,8 +60,11 @@ class FarmThread(Thread):
                     sleep(Browser.STREAM_WATCH_INTERVAL)
             else:
                 self.log.error(f"Login for {self.account} FAILED!")
-                self.stats.updateStatus(self.account, "[red]LOGIN FAILED")
                 self.stats.addLoginFailed(self.account)
+                if self.stats.getFailedLogins(self.account) < 3:
+                    self.stats.updateStatus(self.account, "[red]LOGIN FAILED - WILL RETRY SOON")
+                else:
+                    self.stats.updateStatus(self.account, "[red]LOGIN FAILED")
         except Exception:
             self.log.exception(f"Error in {self.account}. The program will try to recover.")
 
