@@ -1,4 +1,4 @@
-# Capsule Farmer Evolved
+# Capsule Farmer Evolved :D
 
 Are you tired of watching professional League of Legends games? Do you watch only for the drops? This is a revolution in the farming of League of Legends Esports capsules!
 
