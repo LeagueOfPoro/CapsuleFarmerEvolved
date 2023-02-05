@@ -6,7 +6,7 @@ from dataclasses import dataclass
 
 @dataclass
 class Match:
-    tournamentId: string
-    league: string
-    streamChannel: string
-    streamSource: string
+    tournamentId: str
+    league: str
+    streamChannel: str
+    streamSource: str
