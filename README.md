@@ -44,7 +44,7 @@ accounts:
     password: "1234"
 ```
 
-In case of problem, enable debugging mode to invrease verbosity of the log:
+In case of problem, enable debugging mode to increase verbosity of the log:
 `debug: True`
 
 You can select a non-default configuration file, see [CLI](#cli)
