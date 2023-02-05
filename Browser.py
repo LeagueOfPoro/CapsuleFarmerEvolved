@@ -191,15 +191,15 @@ class Browser:
             return []
 
     def __needSessionRefresh(self) -> bool:
-        if "access_token" in self.client.cookies.get_dict():
-            res = jwt.decode(self.client.cookies.get_dict()["access_token"], options={"verify_signature": False})
-            timeLeft = res['exp'] - int(time())
-            self.log.debug(f"{timeLeft} s until session expires.")
-            if timeLeft < 600:
-                return True
-            return False
-        else:
+        if "access_token" not in self.client.cookies.get_dict():
             raise NoAccessTokenException()
+
+        res = jwt.decode(self.client.cookies.get_dict()["access_token"], options={"verify_signature": False})
+        timeLeft = res['exp'] - int(time())
+        self.log.debug(f" s until session expires.")
+        if timeLeft < 600:
+            return True
+        return False
 
     def __sendWatch(self, match: Match) -> object:
         """
