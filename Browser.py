@@ -196,7 +196,7 @@ class Browser:
 
         res = jwt.decode(self.client.cookies.get_dict()["access_token"], options={"verify_signature": False})
         timeLeft = res['exp'] - int(time())
-        self.log.debug(f" s until session expires.")
+        self.log.debug(f"{timeLeft} s until session expires.")
         if timeLeft < 600:
             return True
         return False
