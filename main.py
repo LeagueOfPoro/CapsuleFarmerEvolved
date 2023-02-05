@@ -34,7 +34,7 @@ def init() -> tuple[logging.Logger, Config]:
     Path("./logs/").mkdir(parents=True, exist_ok=True)
     Path("./sessions/").mkdir(parents=True, exist_ok=True)
     config = Config(args.configPath)
-    log = LoggerInit.create_logger()
+    log = LoggerInit.create_logger(False)
     if not VersionManager.is_latest_version(CURRENT_VERSION):
         log.warning(
             "!!! NEW VERSION AVAILABLE !!! Download it from: https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest")
@@ -101,6 +101,6 @@ if __name__ == '__main__':
     except CapsuleFarmerEvolvedException as e:
         # Added null check to prevent issues with failure in init.
         if log_instance is None:
-            LoggerInit.create_logger().error(f'An error has occurred: {e}')
+            LoggerInit.create_logger(False).error(f'An error has occurred: {e}')
         else:
             log_instance.error(f'An error has occurred: {e}')
