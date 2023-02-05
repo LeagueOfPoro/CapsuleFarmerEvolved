@@ -10,33 +10,32 @@ class Config:
     A class that loads and stores the configuration
     """
 
-    def __init__(self, configPath: str) -> None:
+    def __init__(self, config_path: str) -> None:
         """
         Loads the configuration file into the Config object
 
-        :param configPath: string, path to the configuration file
+        :param config_path: string, path to the configuration file
         """
         
         self.accounts = {}
         try:
-            with open(configPath, "r",  encoding='utf-8') as f:
+            with open(config_path, "r", encoding='utf-8') as f:
                 config = yaml.safe_load(f)
-                accs = config.get("accounts")
-                onlyDefaultUsername = True
-                for account in accs:
+                all_accounts = config.get("accounts")
+                only_default_username = True
+                for account in all_accounts:
                     self.accounts[account] = {
-                        "username": accs[account]["username"],
-                        "password": accs[account]["password"],
-
+                        "username": all_accounts[account]["username"],
+                        "password": all_accounts[account]["password"],
                     }
-                    if "username" != accs[account]["username"]:
-                        onlyDefaultUsername = False
-                if onlyDefaultUsername:
+                    if "username" != all_accounts[account]["username"]:
+                        only_default_username = False
+                if only_default_username:
                     raise InvalidCredentialsException                    
                 self.debug = config.get("debug", False)
                 self.connectorDrops = config.get("connectorDropsUrl", "")
         except FileNotFoundError as ex:
-            print(f"[red]CRITICAL ERROR: The configuration file cannot be found at {configPath}\nHave you extacted the ZIP archive and edited the configuration file?")
+            print(f"[red]CRITICAL ERROR: The configuration file cannot be found at {config_path}\nHave you extracted the ZIP archive and edited the configuration file?")
             print("Press any key to exit...")
             input()
             raise ex
@@ -54,7 +53,7 @@ class Config:
         with open("bestStreams.txt", "r",  encoding='utf-8') as f:
             self.bestStreams = f.read().splitlines()
 
-    def getAccount(self, account: str) -> dict:
+    def get_account(self, account: str) -> dict:
         """
         Get account information
 

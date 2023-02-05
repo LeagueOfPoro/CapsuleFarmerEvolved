@@ -1,12 +1,12 @@
-
 from Exceptions.CapsuleFarmerEvolvedException import CapsuleFarmerEvolvedException
 from FarmThread import FarmThread
 from GuiThread import GuiThread
 from threading import Lock
-from Logger import Logger
+from LoggerInit import LoggerInit
 from Config import Config
 import sys
 import argparse
+import logging
 from rich import print
 from pathlib import Path
 from time import sleep
@@ -14,10 +14,10 @@ from time import sleep
 from Stats import Stats
 from VersionManager import VersionManager
 
-
 CURRENT_VERSION = 1.2
 
-def init() -> tuple[Logger, Config]:
+
+def init() -> tuple[logging.Logger, Config]:
     parser = argparse.ArgumentParser(description='Farm Esports Capsules by watching all matches on lolesports.com.')
     parser.add_argument('-c', '--config', dest="configPath", default="./config.yaml",
                         help='Path to a custom config file')
@@ -34,20 +34,23 @@ def init() -> tuple[Logger, Config]:
     Path("./logs/").mkdir(parents=True, exist_ok=True)
     Path("./sessions/").mkdir(parents=True, exist_ok=True)
     config = Config(args.configPath)
-    log = Logger().createLogger(config.debug)
-    if not VersionManager.isLatestVersion(CURRENT_VERSION):
-        log.warning("!!! NEW VERSION AVAILABLE !!! Download it from: https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest")
-        print("[bold red]!!! NEW VERSION AVAILABLE !!!\nDownload it from: https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest\n")
+    log = LoggerInit.create_logger()
+    if not VersionManager.is_latest_version(CURRENT_VERSION):
+        log.warning(
+            "!!! NEW VERSION AVAILABLE !!! Download it from: https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest")
+        print(
+            "[bold red]!!! NEW VERSION AVAILABLE !!!\nDownload it from: https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest\n")
 
     return log, config
 
-def main(log: Logger, config: Config):
-    farmThreads = {}
-    refreshLock = Lock()
-    locks = {"refreshLock": refreshLock}
-    stats = Stats(farmThreads)
+
+def main(log: logging.Logger, config: Config):
+    farm_threads = {}
+    refresh_lock = Lock()
+    locks = {"refreshLock": refresh_lock}
+    stats = Stats(farm_threads)
     for account in config.accounts:
-        stats.initNewAccount(account)
+        stats.init_new_account(account)
 
     log.info(f"Starting a GUI thread.")
     gui = GuiThread(log, config, stats, locks)
@@ -55,44 +58,49 @@ def main(log: Logger, config: Config):
     gui.start()
 
     while True:
-        toDelete = []
+        to_delete = []
         for account in config.accounts:
-            if account not in farmThreads:
-                if stats.getFailedLogins(account) < 3:
-                    if stats.getFailedLogins(account) > 0:
+            if account not in farm_threads:
+                if stats.get_failed_logins(account) < 3:
+                    if stats.get_failed_logins(account) > 0:
                         log.debug("Sleeping {account} before retrying login.")
                         sleep(30)
                     log.info(f"Starting a thread for {account}.")
                     thread = FarmThread(log, config, account, stats, locks)
                     thread.daemon = True
                     thread.start()
-                    farmThreads[account] = thread
+                    farm_threads[account] = thread
                     log.info(f"Thread for {account} was created.")
                 else:
-                    stats.updateStatus(account, "[red]LOGIN FAILED")
+                    stats.update_status(account, "[red]LOGIN FAILED")
                     log.error(f"Maximum login retries reached for account {account}")
-                    toDelete.append(account)
-        if not farmThreads:
+                    to_delete.append(account)
+        if not farm_threads:
             break
-        for account in toDelete:
-            del config.accounts[account]    
+        for account in to_delete:
+            del config.accounts[account]
 
-        toDelete = []
-        for account in farmThreads:
-            if farmThreads[account].is_alive():
-                farmThreads[account].join(1)
+        to_delete = []
+        for account in farm_threads:
+            if farm_threads[account].is_alive():
+                farm_threads[account].join(1)
             else:
-                toDelete.append(account)
+                to_delete.append(account)
                 log.warning(f"Thread {account} has finished.")
-        for account in toDelete:
-            del farmThreads[account]
+        for account in to_delete:
+            del farm_threads[account]
+
 
 if __name__ == '__main__':
     try:
-        log, config = init()
-        main(log, config)
+        log_instance, loaded_config = init()
+        main(log_instance, loaded_config)
     except (KeyboardInterrupt, SystemExit):
-        print('Exitting. Thank you for farming with us!')
+        print('Exiting. Thank you for farming with us!')
         sys.exit()
     except CapsuleFarmerEvolvedException as e:
-        log.error(f'An error has occured: {e}')
+        # Added null check to prevent issues with failure in init.
+        if log_instance is None:
+            LoggerInit.create_logger().error(f'An error has occurred: {e}')
+        else:
+            log_instance.error(f'An error has occurred: {e}')

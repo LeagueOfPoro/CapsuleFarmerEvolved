@@ -1,11 +1,11 @@
+import requests
+
 from Exceptions.NoAccessTokenException import NoAccessTokenException
 from Exceptions.RateLimitException import RateLimitException
 from Match import Match
 import cloudscraper
-from pprint import pprint
 from bs4 import BeautifulSoup
 from datetime import datetime
-import threading
 from time import sleep, time
 from Config import Config
 from Exceptions.StatusCodeAssertException import StatusCodeAssertException
@@ -32,52 +32,53 @@ class Browser:
                 'platform': 'windows',
                 'desktop': True
             },
-            debug=config.getAccount(account).get("debug", False))
+            debug=config.get_account(account).get("debug", False))
         self.log = log
         self.config = config
         self.currentlyWatching = {}
         self.liveMatches = {}
         self.account = account
 
-    def login(self, username: str, password: str, refreshLock) -> bool:
+    def login(self, username: str, password: str, refresh_lock) -> bool:
         """
         Login to the website using given credentials. Obtain necessary tokens.
 
         :param username: string, username of the account
         :param password: string, password of the account
+        :param refresh_lock: lock TODO: document param
         :return: boolean, login successful or not
         """
         # Get necessary cookies from the main page
         self.client.get(
             "https://login.leagueoflegends.com/?redirect_uri=https://lolesports.com/&lang=en")
-        self.__loadCookies()
+        self.__load_cookies()
         try:
-            refreshLock.acquire()
+            refresh_lock.acquire()
             # Submit credentials
             data = {"type": "auth", "username": username,
                     "password": password, "remember": True, "language": "en_US"}
             res = self.client.put(
                 "https://auth.riotgames.com/api/v1/authorization", json=data)
             if res.status_code == 429:
-                retryAfter = res.headers['Retry-after']
-                raise RateLimitException(retryAfter)
-                
-            resJson = res.json()
-            if "multifactor" in resJson.get("type", ""):
-                twoFactorCode = input(f"Enter 2FA code for {self.account}:\n")
+                retry_after = res.headers['Retry-after']
+                raise RateLimitException(retry_after)
+
+            res_json = res.json()
+            if "multifactor" in res_json.get("type", ""):
+                two_factor_code = input(f"Enter 2FA code for {self.account}:\n")
                 print("Code sent")
-                data = {"type": "multifactor", "code": twoFactorCode, "rememberDevice": True}
+                data = {"type": "multifactor", "code": two_factor_code, "rememberDevice": True}
                 res = self.client.put(
                     "https://auth.riotgames.com/api/v1/authorization", json=data)
-                resJson = res.json()
+                res_json = res.json()
             # Finish OAuth2 login
-            res = self.client.get(resJson["response"]["parameters"]["uri"])
+            res = self.client.get(res_json["response"]["parameters"]["uri"])
         except KeyError:
             return False
         finally:
-            refreshLock.release()
+            refresh_lock.release()
         # Login to lolesports.com, riotgames.com, and playvalorant.com
-        token, state = self.__getLoginTokens(res.text)
+        token, state = self.__get_login_tokens(res.text)
         if token and state:
             data = {"token": token, "state": state}
             self.client.post(
@@ -91,48 +92,49 @@ class Browser:
                 "https://login.leagueoflegends.com/sso/callback", data=data)
 
             res = self.client.get(
-                "https://auth.riotgames.com/authorize?client_id=esports-rna-prod&redirect_uri=https://account.rewards.lolesports.com/v1/session/oauth-callback&response_type=code&scope=openid&prompt=none&state=https://lolesports.com/?memento=na.en_GB", allow_redirects=True)
+                "https://auth.riotgames.com/authorize?client_id=esports-rna-prod&redirect_uri=https://account.rewards.lolesports.com/v1/session/oauth-callback&response_type=code&scope=openid&prompt=none&state=https://lolesports.com/?memento=na.en_GB",
+                allow_redirects=True)
 
             # Get access and entitlement tokens for the first time
             headers = {"Origin": "https://lolesports.com",
-                        "Referrer": "https://lolesports.com"}
+                       "Referrer": "https://lolesports.com"}
 
             # This requests sometimes returns 404
-            resAccessToken = self.client.get(
+            res_access_token = self.client.get(
                 "https://account.rewards.lolesports.com/v1/session/token", headers=headers)
             # Currently unused but the call might be important server-side
-            resPasToken = self.client.get(
+            _ = self.client.get(
                 "https://account.rewards.lolesports.com/v1/session/clientconfig/rms", headers=headers)
-            if resAccessToken.status_code == 200:
-                #self.maintainSession()
-                self.__dumpCookies()
+            if res_access_token.status_code == 200:
+                # self.maintainSession()
+                self.__dump_cookies()
                 return True
         return False
 
-    def refreshSession(self):
+    def refresh_session(self):
         """
         Refresh access and entitlement tokens
         """
         headers = {"Origin": "https://lolesports.com",
                    "Referrer": "https://lolesports.com"}
-        resAccessToken = self.client.get(
+        res_access_token = self.client.get(
             "https://account.rewards.lolesports.com/v1/session/refresh", headers=headers)
-        if resAccessToken.status_code == 200:
-            self.maintainSession()
-            self.__dumpCookies()
+        if res_access_token.status_code == 200:
+            self.maintain_session()
+            self.__dump_cookies()
         else:
             self.log.error("Failed to refresh session")
-            raise StatusCodeAssertException(200, resAccessToken.status_code, resAccessToken.request.url) 
+            raise StatusCodeAssertException(200, res_access_token.status_code, res_access_token.request.url)
 
-    def maintainSession(self):
+    def maintain_session(self):
         """
         Periodically maintain the session by refreshing the access_token
         """
-        if self.__needSessionRefresh():
+        if self.__needs_session_refresh():
             self.log.debug("Refreshing session.")
-            self.refreshSession()
+            self.refresh_session()
 
-    def getLiveMatches(self):
+    def get_live_matches(self):
         """
         Retrieve data about currently live matches and store them.
         """
@@ -142,66 +144,68 @@ class Browser:
             "https://esports-api.lolesports.com/persisted/gw/getLive?hl=en-GB", headers=headers)
         if res.status_code != 200:
             raise StatusCodeAssertException(200, res.status_code, res.request.url)
-        resJson = res.json()
+        res_json = res.json()
         self.liveMatches = {}
         try:
-            events = resJson["data"]["schedule"].get("events", [])
+            events = res_json["data"]["schedule"].get("events", [])
             for event in events:
-                tournamentId = event["tournament"]["id"]
-                if tournamentId not in self.liveMatches:
+                tournament_id = event["tournament"]["id"]
+                if tournament_id not in self.liveMatches:
                     league = event["league"]["name"]
                     if len(event["streams"]) > 0:
-                        streamChannel = event["streams"][0]["parameter"]
-                        streamSource = event["streams"][0]["provider"]
+                        stream_channel = event["streams"][0]["parameter"]
+                        stream_source = event["streams"][0]["provider"]
                         for stream in event["streams"]:
                             if stream["parameter"] in self.config.bestStreams:
-                                streamChannel = stream["parameter"]
-                                streamSource = stream["provider"]
+                                stream_channel = stream["parameter"]
+                                stream_source = stream["provider"]
                                 break
-                        self.liveMatches[tournamentId] = Match(
-                            tournamentId, league, streamChannel, streamSource)
+                        self.liveMatches[tournament_id] = Match(
+                            tournament_id, league, stream_channel, stream_source)
         except (KeyError, TypeError):
             self.log.error("Could not get live matches")
 
-    def sendWatchToLive(self):
+    def send_watch_to_live(self):
         """
         Send watch event for all the live matches
         """
-        dropsAvailable = {}
+        drops_available = {}
         for tid in self.liveMatches:
-            res = self.__sendWatch(self.liveMatches[tid])
+            res = self.__send_watch(self.liveMatches[tid])
             self.log.debug(
                 f"{self.account} - {self.liveMatches[tid].league}: {res.json()}")
-            if res.json()["droppability"] == "on":   
-                dropsAvailable[self.liveMatches[tid].league] = True
+            if res.json()["droppability"] == "on":
+                drops_available[self.liveMatches[tid].league] = True
             else:
-                dropsAvailable[self.liveMatches[tid].league] = False
-        return dropsAvailable
-    
-    def checkNewDrops(self, lastCheckTime):
+                drops_available[self.liveMatches[tid].league] = False
+        return drops_available
+
+    def check_new_drops(self, last_check_time):
         try:
             headers = {"Origin": "https://lolesports.com",
-                   "Referrer": "https://lolesports.com",
-                   "Authorization": "Cookie access_token"}
-            res = self.client.get("https://account.service.lolesports.com/fandom-account/v1/earnedDrops?locale=en_GB&site=LOLESPORTS", headers=headers)
-            resJson = res.json()
-            return [drop for drop in resJson if lastCheckTime <= drop["unlockedDateMillis"]]
+                       "Referrer": "https://lolesports.com",
+                       "Authorization": "Cookie access_token"}
+            res = self.client.get(
+                "https://account.service.lolesports.com/fandom-account/v1/earnedDrops?locale=en_GB&site=LOLESPORTS",
+                headers=headers)
+            res_json = res.json()
+            return [drop for drop in res_json if last_check_time <= drop["unlockedDateMillis"]]
         except (KeyError, TypeError):
             self.log.debug("Drop check failed")
             return []
 
-    def __needSessionRefresh(self) -> bool:
+    def __needs_session_refresh(self) -> bool:
         if "access_token" not in self.client.cookies.get_dict():
             raise NoAccessTokenException()
 
         res = jwt.decode(self.client.cookies.get_dict()["access_token"], options={"verify_signature": False})
-        timeLeft = res['exp'] - int(time())
-        self.log.debug(f"{timeLeft} s until session expires.")
-        if timeLeft < 600:
+        time_left = res['exp'] - int(time())
+        self.log.debug(f"{time_left} s until session expires.")
+        if time_left < 600:
             return True
         return False
 
-    def __sendWatch(self, match: Match) -> object:
+    def __send_watch(self, match: Match) -> requests.Response:
         """
         Sends watch event for a match
 
@@ -210,7 +214,7 @@ class Browser:
         """
         data = {"stream_id": match.streamChannel,
                 "source": match.streamSource,
-                "stream_position_time": datetime.utcnow().isoformat(sep='T', timespec='milliseconds')+'Z',
+                "stream_position_time": datetime.utcnow().isoformat(sep='T', timespec='milliseconds') + 'Z',
                 "geolocation": {"code": "CZ", "area": "EU"},
                 "tournament_id": match.tournamentId}
         headers = {"Origin": "https://lolesports.com",
@@ -221,11 +225,12 @@ class Browser:
             raise StatusCodeAssertException(201, res.status_code, res.request.url)
         return res
 
-    def __getLoginTokens(self, form: str) -> tuple[str, str]:
+    @staticmethod
+    def __get_login_tokens(form: str) -> tuple[str, str]:
         """
         Extract token and state from login page html
 
-        :param html: string, html of the login page
+        :param form: string, html of the login page
         :return: tuple, token and state
         """
         page = BeautifulSoup(form, features="html.parser")
@@ -237,11 +242,11 @@ class Browser:
             state = tokenInput.get("value", "")
         return token, state
 
-    def __dumpCookies(self):
+    def __dump_cookies(self):
         with open(f'./sessions/{self.account}.saved', 'wb') as f:
             pickle.dump(self.client.cookies, f)
 
-    def __loadCookies(self):
+    def __load_cookies(self):
         if Path(f'./sessions/{self.account}.saved').exists():
             with open(f'./sessions/{self.account}.saved', 'rb') as f:
                 self.client.cookies.update(pickle.load(f))
