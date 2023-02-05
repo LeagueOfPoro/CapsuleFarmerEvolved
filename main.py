@@ -2,11 +2,10 @@ from Exceptions.CapsuleFarmerEvolvedException import CapsuleFarmerEvolvedExcepti
 from FarmThread import FarmThread
 from GuiThread import GuiThread
 from threading import Lock
-from LoggerInit import LoggerInit
+from Logger import Logger
 from Config import Config
 import sys
 import argparse
-import logging
 from rich import print
 from pathlib import Path
 from time import sleep
@@ -17,7 +16,7 @@ from VersionManager import VersionManager
 CURRENT_VERSION = 1.2
 
 
-def init() -> tuple[logging.Logger, Config]:
+def init() -> tuple[Logger, Config]:
     parser = argparse.ArgumentParser(description='Farm Esports Capsules by watching all matches on lolesports.com.')
     parser.add_argument('-c', '--config', dest="configPath", default="./config.yaml",
                         help='Path to a custom config file')
@@ -34,7 +33,7 @@ def init() -> tuple[logging.Logger, Config]:
     Path("./logs/").mkdir(parents=True, exist_ok=True)
     Path("./sessions/").mkdir(parents=True, exist_ok=True)
     config = Config(args.configPath)
-    log = LoggerInit.create_logger(False)
+    log = Logger().createLogger(config.debug)
     if not VersionManager.is_latest_version(CURRENT_VERSION):
         log.warning(
             "!!! NEW VERSION AVAILABLE !!! Download it from: https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest")
@@ -44,7 +43,7 @@ def init() -> tuple[logging.Logger, Config]:
     return log, config
 
 
-def main(log: logging.Logger, config: Config):
+def main(log: Logger, config: Config):
     farm_threads = {}
     refresh_lock = Lock()
     locks = {"refreshLock": refresh_lock}
@@ -99,8 +98,4 @@ if __name__ == '__main__':
         print('Exiting. Thank you for farming with us!')
         sys.exit()
     except CapsuleFarmerEvolvedException as e:
-        # Added null check to prevent issues with failure in init.
-        if log_instance is None:
-            LoggerInit.create_logger(False).error(f'An error has occurred: {e}')
-        else:
-            log_instance.error(f'An error has occurred: {e}')
+        log_instance.error(f'An error has occured: {e}')
