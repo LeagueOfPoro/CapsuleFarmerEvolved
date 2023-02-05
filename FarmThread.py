@@ -73,5 +73,25 @@ class FarmThread(Thread):
 
     def __notifyConnectorDrops(self, newDrops: list):
         if newDrops:
-            requests.post(self.config.connectorDrops, json=newDrops)
+            if "https://discord.com/api/webhooks" in self.config.connectorDrops:
+                for x in range(len(newDrops)):
+                    title = newDrops[x]["dropsetTitle"]
+                    thumbnail = newDrops[x]["dropsetImages"]["cardUrl"]
+                    reward = newDrops[x]["inventory"][0]["localizedInventory"]["title"]["en_US"]
+                    rewardImage = newDrops[x]["inventory"][0]["localizedInventory"]["inventory"]["imageUrl"]
 
+                    embed = {
+                        "title": f"[{self.account}] {title}",
+                        "description": f"We claimed an **{reward}** from <https://lolesports.com/rewards>",
+                        "image" : {"url": f"{thumbnail}"},
+                        "thumbnail": {"url": f"{rewardImage}"},
+                        "color": 6676471,
+                    }
+
+                    params = {
+                        "username" : "CapsuleFarmerEvolved",
+                        "embeds": [embed]
+                    }
+                    requests.post(self.config.connectorDrops, headers={"Content-type":"application/json"}, json=params)
+            else:
+                requests.post(self.config.connectorDrops, json=newDrops)
