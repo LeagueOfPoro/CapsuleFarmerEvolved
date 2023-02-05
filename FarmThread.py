@@ -36,17 +36,13 @@ class FarmThread(Thread):
                 self.stats.updateStatus(self.account, "[green]LIVE")
                 self.stats.resetLoginFailed(self.account)
                 while True:
+                    self.browser.maintainSession()
                     self.browser.getLiveMatches()
-                    dropsAvailable = self.browser.sendWatchToLive()
+                    self.browser.sendWatchToLive()
                     newDrops = []
                     if self.browser.liveMatches:
                         liveMatchesStatus = []
                         for m in self.browser.liveMatches.values():
-                            # Color code "drops available"
-                            # status = dropsAvailable.get(m.league, False)
-                            # if status:
-                            #     liveMatchesStatus.append(f"[green]{m.league}[/]")
-                            # else: 
                             liveMatchesStatus.append(f"{m.league}")
                         self.log.debug(f"{', '.join(liveMatchesStatus)}")    
                         liveMatchesMsg = f"{', '.join(liveMatchesStatus)}"

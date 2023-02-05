@@ -14,6 +14,7 @@ from time import sleep
 from Stats import Stats
 from VersionManager import VersionManager
 
+
 CURRENT_VERSION = 1.1
 
 def init() -> tuple[Logger, Config]:
