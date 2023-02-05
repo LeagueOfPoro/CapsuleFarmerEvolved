@@ -33,7 +33,7 @@ def init() -> tuple[Logger, Config]:
     Path("./logs/").mkdir(parents=True, exist_ok=True)
     Path("./sessions/").mkdir(parents=True, exist_ok=True)
     config = Config(args.configPath)
-    log = Logger().createLogger(config.debug)
+    log = Logger().create_logger(config.debug)
     if not VersionManager.is_latest_version(CURRENT_VERSION):
         log.warning(
             "!!! NEW VERSION AVAILABLE !!! Download it from: https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest")

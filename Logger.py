@@ -4,8 +4,8 @@ from datetime import datetime
 
 
 class Logger:
-    def createLogger(self, debug: bool):
-        if (debug):
+    def create_logger(self, debug: bool):
+        if debug:
             level = logging.DEBUG
         else:
             level = logging.WARNING
