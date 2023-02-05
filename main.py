@@ -15,7 +15,7 @@ from Stats import Stats
 from VersionManager import VersionManager
 
 
-CURRENT_VERSION = 1.1
+CURRENT_VERSION = 1.2
 
 def init() -> tuple[Logger, Config]:
     parser = argparse.ArgumentParser(description='Farm Esports Capsules by watching all matches on lolesports.com.')
