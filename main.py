@@ -58,7 +58,6 @@ def init() -> tuple[Logger, Config]:
 
     return log, config
 
-
 def main(log: Logger, config: Config):
     farmThreads = {}
     refreshLock = Lock()
