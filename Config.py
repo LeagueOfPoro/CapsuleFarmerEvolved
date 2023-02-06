@@ -5,7 +5,7 @@ from rich import print
 
 from Exceptions.InvalidCredentialsException import InvalidCredentialsException
 
-
+remoteBestStreamsURL = "https://raw.githubusercontent.com/LeagueOfPoro/CapsuleFarmerEvolved/master/bestStreams.txt"
 class Config:
     """
     A class that loads and stores the configuration
@@ -23,6 +23,7 @@ class Config:
             with open(configPath, "r",  encoding='utf-8') as f:
                 config = yaml.safe_load(f)
                 accs = config.get("accounts")
+                notifications = config.get("notifications")
                 onlyDefaultUsername = True
                 for account in accs:
                     self.accounts[account] = {
@@ -36,9 +37,8 @@ class Config:
                     raise InvalidCredentialsException                    
                 self.debug = config.get("debug", False)
                 self.connectorDrops = config.get("connectorDropsUrl", "")
-                self.windowsNotificationToast = config.get("notficationtoast")
-                self.notifyDropSound = config.get("sound")
-
+                self.notifyToast = notifications["toast"]
+                self.notifyDropSound = notifications["sound"]
         except FileNotFoundError as ex:
             print(f"[red]CRITICAL ERROR: The configuration file cannot be found at {configPath}\nHave you extacted the ZIP archive and edited the configuration file?")
             print("Press any key to exit...")
@@ -54,8 +54,7 @@ class Config:
             print("Press any key to exit...")
             input()
             raise ex
-
-        remoteBestStreamsFile = requests.get("https://raw.githubusercontent.com/LeagueOfPoro/CapsuleFarmerEvolved/master/bestStreams.txt")
+        remoteBestStreamsFile = requests.get(remoteBestStreamsURL)
         self.bestStreams = remoteBestStreamsFile.text.splitlines()
 
 

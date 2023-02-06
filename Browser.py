@@ -114,12 +114,16 @@ class Browser:
                 newName = re.search(r"&summoner=(.*)&region", str(urlDecoded))
                 region = re.search(r"&region=(.*)&tag", str(urlDecoded))
                 if newName.group(1):
-                    self.stats.updateName(self.account, f'{newName.group(1)} ({self.account})')
-                    self.stats.updateRegion(self.account, region.group(1))
+                    if region.group(1):
+                        self.stats.updateName(self.account, f'{newName.group(1)} ({self.account})')
+                        self.stats.updateRegion(self.account, region.group(1))
+                    else:
+                        self.stats.updateRegion(self.account, "Unknown")
 
                 else:
                     self.stats.updateName(self.account, self.account)
                     self.stats.updateRegion(self.account, "Unknown")
+
                 return True
         return False
 

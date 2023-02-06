@@ -8,13 +8,11 @@ import os
 supported = False
 
 try:
-    import win10toast
-
+    from win10toast import ToastNotifier
     supported = True
-
-
 except ImportError:
     pass
+
 class FarmThread(Thread):
     """
     A thread that creates a capsule farm for a given account
@@ -64,7 +62,7 @@ class FarmThread(Thread):
                     self.stats.update(self.account, len(newDrops), liveMatchesMsg)
                     if self.config.connectorDrops:
                         self.__notifyConnectorDrops(newDrops)
-                    if self.config.windowsNotificationToast:
+                    if self.config.notifyToast:
                         if supported == True:
                             self.__notifactionToast(newDrops)
                     if newDrops:
@@ -118,7 +116,7 @@ class FarmThread(Thread):
             for x in range(len(newDrops)):
                 title = newDrops[x]["dropsetTitle"]
                 reward = newDrops[x]["inventory"][0]["localizedInventory"]["title"]["en_US"]
-                toast = win10toast.ToastNotifier()
+                toast = ToastNotifier()
                 toast.show_toast(
                     f"The account [{self.account}] received a reward! ({title})",
                     f"We claimed an {reward} from https://lolesports.com/rewards",

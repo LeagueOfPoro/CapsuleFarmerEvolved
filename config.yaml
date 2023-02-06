@@ -1,5 +1,6 @@
-sound: "sound.mp3"
-notficationtoast: true
+notifications:
+  sound: "sound.mp3"
+  toast: true
 accounts:
   accountname:
     username: "username"
