@@ -117,9 +117,7 @@ class FarmThread(Thread):
         if newDrops:
             for x in range(len(newDrops)):
                 title = newDrops[x]["dropsetTitle"]
-                thumbnail = newDrops[x]["dropsetImages"]["cardUrl"]
                 reward = newDrops[x]["inventory"][0]["localizedInventory"]["title"]["en_US"]
-                thumbnail = "https://avatars.githubusercontent.com/u/73201351?s=60&v=4"
                 toast = win10toast.ToastNotifier()
                 toast.show_toast(
                     f"[{self.account}] {title}",
