@@ -65,9 +65,10 @@ class FarmThread(Thread):
                             self.__notifactionToast(newDrops)
                     if newDrops:
                         if self.config.notifyDropSound:
-                            wave_obj = sa.WaveObject.from_wave_file(self.config.notifyDropSound)
-                            play_obj = wave_obj.play()
-                            play_obj.wait_done()
+                            if supported == True:
+                                wave_obj = sa.WaveObject.from_wave_file(self.config.notifyDropSound)
+                                play_obj = wave_obj.play()
+                                play_obj.wait_done()
 
                     sleep(Browser.STREAM_WATCH_INTERVAL)
             else:

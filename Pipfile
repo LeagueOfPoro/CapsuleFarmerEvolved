@@ -12,7 +12,7 @@ pyyaml = "*"
 rich = "*"
 pyjwt = "*"
 win10toast = {version = "*", sys_platform = "== 'win32'"}
-simpleaudio = "*"
+simpleaudio = {version = "*", sys_platform = "== 'win32'"}
 
 [dev-packages]
 autopep8 = "*"
