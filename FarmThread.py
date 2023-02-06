@@ -41,10 +41,8 @@ class FarmThread(Thread):
                     self.browser.sendWatchToLive()
                     newDrops = []
                     if self.browser.liveMatches:
-                        liveMatchesStatus = []
-                        for m in self.browser.liveMatches.values():
-                            liveMatchesStatus.append(f"{m.league}")
-                        self.log.debug(f"{', '.join(liveMatchesStatus)}")    
+                        liveMatchesStatus = [f"{m.league}" for m in self.browser.liveMatches.values()]
+                        self.log.debug(f"{', '.join(liveMatchesStatus)}")
                         liveMatchesMsg = f"{', '.join(liveMatchesStatus)}"
                         newDrops = self.browser.checkNewDrops(self.stats.getLastDropCheck(self.account))
                         self.stats.updateLastDropCheck(self.account, int(datetime.now().timestamp()*1e3))
@@ -71,26 +69,29 @@ class FarmThread(Thread):
         self.browser.stopMaintaininingSession()
 
     def __notifyConnectorDrops(self, newDrops: list):
-        if newDrops:
-            if "https://discord.com/api/webhooks" in self.config.connectorDrops:
-                for x in range(len(newDrops)):
-                    title = newDrops[x]["dropsetTitle"]
-                    thumbnail = newDrops[x]["dropsetImages"]["cardUrl"]
-                    reward = newDrops[x]["inventory"][0]["localizedInventory"]["title"]["en_US"]
-                    rewardImage = newDrops[x]["inventory"][0]["localizedInventory"]["inventory"]["imageUrl"]
+        if not newDrops:
+            return
+        if "https://discord.com/api/webhooks" in self.config.connectorDrops:
+            for newDrop in newDrops:
+                title = newDrop["dropsetTitle"]
+                thumbnail = newDrop["dropsetImages"]["cardUrl"]
+                reward = newDrop["inventory"][0]["localizedInventory"]["title"]["en_US"]
+                rewardImage = newDrop["inventory"][0]["localizedInventory"][
+                    "inventory"
+                ]["imageUrl"]
 
-                    embed = {
-                        "title": f"[{self.account}] {title}",
-                        "description": f"We claimed an **{reward}** from <https://lolesports.com/rewards>",
-                        "image" : {"url": f"{thumbnail}"},
-                        "thumbnail": {"url": f"{rewardImage}"},
-                        "color": 6676471,
-                    }
+                embed = {
+                    "title": f"[{self.account}] {title}",
+                    "description": f"We claimed an **{reward}** from <https://lolesports.com/rewards>",
+                    "image" : {"url": f"{thumbnail}"},
+                    "thumbnail": {"url": f"{rewardImage}"},
+                    "color": 6676471,
+                }
 
-                    params = {
-                        "username" : "CapsuleFarmerEvolved",
-                        "embeds": [embed]
-                    }
-                    requests.post(self.config.connectorDrops, headers={"Content-type":"application/json"}, json=params)
-            else:
-                requests.post(self.config.connectorDrops, json=newDrops)
+                params = {
+                    "username" : "CapsuleFarmerEvolved",
+                    "embeds": [embed]
+                }
+                requests.post(self.config.connectorDrops, headers={"Content-type":"application/json"}, json=params)
+        else:
+            requests.post(self.config.connectorDrops, json=newDrops)

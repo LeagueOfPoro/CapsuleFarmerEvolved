@@ -1,4 +1,3 @@
-
 from Exceptions.CapsuleFarmerEvolvedException import CapsuleFarmerEvolvedException
 from FarmThread import FarmThread
 from GuiThread import GuiThread
@@ -14,8 +13,8 @@ from time import sleep
 from Stats import Stats
 from VersionManager import VersionManager
 
-
 CURRENT_VERSION = 1.2
+
 
 def init() -> tuple[Logger, Config]:
     parser = argparse.ArgumentParser(description='Farm Esports Capsules by watching all matches on lolesports.com.')
@@ -36,10 +35,15 @@ def init() -> tuple[Logger, Config]:
     config = Config(args.configPath)
     log = Logger().createLogger(config.debug)
     if not VersionManager.isLatestVersion(CURRENT_VERSION):
-        log.warning("!!! NEW VERSION AVAILABLE !!! Download it from: https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest")
-        print("[bold red]!!! NEW VERSION AVAILABLE !!!\nDownload it from: https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest\n")
+        log.warning(
+            "!!! NEW VERSION AVAILABLE !!! Download it from: "
+            "https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest")
+        print(
+            "[bold red]!!! NEW VERSION AVAILABLE !!!\nDownload it from: "
+            "https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest\n")
 
     return log, config
+
 
 def main(log: Logger, config: Config):
     farmThreads = {}
@@ -49,7 +53,7 @@ def main(log: Logger, config: Config):
     for account in config.accounts:
         stats.initNewAccount(account)
 
-    log.info(f"Starting a GUI thread.")
+    log.info("Starting a GUI thread.")
     gui = GuiThread(log, config, stats, locks)
     gui.daemon = True
     gui.start()
@@ -75,7 +79,7 @@ def main(log: Logger, config: Config):
         if not farmThreads:
             break
         for account in toDelete:
-            del config.accounts[account]    
+            del config.accounts[account]
 
         toDelete = []
         for account in farmThreads:
@@ -86,6 +90,7 @@ def main(log: Logger, config: Config):
                 log.warning(f"Thread {account} has finished.")
         for account in toDelete:
             del farmThreads[account]
+
 
 if __name__ == '__main__':
     try:

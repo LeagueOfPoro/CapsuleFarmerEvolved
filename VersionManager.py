@@ -1,5 +1,6 @@
 import requests as req
 
+
 class VersionManager:
 
     @staticmethod
@@ -10,6 +11,7 @@ class VersionManager:
             if "tag_name" in latestTagJson:
                 return float(latestTagJson["tag_name"][1:])
         return 0.0
+
     @staticmethod
     def isLatestVersion(currentVersion):
         return currentVersion >= VersionManager.getLatestTag()
