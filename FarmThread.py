@@ -3,16 +3,12 @@ from threading import Thread
 from time import sleep
 from Browser import Browser
 import requests
-from playsound import playsound
-import os
+import simpleaudio as sa
 supported = False
 
 try:
     from win10toast import ToastNotifier
-
     supported = True
-
-
 except ImportError:
     pass
 class FarmThread(Thread):
@@ -64,12 +60,14 @@ class FarmThread(Thread):
                     self.stats.update(self.account, len(newDrops), liveMatchesMsg)
                     if self.config.connectorDrops:
                         self.__notifyConnectorDrops(newDrops)
-                    if self.config.windowsNotificationToast:
+                    if self.config.notifyToast:
                         if supported == True:
                             self.__notifactionToast(newDrops)
                     if newDrops:
                         if self.config.notifyDropSound:
-                            playsound(self.config.notifyDropSound)
+                            wave_obj = sa.WaveObject.from_wave_file(self.config.notifyDropSound)
+                            play_obj = wave_obj.play()
+                            play_obj.wait_done()
 
                     sleep(Browser.STREAM_WATCH_INTERVAL)
             else:
@@ -118,7 +116,7 @@ class FarmThread(Thread):
             for x in range(len(newDrops)):
                 title = newDrops[x]["dropsetTitle"]
                 reward = newDrops[x]["inventory"][0]["localizedInventory"]["title"]["en_US"]
-                toast = win10toast.ToastNotifier()
+                toast = ToastNotifier()
                 toast.show_toast(
                     f"The account [{self.account}] received a reward! ({title})",
                     f"We claimed an {reward} from https://lolesports.com/rewards",

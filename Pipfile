@@ -11,8 +11,8 @@ beautifulsoup4 = "*"
 pyyaml = "*"
 rich = "*"
 pyjwt = "*"
-playsound = "*"
 win10toast = {version = "*", sys_platform = "== 'win32'"}
+simpleaudio = "*"
 
 [dev-packages]
 autopep8 = "*"

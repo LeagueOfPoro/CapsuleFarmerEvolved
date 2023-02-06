@@ -1,5 +1,5 @@
 notifications:
-  sound: "sound.mp3"
+  sound: "sound.wav"
   toast: true
 accounts:
   accountname:
