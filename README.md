@@ -43,9 +43,29 @@ accounts:
     username: "Riot Poro"
     password: "1234"
 ```
+You can enable `connectorDropsUrl` to get a message on discord when you get a new drop.
+This will uses discord's [webhooks](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks) to send the message. Be reasonable when creating the webhook so that it doesn't annoy other users with constant messages! Once the webhook is created just copy the url and place it in `config.toml` as shown below.
+```yaml
+connectorDropsUrl: "https://discord.com/api/webhooks/id/token"
+```
 
 In case of problem, enable debugging mode to increase verbosity of the log:
-`debug: True`
+```yaml
+debug: True
+```
+
+A fully enabled `config.toml` should look like this:
+```yaml
+accounts:
+  accountname:
+    username: "username"
+    password: "password"
+  changethistowhatever:
+    username: "Riot Poro"
+    password: "1234"
+connectorDropsUrl: "https://discord.com/api/webhooks/id/token"
+debug: true
+```
 
 You can select a non-default configuration file, see [CLI](#cli)
 ```bash
