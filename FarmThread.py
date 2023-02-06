@@ -8,7 +8,7 @@ import os
 supported = False
 
 try:
-    import win10toast
+    from win10toast import ToastNotifier
 
     supported = True
 
