@@ -1,3 +1,16 @@
+##################
+##################
+##################
+##################
+##################
+#     !!!!!!   WARNING  !!!!!!!
+# DUE TO PR #72, THIS DOCKERFILE IS NOT CURRENTLY WORKING AND REQUIRES CHANGES. 
+##################
+##################
+##################
+##################
+
+
 FROM python:3.10-slim-buster as base
 
 # Setup env
