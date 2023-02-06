@@ -1,3 +1,5 @@
+sound: "sound.mp3"
+notficationtoast: true
 accounts:
   accountname:
     username: "username"

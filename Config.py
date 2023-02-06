@@ -35,6 +35,9 @@ class Config:
                     raise InvalidCredentialsException                    
                 self.debug = config.get("debug", False)
                 self.connectorDrops = config.get("connectorDropsUrl", "")
+                self.windowsNotificationToast = config.get("notficationtoast")
+                self.notifyDropSound = config.get("sound")
+
         except FileNotFoundError as ex:
             print(f"[red]CRITICAL ERROR: The configuration file cannot be found at {configPath}\nHave you extacted the ZIP archive and edited the configuration file?")
             print("Press any key to exit...")
@@ -61,4 +64,5 @@ class Config:
         :param account: string, name of the account
         :return: dictionary, account information
         """
+
         return self.accounts[account]

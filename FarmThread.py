@@ -3,7 +3,18 @@ from threading import Thread
 from time import sleep
 from Browser import Browser
 import requests
+from playsound import playsound
+import os
+supported = False
 
+try:
+    import win10toast
+
+    supported = True
+
+
+except ImportError:
+    pass
 class FarmThread(Thread):
     """
     A thread that creates a capsule farm for a given account
@@ -44,7 +55,7 @@ class FarmThread(Thread):
                         liveMatchesStatus = []
                         for m in self.browser.liveMatches.values():
                             liveMatchesStatus.append(f"{m.league}")
-                        self.log.debug(f"{', '.join(liveMatchesStatus)}")    
+                        self.log.debug(f"{', '.join(liveMatchesStatus)}")
                         liveMatchesMsg = f"{', '.join(liveMatchesStatus)}"
                         newDrops = self.browser.checkNewDrops(self.stats.getLastDropCheck(self.account))
                         self.stats.updateLastDropCheck(self.account, int(datetime.now().timestamp()*1e3))
@@ -53,6 +64,13 @@ class FarmThread(Thread):
                     self.stats.update(self.account, len(newDrops), liveMatchesMsg)
                     if self.config.connectorDrops:
                         self.__notifyConnectorDrops(newDrops)
+                    if self.config.windowsNotificationToast:
+                        if supported == True:
+                            self.__notifactionToast(newDrops)
+                    if newDrops:
+                        if self.config.notifyDropSound:
+                            playsound(self.config.notifyDropSound)
+
                     sleep(Browser.STREAM_WATCH_INTERVAL)
             else:
                 self.log.error(f"Login for {self.account} FAILED!")
@@ -94,3 +112,20 @@ class FarmThread(Thread):
                     requests.post(self.config.connectorDrops, headers={"Content-type":"application/json"}, json=params)
             else:
                 requests.post(self.config.connectorDrops, json=newDrops)
+
+    def __notifactionToast(self, newDrops: list):
+        if newDrops:
+            for x in range(len(newDrops)):
+                title = newDrops[x]["dropsetTitle"]
+                thumbnail = newDrops[x]["dropsetImages"]["cardUrl"]
+                reward = newDrops[x]["inventory"][0]["localizedInventory"]["title"]["en_US"]
+                thumbnail = "https://avatars.githubusercontent.com/u/73201351?s=60&v=4"
+                toast = win10toast.ToastNotifier()
+                toast.show_toast(
+                    f"[{self.account}] {title}",
+                    f"We claimed an {reward} from https://lolesports.com/rewards",
+                    duration=5,
+                    threaded=True,
+
+                )
+                while toast.notification_active(): sleep(1)
