@@ -5,11 +5,12 @@ from rich import print
 
 from Exceptions.InvalidCredentialsException import InvalidCredentialsException
 
-remoteBestStreamsURL = "https://raw.githubusercontent.com/LeagueOfPoro/CapsuleFarmerEvolved/master/bestStreams.txt"
 class Config:
     """
     A class that loads and stores the configuration
     """
+
+    REMOTE_BEST_STREAMS_URL = "https://raw.githubusercontent.com/LeagueOfPoro/CapsuleFarmerEvolved/master/bestStreams.txt"
 
     def __init__(self, configPath: str) -> None:
         """
@@ -54,16 +55,14 @@ class Config:
             print("Press any key to exit...")
             input()
             raise ex
-        remoteBestStreamsFile = requests.get(remoteBestStreamsURL)
+        remoteBestStreamsFile = requests.get(self.REMOTE_BEST_STREAMS_URL)
         self.bestStreams = remoteBestStreamsFile.text.splitlines()
 
 
     def getAccount(self, account: str) -> dict:
         """
         Get account information
-
         :param account: string, name of the account
         :return: dictionary, account information
         """
-
         return self.accounts[account]

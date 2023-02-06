@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "cea63430292171cb41f6acb9d9c7da442029d6942322dd27ae93fa8e2d11f6c2"
+            "sha256": "efdaa474370ae17b2930b183e79fc3b92812ecc930edba1cca43b45b9e70ff85"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -216,13 +216,6 @@
             "markers": "python_version >= '3.7'",
             "version": "==0.1.2"
         },
-        "playsound": {
-            "hashes": [
-                "sha256:cc6ed11d773034b0ef624e6bb4bf50f4b76b8414a59ce6d38afb89b423297ced"
-            ],
-            "index": "pypi",
-            "version": "==1.3.0"
-        },
         "pygments": {
             "hashes": [
                 "sha256:b3ed06a9e8ac9a9aae5a6f5dbe78a8a58655d17b43b93c078f094ddc476ae297",
@@ -372,6 +365,7 @@
                 "sha256:f68820297ad51577e3a77369e7e9b23989d30d5ae923bf34c92cf983c04ade04"
             ],
             "index": "pypi",
+            "markers": "sys_platform == 'win32'",
             "version": "==1.0.4"
         },
         "sniffio": {

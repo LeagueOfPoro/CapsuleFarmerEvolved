@@ -124,6 +124,5 @@ class FarmThread(Thread):
                     icon_path="poro.ico",
                     duration=5,
                     threaded=True,
-
                 )
                 while toast.notification_active(): sleep(1)
