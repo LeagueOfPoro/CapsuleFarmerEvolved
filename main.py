@@ -106,7 +106,6 @@ def main(log: Logger, config: Config):
         for account in toDelete:
             del farmThreads[account]
 
-
 if __name__ == "__main__":
     try:
         log, config = init()
