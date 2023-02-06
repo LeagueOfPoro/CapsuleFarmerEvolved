@@ -3,7 +3,6 @@ import sys
 from pathlib import Path
 from threading import Lock
 from time import sleep
-
 from rich import print
 
 from Config import Config
