@@ -2,16 +2,13 @@ import re
 from getpass import getpass
 from os.path import isfile
 from typing import Any
-
 import yaml
 from rich import print
 
 
-
 def createConfig(configPath: str) -> None:  # noqa
     print("[green]Welcome to the configuration file generator!")
-
-    if not confirmPrompt("Do you want to continue?", True):
+    if not confirmPrompt("Do you want to continue?"):
         print("Exiting...")
         exit(0)
 
@@ -21,38 +18,22 @@ def createConfig(configPath: str) -> None:  # noqa
     accs: dict[str, dict[str, str]] = {}
 
     while True:
-        accGroup = getInput(
-            "Enter group name (No spaces, no special characters, should be recognizable)"
-        )
-        accName = getInput(
-            "Enter [red]Riot username[/red] (used to log in to the game)"
-        )
-
+        accGroup = getInput("Enter group name (No spaces, no special characters, should be recognizable)")
+        accName = getInput("Enter [red]Riot username[/red] (used to log in to the game)")
         print("Enter [red]Riot password[/red] (used to log in to the game)")
-
         accPassword = getpass("(PASSWORD HIDDEN): ")
         accs[accGroup] = {"username": accName, "password": accPassword}
 
-        if not confirmPrompt("Do you want to add another account? (y/n)", False):
+        if not confirmPrompt("Do you want to add another account?"):
             break
 
     config["accounts"] = accs
-
-    config["debug"] = confirmPrompt("Do you want to enable debug mode? (y/n)", False)
-
-    if not confirmPrompt("[bold]Continue with advanced settings?", False):
+    config["debug"] = confirmPrompt("Do you want to enable debug mode?")
+    if not confirmPrompt("[bold]Continue with advanced settings?"):
         print(f"Done! Writing configuration file {configPath}")
-
-        if confirmPrompt("Continue?", True):
-            with open(configPath, "w", encoding="utf-8") as f:
-                yaml.dump(config, f)
-        else:
-            print("No changes made.")
-            return
-
+        with open(configPath, "w", encoding="utf-8") as f:
+            yaml.dump(config, f)
         return
-
-    # ! TODO: README.md is not ready yet
 
     print("[bold][red]Advanced settings")
     print("[green]Read more about them here:")
@@ -60,14 +41,14 @@ def createConfig(configPath: str) -> None:  # noqa
         "https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/blob/master/README.md#Configuration"
     )
 
-    if confirmPrompt("Enable connectorDropsUrl?", False):
+    if confirmPrompt("Enable connectorDropsUrl?"):
         while True:
             connectorDropsUrl = getInput("Enter the webhook URL")
             if not webhook_re.match(connectorDropsUrl):
                 print(
                     "Webhook URL seems invalid. Should start with https://discord.com/api/webhooks/"
                 )
-                if not confirmPrompt("Do you want to try again? (y/n)", False):
+                if not confirmPrompt("Do you want to try again"):
                     break
             else:
                 config["connectorDropsUrl"] = connectorDropsUrl
@@ -75,16 +56,11 @@ def createConfig(configPath: str) -> None:  # noqa
 
     print(f"[green]Done![/green] This will write configuration file {configPath}")
 
-    if confirmPrompt("Continue?", True):
-        with open(configPath, "w", encoding="utf-8") as f:
-            yaml.dump(config, f)
-    else:
-        print("No changes made.")
-
+    with open(configPath, "w", encoding="utf-8") as f:
+        yaml.dump(config, f)
 
 invalidUsernames = ["", "username"]
 invalidPasswords = ["", "password"]
-
 
 def validateConfig(configPath: str) -> bool:
     if not isfile(configPath):
@@ -107,19 +83,15 @@ def validateConfig(configPath: str) -> bool:
 
     return True
 
-
 def getInput(prompt: str) -> str:
     print(prompt)
     return input("> ").strip()
 
-
-def confirmPrompt(prompt: str, default: bool) -> bool:
+def confirmPrompt(prompt: str) -> bool:
     print(prompt)
-    inp = input(f"[{'y' if default else 'n'}]> ").strip().lower()
+    inp = input("[y/n]> ").strip().lower()
 
     if inp in ["y", "yes"]:
         return True
-    elif inp in ["n", "no"]:
-        return False
     else:
-        return default
+        return False

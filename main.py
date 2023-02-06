@@ -4,7 +4,6 @@ from pathlib import Path
 from threading import Lock
 from time import sleep
 from rich import print
-
 from Config import Config
 from CreateConfigFile import createConfig, validateConfig
 from Exceptions.CapsuleFarmerEvolvedException import CapsuleFarmerEvolvedException
@@ -29,7 +28,9 @@ def init() -> tuple[Logger, Config]:
     )
 
     parser.add_argument(
-        "--create-config", action="store_true", help="Create a config file"
+        "--create-config",
+        action="store_true",
+        help="Create a config file",
     )
     args = parser.parse_args()
 
