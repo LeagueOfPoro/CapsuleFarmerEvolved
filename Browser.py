@@ -40,7 +40,6 @@ class Browser:
         self.currentlyWatching = {}
         self.liveMatches = {}
         self.account = account
-
         self.stats = stats
 
     def login(self, username: str, password: str, refreshLock) -> bool:
