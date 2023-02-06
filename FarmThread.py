@@ -120,8 +120,9 @@ class FarmThread(Thread):
                 reward = newDrops[x]["inventory"][0]["localizedInventory"]["title"]["en_US"]
                 toast = win10toast.ToastNotifier()
                 toast.show_toast(
-                    f"[{self.account}] {title}",
+                    f"The account [{self.account}] received a reward! ({title})",
                     f"We claimed an {reward} from https://lolesports.com/rewards",
+                    icon_path="poro.ico",
                     duration=5,
                     threaded=True,
 
