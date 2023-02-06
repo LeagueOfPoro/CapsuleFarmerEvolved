@@ -34,7 +34,7 @@ class FarmThread(Thread):
         self.config = config
         self.account = account
         self.stats = stats
-        self.browser = Browser(self.log, self.config, self.account)
+        self.browser = Browser(self.log, stats, self.config, self.account)
         self.locks = locks
 
     def run(self):

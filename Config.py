@@ -1,3 +1,4 @@
+import requests
 import yaml
 from yaml.parser import ParserError
 from rich import print
@@ -53,9 +54,10 @@ class Config:
             print("Press any key to exit...")
             input()
             raise ex
-            
-        with open("bestStreams.txt", "r",  encoding='utf-8') as f:
-            self.bestStreams = f.read().splitlines()
+
+        remoteBestStreamsFile = requests.get("https://raw.githubusercontent.com/LeagueOfPoro/CapsuleFarmerEvolved/master/bestStreams.txt")
+        self.bestStreams = remoteBestStreamsFile.text.splitlines()
+
 
     def getAccount(self, account: str) -> dict:
         """
