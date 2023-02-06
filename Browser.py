@@ -113,13 +113,9 @@ class Browser:
                 urlDecoded = urllib.parse.unquote(res)
                 newName = re.search(r"&summoner=(.*)&region", str(urlDecoded))
                 region = re.search(r"&region=(.*)&tag", str(urlDecoded))
-                if newName.group(1):
-                    if region.group(1):
-                        self.stats.updateName(self.account, f'{newName.group(1)} ({self.account})')
-                        self.stats.updateRegion(self.account, region.group(1))
-                    else:
-                        self.stats.updateRegion(self.account, "Unknown")
-
+                if newName.group(1) and region.group(1):
+                    self.stats.updateName(self.account, f'{newName.group(1)} ({self.account})')
+                    self.stats.updateRegion(self.account, region.group(1))
                 else:
                     self.stats.updateName(self.account, self.account)
                     self.stats.updateRegion(self.account, "Unknown")
@@ -258,6 +254,7 @@ class Browser:
     def __dumpCookies(self):
         with open(f'./sessions/{self.account}.saved', 'wb') as f:
             pickle.dump(self.client.cookies, f)
+
     def __loadCookies(self):
         if Path(f'./sessions/{self.account}.saved').exists():
             with open(f'./sessions/{self.account}.saved', 'rb') as f:

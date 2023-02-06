@@ -11,6 +11,7 @@ try:
     supported = True
 except ImportError:
     pass
+
 class FarmThread(Thread):
     """
     A thread that creates a capsule farm for a given account
