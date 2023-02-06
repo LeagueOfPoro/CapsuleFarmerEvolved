@@ -1,26 +1,38 @@
+import argparse
+import sys
+from pathlib import Path
+from threading import Lock
+from time import sleep
 
+from rich import print
+
+from Config import Config
+from CreateConfigFile import createConfig, validateConfig
 from Exceptions.CapsuleFarmerEvolvedException import CapsuleFarmerEvolvedException
 from FarmThread import FarmThread
 from GuiThread import GuiThread
-from threading import Lock
 from Logger import Logger
-from Config import Config
-import sys
-import argparse
-from rich import print
-from pathlib import Path
-from time import sleep
-
 from Stats import Stats
 from VersionManager import VersionManager
 
-
 CURRENT_VERSION = 1.2
 
+
 def init() -> tuple[Logger, Config]:
-    parser = argparse.ArgumentParser(description='Farm Esports Capsules by watching all matches on lolesports.com.')
-    parser.add_argument('-c', '--config', dest="configPath", default="./config.yaml",
-                        help='Path to a custom config file')
+    parser = argparse.ArgumentParser(
+        description="Farm Esports Capsules by watching all matches on lolesports.com."
+    )
+    parser.add_argument(
+        "-c",
+        "--config",
+        dest="configPath",
+        default="./config.yaml",
+        help="Path to a custom config file",
+    )
+
+    parser.add_argument(
+        "--create-config", action="store_true", help="Create a config file"
+    )
     args = parser.parse_args()
 
     print("*********************************************************")
@@ -31,21 +43,30 @@ def init() -> tuple[Logger, Config]:
     print("*********************************************************")
     print()
 
+    if args.create_config or not validateConfig(args.configPath):
+        createConfig(args.configPath)
+
     Path("./logs/").mkdir(parents=True, exist_ok=True)
     Path("./sessions/").mkdir(parents=True, exist_ok=True)
     config = Config(args.configPath)
     log = Logger().createLogger(config.debug)
     if not VersionManager.isLatestVersion(CURRENT_VERSION):
-        log.warning("!!! NEW VERSION AVAILABLE !!! Download it from: https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest")
-        print("[bold red]!!! NEW VERSION AVAILABLE !!!\nDownload it from: https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest\n")
+        log.warning(
+            "!!! NEW VERSION AVAILABLE !!! Download it from: https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest"
+        )
+        print(
+            "[bold red]!!! NEW VERSION AVAILABLE !!!\nDownload it from: https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest\n"
+        )
 
     return log, config
+
 
 def main(log: Logger, config: Config):
     farmThreads = {}
     refreshLock = Lock()
     locks = {"refreshLock": refreshLock}
     stats = Stats(farmThreads)
+
     for account in config.accounts:
         stats.initNewAccount(account)
 
@@ -75,7 +96,7 @@ def main(log: Logger, config: Config):
         if not farmThreads:
             break
         for account in toDelete:
-            del config.accounts[account]    
+            del config.accounts[account]
 
         toDelete = []
         for account in farmThreads:
@@ -87,12 +108,13 @@ def main(log: Logger, config: Config):
         for account in toDelete:
             del farmThreads[account]
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     try:
         log, config = init()
         main(log, config)
     except (KeyboardInterrupt, SystemExit):
-        print('Exitting. Thank you for farming with us!')
+        print("Exitting. Thank you for farming with us!")
         sys.exit()
     except CapsuleFarmerEvolvedException as e:
-        log.error(f'An error has occured: {e}')
+        log.error(f"An error has occured: {e}")
