@@ -3,10 +3,10 @@ from threading import Thread
 from time import sleep
 from Browser import Browser
 import requests
-import simpleaudio as sa
 supported = False
 
 try:
+    import simpleaudio as sa
     from win10toast import ToastNotifier
     supported = True
 except ImportError:
