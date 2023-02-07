@@ -1,4 +1,5 @@
 ![# Capsule Farmer Evolved](https://raw.githubusercontent.com/Penguax/CapsuleFarmerEvolved/master/.github/banner.png)
+<!-- Font for banner above by Riot Games BeaufortForLoL https://brand.riotgames.com/en-us/league-of-legends/typography/ -->
 <p align="center">
 <a href="https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/blob/master/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-orange"></a>
 <a href="https://www.python.org/downloads/release/python-3100/"><img alt="Python3" src="https://img.shields.io/badge/built%20for-Python%E2%89%A53.10-red.svg?style=flat"></a>
@@ -12,9 +13,18 @@ Are you tired of watching professional League of Legends games? Do you watch onl
 
 This is a successor to the old [EsportsCapsuleFarmer](https://github.com/LeagueOfPoro/EsportsCapsuleFarmer) which relied on a web browser to watch videos. *Capsule Farmer Evolved* simulates traffic to lolesports.com servers and tricks it into thinking the account is watching a stream. This approach drastically lowers the hardware requirements.
 
-[Learn more about the esports drops directly from Riot games.](https://lolesports.com/article/drops-information-for-lol-esports-season-2023/blt15759d60486d16cc)
+[More information about Drops From Riot Games.](https://lolesports.com/article/drops-information-for-lol-esports-season-2023/blt15759d60486d16cc)
 
-### Features
+
+# README CONTENTS 
+1. [Features](#features) 
+2. [Windows Installation](#windows-installation) 
+3. [Advanced Installation](#advanced-installation)
+4. [Community](#community)
+
+
+
+## Features
 - Watch every live LoL-Esports match
 - Show how many drops each account received during the program run
 - Very lightweight - no external browser needed
@@ -22,10 +32,10 @@ This is a successor to the old [EsportsCapsuleFarmer](https://github.com/LeagueO
 - 2FA (experimental) - programs prompts for the code on startup
 - ARM supported (Raspberry Pi)
 
-### Discord
-Share your drops or just come hangout to League of Poro's Discord server: https://discord.gg/c2Qs9Y83hh 
+## Community
+If you have any type of issue, need help, or just want to hangout. Come to League of Poro's Discord server: https://discord.gg/c2Qs9Y83hh 
 
-## Installation
+## Windows Installation
 1. Download and run the latest CapsuleFarmerEvolved.zip from [Releases tab](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest)
 2. Extract the archive
 3. Edit the configuration file `config.yaml` with a text editor (e.g. Notepad) - see [Configuration](#configuration) for details
@@ -77,7 +87,7 @@ options:
   -c CONFIGPATH, --config CONFIGPATH
                         Path to a custom config file
 ```                        
-## Installation (advanced)
+## Advanced Installation
 
 ### Prerequisities
 - Python >= 3.10.1 (version 3.9 should work as well but is not officially supported)
