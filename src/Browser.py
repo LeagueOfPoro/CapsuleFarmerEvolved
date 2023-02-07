@@ -1,3 +1,6 @@
+import re
+import urllib
+
 from Exceptions.NoAccessTokenException import NoAccessTokenException
 from Exceptions.RateLimitException import RateLimitException
 from Match import Match
@@ -18,7 +21,7 @@ class Browser:
     SESSION_REFRESH_INTERVAL = 1800.0
     STREAM_WATCH_INTERVAL = 60.0
 
-    def __init__(self, log, config: Config, account: str):
+    def __init__(self, log, stats, config: Config, account: str):
         """
         Initialize the Browser class
 
@@ -38,6 +41,7 @@ class Browser:
         self.currentlyWatching = {}
         self.liveMatches = {}
         self.account = account
+        self.stats = stats
 
     def login(self, username: str, password: str, refreshLock) -> bool:
         """
@@ -106,6 +110,16 @@ class Browser:
             if resAccessToken.status_code == 200:
                 #self.maintainSession()
                 self.__dumpCookies()
+                res = (self.client.cookies.get_dict()["id_hint"])
+                urlDecoded = urllib.parse.unquote(res)
+                newName = re.search(r"&summoner=(.*)&region", str(urlDecoded))
+                region = re.search(r"&region=(.*)&tag", str(urlDecoded))
+                if newName.group(1) and region.group(1):
+                    self.stats.updateName(self.account, f'{newName.group(1)} ({self.account})')
+                    self.stats.updateRegion(self.account, region.group(1))
+                else:
+                    self.stats.updateName(self.account, self.account)
+                    self.stats.updateRegion(self.account, "Unknown")
                 return True
         return False
 
