@@ -12,8 +12,6 @@ from Exceptions.StatusCodeAssertException import StatusCodeAssertException
 import pickle
 from pathlib import Path
 import jwt
-from notifypy import Notify
-
 
 class Browser:
     SESSION_REFRESH_INTERVAL = 1800.0
@@ -39,6 +37,7 @@ class Browser:
         self.currentlyWatching = {}
         self.liveMatches = {}
         self.account = account
+        self.notificationManager = config.getNotificationManager()
 
     def login(self, username: str, password: str, refreshLock) -> bool:
         """
@@ -65,13 +64,7 @@ class Browser:
                 
             resJson = res.json()
             if "multifactor" in resJson.get("type", ""):
-                if self.config.get2FANotification():
-                    notification = Notify()
-                    notification.title = username + " 2FA"
-                    notification.message = "New 2FA code required"
-                    notification.icon = "./poro.ico"
-                    notification.audio = "./sounds/NotificationSound.wav"
-                    notification.send()
+                self.notificationManager.makeNotificationOn2FA(username, "New 2FA code required")
                 twoFactorCode = input(f"Enter 2FA code for {self.account}:\n")
                 print("Code sent")
                 data = {"type": "multifactor", "code": twoFactorCode, "rememberDevice": True}

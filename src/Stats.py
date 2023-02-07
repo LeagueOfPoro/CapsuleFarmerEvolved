@@ -1,6 +1,5 @@
 from datetime import datetime
-from notifypy import Notify
-
+from Notifications import NotificationManager
 
 class Stats:
     def __init__(self, farmThreads) -> None:
@@ -10,17 +9,11 @@ class Stats:
     def initNewAccount(self, accountName: str):
         self.accountData[accountName] = {"lastCheck": "", "totalDrops": 0, "lastDrop": "N/A", "liveMatches": "", "status": "[yellow]WAIT", "failedLoginCounter": 0, "lastDropCheck": int(datetime.now().timestamp()*1e3)}
     
-    def update(self, accountName: str, newDrops: int = 0, liveMatches: str = "", dropNotification: bool = False):
+    def update(self, notificationManager: NotificationManager, accountName: str, newDrops: int = 0, liveMatches: str = ""):
         self.accountData[accountName]["lastCheck"] = datetime.now().strftime("%H:%M:%S %d/%m")
         self.accountData[accountName]["liveMatches"] = liveMatches
         if newDrops > 0:
-            if dropNotification:
-                notification = Notify()
-                notification.title = "{} Drops".format(accountName)
-                notification.message = "{} New Drop(s) received".format(newDrops)
-                notification.icon = "./poro.ico"
-                notification.audio = "../NotificationSound.wav"
-                notification.send()
+            notificationManager.makeNotificationDrop((accountName),"{} New Drop(s) received".format(newDrops))
             self.accountData[accountName]["totalDrops"] += newDrops
             self.accountData[accountName]["lastDrop"] = datetime.now().strftime("%H:%M:%S %d/%m")
     

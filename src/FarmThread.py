@@ -2,6 +2,7 @@ from datetime import datetime
 from threading import Thread
 from time import sleep
 from Browser import Browser
+from Config import Config
 import requests
 
 class FarmThread(Thread):
@@ -9,7 +10,7 @@ class FarmThread(Thread):
     A thread that creates a capsule farm for a given account
     """
 
-    def __init__(self, log, config, account, stats, locks):
+    def __init__(self, log, config: Config, account, stats, locks):
         """
         Initializes the FarmThread
 
@@ -25,7 +26,6 @@ class FarmThread(Thread):
         self.stats = stats
         self.browser = Browser(self.log, self.config, self.account)
         self.locks = locks
-        self.dropNotification = self.config.getDropNotification()
 
     def run(self):
         """
@@ -51,7 +51,7 @@ class FarmThread(Thread):
                         self.stats.updateLastDropCheck(self.account, int(datetime.now().timestamp()*1e3))
                     else:
                         liveMatchesMsg = "None"
-                    self.stats.update(self.account, len(newDrops), liveMatchesMsg, self.dropNotification)
+                    self.stats.update(self.config.getNotificationManager(), self.account, len(newDrops), liveMatchesMsg)
                     if self.config.connectorDrops:
                         self.__notifyConnectorDrops(newDrops)
                     sleep(Browser.STREAM_WATCH_INTERVAL)
