@@ -1,6 +1,7 @@
 import yaml
 from yaml.parser import ParserError
 from rich import print
+from pathlib import Path
 
 from Exceptions.InvalidCredentialsException import InvalidCredentialsException
 
@@ -19,6 +20,7 @@ class Config:
         
         self.accounts = {}
         try:
+            configPath = self.__findConfig(configPath)
             with open(configPath, "r",  encoding='utf-8') as f:
                 config = yaml.safe_load(f)
                 accs = config.get("accounts")
@@ -62,3 +64,20 @@ class Config:
         :return: dictionary, account information
         """
         return self.accounts[account]
+    
+    def __findConfig(self, configPath):
+        """
+        Try to find configuartion file in alternative locations.
+
+        :param configPath: user suplied configuartion file path
+        :return: pathlib.Path, path to the configuration file
+        """
+        configPath = Path(configPath)
+        if configPath.exists():
+            return configPath
+        if Path("../config/config.yaml").exists():
+            print(f"[red]ERROR: The configuration file cannot be found at {configPath}\nUsing the one from '../config/config.yaml'.\nRemember you can specify alternative configuration file using --config argument.")
+            return Path("../config/config.yaml")
+        
+        return configPath
+
