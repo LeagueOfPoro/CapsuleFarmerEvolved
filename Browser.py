@@ -1,17 +1,17 @@
+import pickle
+from datetime import datetime, timezone
+from pathlib import Path
+from time import time
+
+import cloudscraper
+import jwt
+from bs4 import BeautifulSoup
+
+from Config import Config
 from Exceptions.NoAccessTokenException import NoAccessTokenException
 from Exceptions.RateLimitException import RateLimitException
-from Match import Match
-import cloudscraper
-from pprint import pprint
-from bs4 import BeautifulSoup
-from datetime import datetime
-import threading
-from time import sleep, time
-from Config import Config
 from Exceptions.StatusCodeAssertException import StatusCodeAssertException
-import pickle
-from pathlib import Path
-import jwt
+from Match import Match
 
 
 class Browser:
@@ -54,14 +54,17 @@ class Browser:
         try:
             refreshLock.acquire()
             # Submit credentials
-            data = {"type": "auth", "username": username,
-                    "password": password, "remember": True, "language": "en_US"}
+            data = {"type": "auth",
+                    "username": username,
+                    "password": password,
+                    "remember": True,
+                    "language": "en_US"}
             res = self.client.put(
                 "https://auth.riotgames.com/api/v1/authorization", json=data)
             if res.status_code == 429:
                 retryAfter = res.headers['Retry-after']
                 raise RateLimitException(retryAfter)
-                
+
             resJson = res.json()
             if "multifactor" in resJson.get("type", ""):
                 twoFactorCode = input(f"Enter 2FA code for {self.account}:\n")
@@ -91,11 +94,15 @@ class Browser:
                 "https://login.leagueoflegends.com/sso/callback", data=data)
 
             res = self.client.get(
-                "https://auth.riotgames.com/authorize?client_id=esports-rna-prod&redirect_uri=https://account.rewards.lolesports.com/v1/session/oauth-callback&response_type=code&scope=openid&prompt=none&state=https://lolesports.com/?memento=na.en_GB", allow_redirects=True)
+                "https://auth.riotgames.com/authorize?client_id=esports-rna-prod&redirect_uri=https://account.rewards"
+                ".lolesports.com/v1/session/oauth-callback&response_type=code&scope=openid&prompt=none&state=https"
+                "://lolesports.com/?memento=na.en_GB",
+                allow_redirects=True
+            )
 
             # Get access and entitlement tokens for the first time
             headers = {"Origin": "https://lolesports.com",
-                        "Referrer": "https://lolesports.com"}
+                       "Referrer": "https://lolesports.com"}
 
             # This requests sometimes returns 404
             resAccessToken = self.client.get(
@@ -104,7 +111,7 @@ class Browser:
             resPasToken = self.client.get(
                 "https://account.rewards.lolesports.com/v1/session/clientconfig/rms", headers=headers)
             if resAccessToken.status_code == 200:
-                #self.maintainSession()
+                # self.maintainSession()
                 self.__dumpCookies()
                 return True
         return False
@@ -122,7 +129,7 @@ class Browser:
             self.__dumpCookies()
         else:
             self.log.error("Failed to refresh session")
-            raise StatusCodeAssertException(200, resAccessToken.status_code, resAccessToken.request.url) 
+            raise StatusCodeAssertException(200, resAccessToken.status_code, resAccessToken.request.url)
 
     def maintainSession(self):
         """
@@ -172,18 +179,20 @@ class Browser:
             res = self.__sendWatch(self.liveMatches[tid])
             self.log.debug(
                 f"{self.account} - {self.liveMatches[tid].league}: {res.json()}")
-            if res.json()["droppability"] == "on":   
-                dropsAvailable[self.liveMatches[tid].league] = True
-            else:
-                dropsAvailable[self.liveMatches[tid].league] = False
+            dropsAvailable[self.liveMatches[tid].league] = (
+                    res.json()["droppability"] == "on"
+            )
         return dropsAvailable
-    
+
     def checkNewDrops(self, lastCheckTime):
         try:
             headers = {"Origin": "https://lolesports.com",
-                   "Referrer": "https://lolesports.com",
-                   "Authorization": "Cookie access_token"}
-            res = self.client.get("https://account.service.lolesports.com/fandom-account/v1/earnedDrops?locale=en_GB&site=LOLESPORTS", headers=headers)
+                       "Referrer": "https://lolesports.com",
+                       "Authorization": "Cookie access_token"}
+            res = self.client.get(
+                "https://account.service.lolesports.com/fandom-account/v1/earnedDrops?locale=en_GB&site=LOLESPORTS",
+                headers=headers
+            )
             resJson = res.json()
             return [drop for drop in resJson if lastCheckTime <= drop["unlockedDateMillis"]]
         except (KeyError, TypeError):
@@ -197,9 +206,7 @@ class Browser:
         res = jwt.decode(self.client.cookies.get_dict()["access_token"], options={"verify_signature": False})
         timeLeft = res['exp'] - int(time())
         self.log.debug(f"{timeLeft} s until session expires.")
-        if timeLeft < 600:
-            return True
-        return False
+        return timeLeft < 600
 
     def __sendWatch(self, match: Match) -> object:
         """
@@ -210,7 +217,7 @@ class Browser:
         """
         data = {"stream_id": match.streamChannel,
                 "source": match.streamSource,
-                "stream_position_time": datetime.utcnow().isoformat(sep='T', timespec='milliseconds')+'Z',
+                "stream_position_time": datetime.now(timezone.utc).isoformat(sep='T', timespec='milliseconds')[:-6]+'Z',
                 "geolocation": {"code": "CZ", "area": "EU"},
                 "tournament_id": match.tournamentId}
         headers = {"Origin": "https://lolesports.com",
