@@ -34,7 +34,6 @@ class GuiThread(Thread):
         table.add_column("Drops")
 
         for acc in self.stats.accountData:
-            status = self.stats.accountData[acc]["status"]
             table.add_row(f"{self.stats.accountData[acc]['account']}",f"{self.stats.accountData[acc]['region']}", f"{self.stats.accountData[acc]['status']}", f"{self.stats.accountData[acc]['liveMatches']}", f"{self.stats.accountData[acc]['lastCheck']}", f"{self.stats.accountData[acc]['lastDrop']}", f"{self.stats.accountData[acc]['totalDrops']}")
         return table
 
