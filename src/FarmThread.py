@@ -25,6 +25,7 @@ class FarmThread(Thread):
         self.stats = stats
         self.browser = Browser(self.log, self.config, self.account)
         self.locks = locks
+        self.dropNotification = self.config.getDropNotification()
 
     def run(self):
         """
@@ -50,7 +51,7 @@ class FarmThread(Thread):
                         self.stats.updateLastDropCheck(self.account, int(datetime.now().timestamp()*1e3))
                     else:
                         liveMatchesMsg = "None"
-                    self.stats.update(self.account, len(newDrops), liveMatchesMsg)
+                    self.stats.update(self.account, len(newDrops), liveMatchesMsg, self.dropNotification)
                     if self.config.connectorDrops:
                         self.__notifyConnectorDrops(newDrops)
                     sleep(Browser.STREAM_WATCH_INTERVAL)

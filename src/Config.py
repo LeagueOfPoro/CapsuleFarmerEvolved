@@ -34,7 +34,9 @@ class Config:
                     if "username" != accs[account]["username"]:
                         onlyDefaultUsername = False
                 if onlyDefaultUsername:
-                    raise InvalidCredentialsException                    
+                    raise InvalidCredentialsException        
+                self.dropNotification = config.get("dropNotification", False)
+                self.Notification_2FA = config.get("2FANotification", False)              
                 self.debug = config.get("debug", False)
                 self.connectorDrops = config.get("connectorDropsUrl", "")
         except FileNotFoundError as ex:
@@ -74,6 +76,22 @@ class Config:
         :return: dictionary, account information
         """
         return self.accounts[account]
+    
+    def getDropNotification(self) -> bool:
+        """
+        Get Drop notification flag
+
+        :return: boolean, Drop notification flag
+        """
+        return self.dropNotification
+    
+    def get2FANotification(self) -> bool:
+        """
+        Get 2FA notification flag
+
+        :return: boolean, 2FA notification flag
+        """
+        return self.Notification_2FA
     
     def __findConfig(self, configPath):
         """
