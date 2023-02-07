@@ -21,7 +21,7 @@ This is a successor to the old [EsportsCapsuleFarmer](https://github.com/LeagueO
 2. [Community](#community)
 3. [Notes](#notes)
 4. [Installation](#installation) 
-    - [Windows](#windows-installation)
+    - [Windows](wiki/Advanced-Installation-for-Windows)
     - [Linux](#linux-installation)
     - [Docker](#docker-installation)
     - [Other](#other-operating-systems)
