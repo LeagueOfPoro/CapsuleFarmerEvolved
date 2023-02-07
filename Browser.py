@@ -27,9 +27,11 @@ class Browser:
         :param account: account string
         """
         self.client = cloudscraper.create_scraper(
-            browser={'browser': 'chrome',
-                     'platform': 'windows',
-                     'desktop': True},
+            browser={
+                'browser': 'chrome',
+                'platform': 'windows',
+                'desktop': True
+            },
             debug=config.getAccount(account).get("debug", False))
         self.log = log
         self.config = config
