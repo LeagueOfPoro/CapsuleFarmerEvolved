@@ -18,7 +18,7 @@ class Stats:
                 notification = Notify()
                 notification.title = "{} Drops".format(accountName)
                 notification.message = "{} New Drop(s) received".format(newDrops)
-                notification.icon = "../poro.ico"
+                notification.icon = "./poro.ico"
                 notification.audio = "../NotificationSound.wav"
                 notification.send()
             self.accountData[accountName]["totalDrops"] += newDrops
