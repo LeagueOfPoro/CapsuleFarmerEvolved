@@ -122,7 +122,7 @@ class FarmThread(Thread):
                 toast.show_toast(
                     f"The account [{self.account}] received a reward! ({title})",
                     f"We claimed an {reward} from https://lolesports.com/rewards",
-                    icon_path="poro.ico",
+                    icon_path="../poro.ico",
                     duration=5,
                     threaded=True,
                 )

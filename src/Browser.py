@@ -3,11 +3,9 @@ from Exceptions.NoAccessTokenException import NoAccessTokenException
 from Exceptions.RateLimitException import RateLimitException
 from Match import Match
 import cloudscraper
-from pprint import pprint
 from bs4 import BeautifulSoup
 from datetime import datetime
-import threading
-from time import sleep, time
+from time import time
 from Config import Config
 from Exceptions.StatusCodeAssertException import StatusCodeAssertException
 import pickle

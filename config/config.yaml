@@ -1,5 +1,5 @@
 notifications:
-  sound: "sound.wav"
+  sound: "../sound.wav" #Toast can cancel this sound
   toast: true
 accounts:
   accountname:
