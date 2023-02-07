@@ -39,7 +39,7 @@ This is a successor to the old [EsportsCapsuleFarmer](https://github.com/LeagueO
 - ARM supported (Raspberry Pi)
 
 ## Community
-If you have any type of issue, need help, or just want to hangout. Come to League of Poro's Discord server: https://discord.gg/c2Qs9Y83hh 
+If you have any type of issue, need help, or just want to hangout. Come to [League of Poro's Discord server](https://discord.gg/c2Qs9Y83hh).
 
 ## Support my work
 [Subscribe to my channel on YouTube](https://www.youtube.com/channel/UCwgpdTScSd788qILhLnyyyw?sub_confirmation=1) or even
