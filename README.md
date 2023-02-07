@@ -20,14 +20,15 @@ This is a successor to the old [EsportsCapsuleFarmer](https://github.com/LeagueO
 1. [Features](#features) 
 2. [Community](#community)
 3. [Notes](#notes)
-4. [Installation](#installation) 
-    - [Windows](wiki/Advanced-Installation-for-Windows)
-    - [Linux](#linux-installation)
-    - [Docker](#docker-installation)
-    - [Other](#other-operating-systems)
+4. [Configuration](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/wiki/Configuration)
+5. [Installation](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/wiki)
+    - [Windows](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/wiki/Advanced-Installation-for-Windows)
+    - [Linux](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/wiki/Advanced-Installation-for-Linux)
+    - [Docker](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/wiki/Advanced-Installation-for-Docker)
+    - [MacOS](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/wiki/Advanced-Installation-for-MacOS)
+    - [Android](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/wiki/Advanced-Installation-for-Android)
+    - [Google TV](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/wiki/Advanced-Installation-for-Google-TV)
 6. [Disclaimer⚠️](#disclaimer)
-
-
 
 ## Features
 - Watch all live matches on lolesports.com
@@ -50,101 +51,6 @@ If you have any type of issue, need help, or just want to hangout. Come to Leagu
 - Not every account receives every drop. That is normal, and it would happen even if you watched it on the web.
 ![image](https://user-images.githubusercontent.com/95635582/215994461-4f613b76-0e96-4b1a-b138-f1caa748df65.png)
 - Regularly check if the "Heartbeat" happened within the last few minutes. If not, restart the program.
-
-
-# Installation
-  - [Windows](#windows-installation)
-  - [Linux](#linux-installation)
-  - [Docker](#docker-installation)
-  - [Other](#other-operating-systems)
-
-
-## Configuration
-Fill out your username and password in `config.yaml`. Name of the account groups is not important but I recommend entering something recognizable to better detect problems with the account. 
-```yaml
-accounts:
-  accountname:
-    username: "username"
-    password: "password"
-```
-You can add as many accounts as you want. _(But be reasonable)_ Example:
-```yaml
-accounts:
-  accountname:
-    username: "username"
-    password: "password"
-  changethistowhatever:
-    username: "Riot Poro"
-    password: "1234"
-```
-
-In case of problem, enable debugging mode to increase verbosity of the log:
-`debug: True`
-
-## Windows Installation
-1. Download and run the latest CapsuleFarmerEvolved.zip from [Releases tab](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest).
-2. Extract `CapsuleFarmerEvolved.zip` to its own folder.
-3. Edit the configuration file `config.yaml` with a text editor (e.g. Notepad) - see [Configuration](#configuration) for details.
-4. Run `CapsuleFarmer.exe`.
-
-There's a [Quickstart guide](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/wiki/Quickstart-guide) if you have issues
-
-You can select a non-default configuration file, see [CLI](#cli)
-
-## CLI
-```
-usage: CapsuleFarmerEvolved.exe [-h] [-c CONFIGPATH]
-
-Farm Esports Capsules by watching all matches on lolesports.com.
-
-options:
-  -h, --help            show this help message and exit
-  -c CONFIGPATH, --config CONFIGPATH
-                        Path to a custom config file
-```
-```bash
-capsulefarmerevolved.exe --config /path/to/secret.yaml
-```
-
-## Linux Installation
-
-### Prerequisities
-- Python ≥ 3.10.1 (version 3.9 should work as well but is not officially supported)
-- pipenv (`pip install pipenv`)
-
-### Step by step
-1. Clone this repo - `git clone https://github.com/LeagueOfPoro/CapsuleFarmerEvolved.git`
-2. Move to the directory -  `cd CapsuleFarmerEvolved`
-3. Install the Python virtual environment - `pipenv install`
-4. Edit the [configuration](#configuration) file
-5. Run the tool - `pipenv run python ./main.py`
-
-### Update
-In the CapsuleFarmerEvolved, run `git pull`
-
-### Creating EXE
-1.  `pipenv install --dev`
-2.  `pipenv run pyinstaller -F --icon=poro.ico ./main.py --collect-all charset_normalizer -n CapsuleFarmerEvolved`
-
-
-## Docker Installation
-Pre-built image:
-
-Edit the `/path/to/config.yaml` to absolute path to your configuration file and run the container in the background:
-```
-docker run -it --restart unless-stopped --name CapsuleFarmer -d -v /path/to/config.yaml:/config/config.yaml  leagueofporo/capsulefarmer:master
-```
-
-If you want to build the image locally:
-1. Clone this repo and move to it's direcotry
-2. Build the image: `docker build -t capsulefarmerevolved`.
-3. Edit the `/path/to/config.yaml` to absolute path to your configuration file and run the container in the background:
-```docker
-docker run -it --restart unless-stopped -d -v /path/to/config.yaml:/config/config.yaml  capsulefarmerevolved
-```
-## Other Operating Systems
-
-Other operating systems are supported such as MacOS, Android, and  Check the Wiki for installation guides for those systems.
 
 ## Disclaimer 
 This project comes with no guarantee or warranty. You are responsible for whatever happens from using this project. No bans have been reported from using this project but it is not a guarantee. This is a personal project and is in no way affiliated with Riot Games.
