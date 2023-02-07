@@ -18,14 +18,19 @@ This is a successor to the old [EsportsCapsuleFarmer](https://github.com/LeagueO
 
 # README CONTENTS 
 1. [Features](#features) 
-2. [Windows Installation](#windows-installation) 
-3. [Advanced Installation](#advanced-installation)
-4. [Community](#community)
+2. [Community](#community)
+3. [Notes](#notes)
+4. [Installation](#installation) 
+    - [Windows](#windows-installation)
+    - [Linux](#linux-installation)
+    - [Docker](#docker-installation)
+    - [Other](#other-operating-systems)
+6. [Disclaimer⚠️](#disclaimer)
 
 
 
 ## Features
-- Watch every live LoL-Esports match
+- Watch all live matches on lolesports.com
 - Show how many drops each account received during the program run
 - Very lightweight - no external browser needed
 - Simple GUI
@@ -35,13 +40,24 @@ This is a successor to the old [EsportsCapsuleFarmer](https://github.com/LeagueO
 ## Community
 If you have any type of issue, need help, or just want to hangout. Come to League of Poro's Discord server: https://discord.gg/c2Qs9Y83hh 
 
-## Windows Installation
-1. Download and run the latest CapsuleFarmerEvolved.zip from [Releases tab](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest)
-2. Extract the archive
-3. Edit the configuration file `config.yaml` with a text editor (e.g. Notepad) - see [Configuration](#configuration) for details
-4. Run `CapsuleFarmer.exe`
+## Support my work
+[Subscribe to my channel on YouTube](https://www.youtube.com/channel/UCwgpdTScSd788qILhLnyyyw?sub_confirmation=1) or even
 
-There's a [Quickstart guide](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/wiki/Quickstart-guide) if you have issues
+<a href='https://www.youtube.com/channel/UCwgpdTScSd788qILhLnyyyw/join' target='_blank'><img height='35' style='border:0px;height:46px;' src='https://share.leagueofporo.com/yt_member.png' border='0' alt='Become a channel member on YouTube' />
+
+## Notes
+- I recommend disabling 2FA on accounts using the bot. It will be way more stable, and it won't ask you for a code in the middle of a random night.
+- Not every account receives every drop. That is normal, and it would happen even if you watched it on the web.
+![image](https://user-images.githubusercontent.com/95635582/215994461-4f613b76-0e96-4b1a-b138-f1caa748df65.png)
+- Regularly check if the "Heartbeat" happened within the last few minutes. If not, restart the program.
+
+
+# Installation
+  - [Windows](#windows-installation)
+  - [Linux](#linux-installation)
+  - [Docker](#docker-installation)
+  - [Other](#other-operating-systems)
+
 
 ## Configuration
 Fill out your username and password in `config.yaml`. Name of the account groups is not important but I recommend entering something recognizable to better detect problems with the account. 
@@ -65,16 +81,15 @@ accounts:
 In case of problem, enable debugging mode to increase verbosity of the log:
 `debug: True`
 
-You can select a non-default configuration file, see [CLI](#cli)
-```bash
-capsulefarmerevolved.exe --config secret.yaml
-```
+## Windows Installation
+1. Download and run the latest CapsuleFarmerEvolved.zip from [Releases tab](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest).
+2. Extract `CapsuleFarmerEvolved.zip` to its own folder.
+3. Edit the configuration file `config.yaml` with a text editor (e.g. Notepad) - see [Configuration](#configuration) for details.
+4. Run `CapsuleFarmer.exe`.
 
-## Notes
-- I recommend disabling 2FA on accounts using the bot. It will be way more stable, and it won't ask you for a code in the middle of a random night.
-- Not every account receives every drop. That is normal, and it would happen even if you watched it on the web.
-![image](https://user-images.githubusercontent.com/95635582/215994461-4f613b76-0e96-4b1a-b138-f1caa748df65.png)
-- Regularly check if the "Heartbeat" happened within the last few minutes. If not, restart the program.
+There's a [Quickstart guide](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/wiki/Quickstart-guide) if you have issues
+
+You can select a non-default configuration file, see [CLI](#cli)
 
 ## CLI
 ```
@@ -86,28 +101,33 @@ options:
   -h, --help            show this help message and exit
   -c CONFIGPATH, --config CONFIGPATH
                         Path to a custom config file
-```                        
-## Advanced Installation
+```
+```bash
+capsulefarmerevolved.exe --config /path/to/secret.yaml
+```
+
+## Linux Installation
 
 ### Prerequisities
-- Python >= 3.10.1 (version 3.9 should work as well but is not officially supported)
+- Python ≥ 3.10.1 (version 3.9 should work as well but is not officially supported)
 - pipenv (`pip install pipenv`)
 
 ### Step by step
 1. Clone this repo - `git clone https://github.com/LeagueOfPoro/CapsuleFarmerEvolved.git`
 2. Move to the directory -  `cd CapsuleFarmerEvolved`
 3. Install the Python virtual environment - `pipenv install`
-4. Edit the configuration file
+4. Edit the [configuration](#configuration) file
 5. Run the tool - `pipenv run python ./main.py`
 
 ### Update
 In the CapsuleFarmerEvolved, run `git pull`
 
-### Create EXE
+### Creating EXE
 1.  `pipenv install --dev`
 2.  `pipenv run pyinstaller -F --icon=poro.ico ./main.py --collect-all charset_normalizer -n CapsuleFarmerEvolved`
 
-## Docker
+
+## Docker Installation
 Pre-built image:
 
 Edit the `/path/to/config.yaml` to absolute path to your configuration file and run the container in the background:
@@ -122,8 +142,9 @@ If you want to build the image locally:
 ```docker
 docker run -it --restart unless-stopped -d -v /path/to/config.yaml:/config/config.yaml  capsulefarmerevolved
 ```
+## Other Operating Systems
 
-## Support my work
-[Subscribe to my channel on YouTube](https://www.youtube.com/channel/UCwgpdTScSd788qILhLnyyyw?sub_confirmation=1) or even
+Other operating systems are supported such as MacOS, Android, and  Check the Wiki for installation guides for those systems.
 
-<a href='https://www.youtube.com/channel/UCwgpdTScSd788qILhLnyyyw/join' target='_blank'><img height='35' style='border:0px;height:46px;' src='https://share.leagueofporo.com/yt_member.png' border='0' alt='Become a channel member on YouTube' />
+## Disclaimer 
+This project comes with no guarantee or warranty. You are responsible for whatever happens from using this project. No bans have been reported from using this project but it is not a guarantee. This is a personal project and is in no way affiliated with Riot Games.
