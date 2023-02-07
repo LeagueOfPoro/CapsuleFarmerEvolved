@@ -1,13 +1,12 @@
-# Capsule Farmer Evolved
-
+![# Capsule Farmer Evolved](https://raw.githubusercontent.com/Penguax/CapsuleFarmerEvolved/master/.github/banner.png)
 Are you tired of watching professional League of Legends games? Do you watch only for the drops? This is a revolution in the farming of League of Legends Esports capsules!
 
 This is a successor to the old [EsportsCapsuleFarmer](https://github.com/LeagueOfPoro/EsportsCapsuleFarmer) which relied on a web browser to watch videos. *Capsule Farmer Evolved* simulates traffic to lolesports.com servers and tricks it into thinking the account is watching a stream. This approach drastically lowers the hardware requirements.
 
-[Learn more about the esports drops directly from Riot games.](https://lolesports.com/article/lol-esports-2022-season-rewards-and-drops-update!/blt4ae38b4643f45741)
+[Learn more about the esports drops directly from Riot games.](https://lolesports.com/article/drops-information-for-lol-esports-season-2023/blt15759d60486d16cc)
 
 ### Features
-- Watch every live match
+- Watch every live LoL-Esports match
 - Show how many drops each account received during the program run
 - Very lightweight - no external browser needed
 - Simple GUI
@@ -94,15 +93,15 @@ Pre-built image:
 
 Edit the `/path/to/config.yaml` to absolute path to your configuration file and run the container in the background:
 ```
-docker run -it --rm --restart unless-stopped --name CapsuleFarmer -d -v /path/to/config.yaml:/config/config.yaml  leagueofporo/capsulefarmer:master
+docker run -it --restart unless-stopped --name CapsuleFarmer -d -v /path/to/config.yaml:/config/config.yaml  leagueofporo/capsulefarmer:master
 ```
 
 If you want to build the image locally:
 1. Clone this repo and move to it's direcotry
-2. Build the image: `docker build -t capsulefarmerevolved .`
+2. Build the image: `docker build -t capsulefarmerevolved`.
 3. Edit the `/path/to/config.yaml` to absolute path to your configuration file and run the container in the background:
 ```docker
-docker run -it --rm --restart unless-stopped -d -v /path/to/config.yaml:/config/config.yaml  capsulefarmerevolved
+docker run -it --restart unless-stopped -d -v /path/to/config.yaml:/config/config.yaml  capsulefarmerevolved
 ```
 
 ## Support my work
