@@ -53,13 +53,11 @@ class Config:
             input()
             raise ex
         try:
-            if Path("bestStreams.txt").exists():
-                bestStreams = Path("bestStreams.txt")
-            elif Path("../config/bestStreams.txt").exists():
+            bestStreams = Path("bestStreams.txt")
+            if Path("../config/bestStreams.txt").exists():
                 bestStreams = Path("../config/bestStreams.txt")
             elif Path("config/bestStreams.txt").exists():
                 bestStreams = Path("config/bestStreams.txt")
-            
             with open(bestStreams, "r",  encoding='utf-8') as f:
                 self.bestStreams = f.read().splitlines()
         except FileNotFoundError as ex:
