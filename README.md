@@ -44,7 +44,13 @@ accounts:
     password: "1234"
 ```
 
-In case of problem, enable debugging mode to increase verbosity of the log:
+- To enable drop sound notifications
+`dropNotification: True`
+
+- To enable 2FA sound notifications
+`2FANotification: True`
+
+- In case of problem, enable debugging mode to increase verbosity of the log:
 `debug: True`
 
 You can select a non-default configuration file, see [CLI](#cli)
