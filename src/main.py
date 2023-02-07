@@ -9,11 +9,13 @@ import sys
 import argparse
 from rich import print
 from pathlib import Path
+from time import sleep
 
 from Stats import Stats
 from VersionManager import VersionManager
 
-CURRENT_VERSION = 1.1
+
+CURRENT_VERSION = 1.2
 
 def init() -> tuple[Logger, Config]:
     parser = argparse.ArgumentParser(description='Farm Esports Capsules by watching all matches on lolesports.com.')
@@ -57,6 +59,9 @@ def main(log: Logger, config: Config):
         for account in config.accounts:
             if account not in farmThreads:
                 if stats.getFailedLogins(account) < 3:
+                    if stats.getFailedLogins(account) > 0:
+                        log.debug("Sleeping {account} before retrying login.")
+                        sleep(30)
                     log.info(f"Starting a thread for {account}.")
                     thread = FarmThread(log, config, account, stats, locks)
                     thread.daemon = True

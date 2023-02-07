@@ -1,3 +1,4 @@
+from Exceptions.NoAccessTokenException import NoAccessTokenException
 from Exceptions.RateLimitException import RateLimitException
 from Match import Match
 import cloudscraper
@@ -5,11 +6,12 @@ from pprint import pprint
 from bs4 import BeautifulSoup
 from datetime import datetime
 import threading
-from time import sleep
+from time import sleep, time
 from Config import Config
 from Exceptions.StatusCodeAssertException import StatusCodeAssertException
 import pickle
 from pathlib import Path
+import jwt
 
 
 class Browser:
@@ -96,24 +98,18 @@ class Browser:
                         "Referrer": "https://lolesports.com"}
 
             # This requests sometimes returns 404
-            for i in range(5):
-                resAccessToken = self.client.get(
-                    "https://account.rewards.lolesports.com/v1/session/token", headers=headers)
-                if resAccessToken.status_code == 200:
-                    break
-                else:
-                    sleep(1)
-
+            resAccessToken = self.client.get(
+                "https://account.rewards.lolesports.com/v1/session/token", headers=headers)
             # Currently unused but the call might be important server-side
             resPasToken = self.client.get(
                 "https://account.rewards.lolesports.com/v1/session/clientconfig/rms", headers=headers)
             if resAccessToken.status_code == 200:
-                self.maintainSession()
+                #self.maintainSession()
                 self.__dumpCookies()
                 return True
         return False
 
-    def refreshTokens(self):
+    def refreshSession(self):
         """
         Refresh access and entitlement tokens
         """
@@ -130,17 +126,11 @@ class Browser:
 
     def maintainSession(self):
         """
-        Periodically maintain the session by refreshing the tokens
+        Periodically maintain the session by refreshing the access_token
         """
-        self.refreshTimer = threading.Timer(
-            Browser.SESSION_REFRESH_INTERVAL, self.refreshTokens)
-        self.refreshTimer.start()
-
-    def stopMaintaininingSession(self):
-        """
-        Stops refreshing the tokens
-        """
-        self.refreshTimer.cancel()
+        if self.__needSessionRefresh():
+            self.log.debug("Refreshing session.")
+            self.refreshSession()
 
     def getLiveMatches(self):
         """
@@ -196,9 +186,20 @@ class Browser:
             res = self.client.get("https://account.service.lolesports.com/fandom-account/v1/earnedDrops?locale=en_GB&site=LOLESPORTS", headers=headers)
             resJson = res.json()
             return [drop for drop in resJson if lastCheckTime <= drop["unlockedDateMillis"]]
-        except KeyError:
+        except (KeyError, TypeError):
             self.log.debug("Drop check failed")
             return []
+
+    def __needSessionRefresh(self) -> bool:
+        if "access_token" not in self.client.cookies.get_dict():
+            raise NoAccessTokenException()
+
+        res = jwt.decode(self.client.cookies.get_dict()["access_token"], options={"verify_signature": False})
+        timeLeft = res['exp'] - int(time())
+        self.log.debug(f"{timeLeft} s until session expires.")
+        if timeLeft < 600:
+            return True
+        return False
 
     def __sendWatch(self, match: Match) -> object:
         """

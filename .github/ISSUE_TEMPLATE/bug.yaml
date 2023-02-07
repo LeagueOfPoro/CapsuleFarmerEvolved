@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report! Please ensure this issue is not already reported by searching the [issue tracker](https://https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/issues) for a similar issue. Please do not use this template for questions! If you have a question, please ask it our Discord server. If you have a feature request, please use the feature request template.
+        Thanks for taking the time to fill out this bug report! Please ensure this issue is not already reported by searching the [issue tracker](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/issues) for a similar issue. Please do not use this template for questions! If you have a question, please ask it our Discord server. If you have a feature request, please use the feature request template.
   - type: textarea
     id: what-happened
     attributes:
@@ -56,6 +56,11 @@ body:
       label: Relevant log output
       description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
       render: shell
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Anything else you would like to add into this issue request, such as notes, credits, etc.
   - type: checkboxes
     id: terms
     attributes:
