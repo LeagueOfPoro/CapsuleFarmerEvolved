@@ -36,6 +36,7 @@ sharepython-wheels
 .egg
 MANIFEST
 main.spec
+CapsuleFarmerEvolved.spec
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
