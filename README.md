@@ -1,4 +1,13 @@
 ![# Capsule Farmer Evolved](https://raw.githubusercontent.com/Penguax/CapsuleFarmerEvolved/master/.github/banner.png)
+<p align="center">
+<a href="https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/blob/master/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-orange"></a>
+<a href="https://www.python.org/downloads/release/python-3100/"><img alt="Python3" src="https://img.shields.io/badge/built%20for-Python%E2%89%A53.10-red.svg?style=flat"></a>
+<a href="https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/pulls"><img alt="PRsWelcome" src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat"></a>
+<a href="https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/stargazers"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/LeagueOfPoro/CapsuleFarmerEvolved"></a>
+<a href="https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/issues?q=is%3Aissue+is%3Aclosed"><img alt="GitHub closed issues" src="https://img.shields.io/github/issues-closed/LeagueOfPoro/CapsuleFarmerEvolved"></a>
+<a href="https://github.com/LeagueOfPoro/CapsuleFarmerEvolved"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/LeagueOfPoro/CapsuleFarmerEvolved"></a>
+</p>
+
 Are you tired of watching professional League of Legends games? Do you watch only for the drops? This is a revolution in the farming of League of Legends Esports capsules!
 
 This is a successor to the old [EsportsCapsuleFarmer](https://github.com/LeagueOfPoro/EsportsCapsuleFarmer) which relied on a web browser to watch videos. *Capsule Farmer Evolved* simulates traffic to lolesports.com servers and tricks it into thinking the account is watching a stream. This approach drastically lowers the hardware requirements.
