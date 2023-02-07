@@ -1,5 +1,6 @@
 from threading import Thread
 from time import sleep
+
 from rich.live import Live
 from rich.table import Table
 
@@ -34,9 +35,11 @@ class GuiThread(Thread):
 
         for acc in self.stats.accountData:
             status = self.stats.accountData[acc]["status"]
-            table.add_row(f"{acc}", f"{status}", f"{self.stats.accountData[acc]['liveMatches']}",
-                          f"{self.stats.accountData[acc]['lastCheck']}", f"{self.stats.accountData[acc]['lastDrop']}",
-                          f"{self.stats.accountData[acc]['totalDrops']}")
+            table.add_row(
+                f"{acc}", f"{status}", f"{self.stats.accountData[acc]['liveMatches']}",
+                f"{self.stats.accountData[acc]['lastCheck']}", f"{self.stats.accountData[acc]['lastDrop']}",
+                f"{self.stats.accountData[acc]['totalDrops']}"
+            )
             # table.add_row(f"{acc}", f"{status}", f"{self.stats.accountData[acc]['liveMatches']}",
             # f"{self.stats.accountData[acc]['lastCheck']}")
         return table

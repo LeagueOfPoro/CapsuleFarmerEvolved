@@ -7,8 +7,12 @@ class Stats:
         self.accountData = {}
 
     def initNewAccount(self, accountName: str):
-        self.accountData[accountName] = {"lastCheck": "", "totalDrops": 0, "lastDrop": "N/A", "liveMatches": "",
-                                         "status": "[yellow]WAIT", "failedLoginCounter": 0,
+        self.accountData[accountName] = {"lastCheck": "",
+                                         "totalDrops": 0,
+                                         "lastDrop": "N/A",
+                                         "liveMatches": "",
+                                         "status": "[yellow]WAIT",
+                                         "failedLoginCounter": 0,
                                          "lastDropCheck": int(datetime.now().timestamp() * 1e3)}
 
     def update(self, accountName: str, newDrops: int = 0, liveMatches: str = ""):

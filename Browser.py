@@ -27,11 +27,9 @@ class Browser:
         :param account: account string
         """
         self.client = cloudscraper.create_scraper(
-            browser={
-                'browser': 'chrome',
-                'platform': 'windows',
-                'desktop': True
-            },
+            browser={'browser': 'chrome',
+                     'platform': 'windows',
+                     'desktop': True},
             debug=config.getAccount(account).get("debug", False))
         self.log = log
         self.config = config
@@ -54,8 +52,11 @@ class Browser:
         try:
             refreshLock.acquire()
             # Submit credentials
-            data = {"type": "auth", "username": username,
-                    "password": password, "remember": True, "language": "en_US"}
+            data = {"type": "auth",
+                    "username": username,
+                    "password": password,
+                    "remember": True,
+                    "language": "en_US"}
             res = self.client.put(
                 "https://auth.riotgames.com/api/v1/authorization", json=data)
             if res.status_code == 429:
@@ -94,7 +95,8 @@ class Browser:
                 "https://auth.riotgames.com/authorize?client_id=esports-rna-prod&redirect_uri=https://account.rewards"
                 ".lolesports.com/v1/session/oauth-callback&response_type=code&scope=openid&prompt=none&state=https"
                 "://lolesports.com/?memento=na.en_GB",
-                allow_redirects=True)
+                allow_redirects=True
+            )
 
             # Get access and entitlement tokens for the first time
             headers = {"Origin": "https://lolesports.com",
@@ -187,7 +189,8 @@ class Browser:
                        "Authorization": "Cookie access_token"}
             res = self.client.get(
                 "https://account.service.lolesports.com/fandom-account/v1/earnedDrops?locale=en_GB&site=LOLESPORTS",
-                headers=headers)
+                headers=headers
+            )
             resJson = res.json()
             return [drop for drop in resJson if lastCheckTime <= drop["unlockedDateMillis"]]
         except (KeyError, TypeError):
@@ -212,8 +215,8 @@ class Browser:
         """
         data = {"stream_id": match.streamChannel,
                 "source": match.streamSource,
-                "stream_position_time": datetime.now(timezone.utc).isoformat(
-                    sep='T', timespec='milliseconds')[:-6] + 'Z',
+                "stream_position_time": datetime.now(timezone.utc).isoformat(sep='T', timespec='milliseconds')[
+                                        :-6] + 'Z',
                 "geolocation": {"code": "CZ", "area": "EU"},
                 "tournament_id": match.tournamentId}
         headers = {"Origin": "https://lolesports.com",
