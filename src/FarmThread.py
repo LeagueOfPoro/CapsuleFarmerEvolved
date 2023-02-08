@@ -2,6 +2,7 @@ from datetime import datetime
 from threading import Thread
 from time import sleep
 from Browser import Browser
+from Exceptions.InvalidIMAPCredentials import InvalidIMAPCredentialsException
 import requests
 
 class FarmThread(Thread):
@@ -23,7 +24,7 @@ class FarmThread(Thread):
         self.config = config
         self.account = account
         self.stats = stats
-        self.browser = Browser(self.log, self.config, self.account)
+        self.browser = Browser(self.log, self.stats, self.config, self.account)
         self.locks = locks
 
     def run(self):
@@ -32,7 +33,7 @@ class FarmThread(Thread):
         """
         try:
             self.stats.updateStatus(self.account, "[green]LOGIN")
-            if self.browser.login(self.config.getAccount(self.account)["username"], self.config.getAccount(self.account)["password"], self.locks["refreshLock"]):
+            if self.browser.login(self.config.getAccount(self.account)["username"], self.config.getAccount(self.account)["password"], self.config.getAccount(self.account)["imapusername"], self.config.getAccount(self.account)["imappassword"], self.config.getAccount(self.account)["imapserver"], self.locks["refreshLock"]):
                 self.stats.updateStatus(self.account, "[green]LIVE")
                 self.stats.resetLoginFailed(self.account)
                 while True:
@@ -61,8 +62,13 @@ class FarmThread(Thread):
                     self.stats.updateStatus(self.account, "[red]LOGIN FAILED - WILL RETRY SOON")
                 else:
                     self.stats.updateStatus(self.account, "[red]LOGIN FAILED")
-        except Exception:
-            self.log.exception(f"Error in {self.account}. The program will try to recover.")
+        except (Exception, InvalidIMAPCredentialsException):
+            if InvalidIMAPCredentialsException:
+                self.log.error(f"IMAP login failed for {self.account}")
+                self.stats.updateStatus(self.account, "[red]IMAP LOGIN FAILED")
+                self.stats.accountData[self.account]["failedLoginCounter"] = 3
+            else:
+                self.log.exception(f"Error in {self.account}. The program will try to recover.")
 
     def stop(self):
         """

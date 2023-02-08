@@ -1,5 +1,6 @@
 from Exceptions.NoAccessTokenException import NoAccessTokenException
 from Exceptions.RateLimitException import RateLimitException
+from Exceptions.InvalidIMAPCredentials import InvalidIMAPCredentialsException
 from Match import Match
 import cloudscraper
 from pprint import pprint
@@ -12,13 +13,15 @@ from Exceptions.StatusCodeAssertException import StatusCodeAssertException
 import pickle
 from pathlib import Path
 import jwt
+from IMAP import IMAP # Added to automate 2FA
+import imaplib2
 
 
 class Browser:
     SESSION_REFRESH_INTERVAL = 1800.0
     STREAM_WATCH_INTERVAL = 60.0
 
-    def __init__(self, log, config: Config, account: str):
+    def __init__(self, log, stats, config: Config, account: str):
         """
         Initialize the Browser class
 
@@ -33,13 +36,15 @@ class Browser:
                 'desktop': True
             },
             debug=config.getAccount(account).get("debug", False))
+        
         self.log = log
+        self.stats = stats
         self.config = config
         self.currentlyWatching = {}
         self.liveMatches = {}
         self.account = account
 
-    def login(self, username: str, password: str, refreshLock) -> bool:
+    def login(self, username: str, password: str, imapusername: str, imappassword: str, imapserver: str, refreshLock) -> bool:
         """
         Login to the website using given credentials. Obtain necessary tokens.
 
@@ -61,15 +66,34 @@ class Browser:
             if res.status_code == 429:
                 retryAfter = res.headers['Retry-after']
                 raise RateLimitException(retryAfter)
-                
+            
             resJson = res.json()
             if "multifactor" in resJson.get("type", ""):
-                twoFactorCode = input(f"Enter 2FA code for {self.account}:\n")
-                print("Code sent")
-                data = {"type": "multifactor", "code": twoFactorCode, "rememberDevice": True}
-                res = self.client.put(
-                    "https://auth.riotgames.com/api/v1/authorization", json=data)
-                resJson = res.json()
+                if (imapserver != ""):
+                    #Handles all IMAP requests
+                    try:
+                        M = imaplib2.IMAP4_SSL(imapserver)
+                        M.login(imapusername, imappassword)
+                        M.select("INBOX")
+                        idler = IMAP(M)
+                        idler.start()
+                        self.stats.updateStatus(self.account, f"[green]WAITING FOR 2FA")
+                        idler.join()
+                        M.logout()
+
+                        data = {"type": "multifactor", "code": idler.code, "rememberDevice": True}
+                        res = self.client.put(
+                            "https://auth.riotgames.com/api/v1/authorization", json=data)
+                        resJson = res.json()
+                    except:
+                        raise InvalidIMAPCredentialsException()
+                else:
+                    twoFactorCode = input(f"Enter 2FA code for {self.account}:\n")
+                    self.stats.updateStatus(self.account, f"[green]CODE SENT")
+                    data = {"type": "multifactor", "code": twoFactorCode, "rememberDevice": True}
+                    res = self.client.put(
+                        "https://auth.riotgames.com/api/v1/authorization", json=data)
+                    resJson = res.json()
             # Finish OAuth2 login
             res = self.client.get(resJson["response"]["parameters"]["uri"])
         except KeyError:
@@ -118,6 +142,7 @@ class Browser:
         resAccessToken = self.client.get(
             "https://account.rewards.lolesports.com/v1/session/refresh", headers=headers)
         if resAccessToken.status_code == 200:
+            self.maintainSession()
             self.__dumpCookies()
         else:
             self.log.error("Failed to refresh session")
@@ -195,7 +220,7 @@ class Browser:
 
         res = jwt.decode(self.client.cookies.get_dict()["access_token"], options={"verify_signature": False})
         timeLeft = res['exp'] - int(time())
-        self.log.debug(f"{timeLeft} s until session expires.")
+        self.log.debug(f"{timeLeft}s until session expires.")
         if timeLeft < 600:
             return True
         return False
