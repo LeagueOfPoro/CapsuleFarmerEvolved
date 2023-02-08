@@ -15,7 +15,7 @@ class NotificationManager:
         self.notificationOnDrop = config.get("notificationOnDrop", False)
         self.notificationOnFault = config.get("notificationOnFault", False)
         
-        self.soundPath = config.get("soundPath","../defaultNotificationSound.wav")        
+        self.soundPath = config.get("soundPath","./assets/defaultNotificationSound.wav")        
         self.soundOnStart = config.get("soundOnStart", False)
         self.soundOn2FA = config.get("soundOn2FA", False)
         self.soundOnDrop = config.get("soundOnDrop", False)
@@ -26,7 +26,7 @@ class NotificationManager:
             notification = Notify()
             notification.title = title
             notification.message = message
-            notification.icon = "./poro.ico"
+            notification.icon = "./assets/poro.ico"
             
             if soundOn:
                 notification.audio = self.soundPath
