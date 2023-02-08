@@ -147,17 +147,13 @@ class Config:
                 config.update({"connectorDropsUrl": url})
         print("[green]Done!")
         print(f"[green]Writing to [/green][purple]{configFile}")
-        exit()
         configFile.write_text(yaml.dump(config))
 
     def __isValidAccount(self, acc: dict[str, str]) -> bool:
         """
         Check if the account has default username and password
         """
-        if (
-            acc.get("username", "username") == "username"
-            or acc.get("password", "password") == "password"
-        ):
+        if acc.get("username", "username") == "username":
             return False
         return True
 
