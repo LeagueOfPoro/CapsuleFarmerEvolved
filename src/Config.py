@@ -1,9 +1,10 @@
-import yaml
-from yaml.parser import ParserError
-from rich import print
+import re
+from getpass import getpass
 from pathlib import Path
 
-from Exceptions.InvalidCredentialsException import InvalidCredentialsException
+import yaml
+from rich import print
+from yaml.parser import ParserError
 
 
 class Config:
@@ -17,48 +18,21 @@ class Config:
 
         :param configPath: string, path to the configuration file
         """
-        
+
         self.accounts = {}
-        try:
-            configPath = self.__findConfig(configPath)
-            with open(configPath, "r",  encoding='utf-8') as f:
-                config = yaml.safe_load(f)
-                accs = config.get("accounts")
-                for account in accs:
-                    if "username" != accs[account]["username"]:
-                        self.accounts[account] = {
-                            "username": accs[account]["username"],
-                            "password": accs[account]["password"]
-                        }                    
-                if not self.accounts:
-                    raise InvalidCredentialsException                    
-                self.debug = config.get("debug", False)
-                self.connectorDrops = config.get("connectorDropsUrl", "")
-        except FileNotFoundError as ex:
-            print(f"[red]CRITICAL ERROR: The configuration file cannot be found at {configPath}\nHave you extacted the ZIP archive and edited the configuration file?")
-            print("Press any key to exit...")
-            input()
-            raise ex
-        except (ParserError, KeyError) as ex:
-            print(f"[red]CRITICAL ERROR: The configuration file does not have a valid format.\nPlease, check it for extra spaces and other characters.\nAlternatively, use confighelper.html to generate a new one.")
-            print("Press any key to exit...")
-            input()
-            raise ex
-        except InvalidCredentialsException as ex:
-            print(f"[red]CRITICAL ERROR: There are only default credentials in the configuration file.\nYou need to add you Riot account login to config.yaml to receive drops.")
-            print("Press any key to exit...")
-            input()
-            raise ex
+        self.__loadConfig(configPath)
         try:
             bestStreams = Path("bestStreams.txt")
             if Path("../config/bestStreams.txt").exists():
                 bestStreams = Path("../config/bestStreams.txt")
             elif Path("config/bestStreams.txt").exists():
                 bestStreams = Path("config/bestStreams.txt")
-            with open(bestStreams, "r",  encoding='utf-8') as f:
+            with open(bestStreams, "r", encoding="utf-8") as f:
                 self.bestStreams = f.read().splitlines()
         except FileNotFoundError as ex:
-            print(f"[red]CRITICAL ERROR: The file bestStreams.txt was not found. Is it in the same folder as the executable?")
+            print(
+                f"[red]CRITICAL ERROR: The file bestStreams.txt was not found. Is it in the same folder as the executable?"
+            )
             print("Press any key to exit...")
             input()
             raise ex
@@ -71,20 +45,139 @@ class Config:
         :return: dictionary, account information
         """
         return self.accounts[account]
-    
-    def __findConfig(self, configPath):
+
+    def __findConfig(self, configPath: str) -> Path:
         """
         Try to find configuartion file in alternative locations.
 
         :param configPath: user suplied configuartion file path
         :return: pathlib.Path, path to the configuration file
         """
-        configPath = Path(configPath)
-        if configPath.exists():
-            return configPath
-        if Path("../config/config.yaml").exists():
-            return Path("../config/config.yaml")
-        if Path("config/config.yaml").exists():
-            return Path("config/config.yaml")
-        
-        return configPath
+        configFile = Path(configPath)
+        if configFile.exists():
+            return configFile
+
+        _file = Path(__file__)
+        src = _file.parent
+        if src.name == "src":
+            return src.parent / "config" / "config.yaml"
+        else:
+            return src / "config" / "config.yaml"
+
+    def __loadConfig(self, configPath: str) -> None:
+        """
+        Try to load config file
+        If file doens't exits create one then load it
+
+        :param configFile: string, path to th config file
+        """
+        configFile = self.__findConfig(configPath)
+
+        if not configFile.is_file():
+            self.__createConfig(configFile)
+        try:
+            try:
+                data = yaml.safe_load(configFile.read_text())
+            except ParserError:
+                print("Config file is invalid")
+                self.__createConfig(configFile)
+                self.__loadConfig(configPath)
+                return
+
+            accounts = data["accounts"]
+            for accountGroup in accounts:
+                if self.__isValidAccount(accounts[accountGroup]):
+                    self.accounts.update({accountGroup: accounts[accountGroup]})
+
+            if len(self.accounts) == 0:
+                print("Found no valid accounts")
+                self.__createConfig(configFile)
+                self.__loadConfig(configPath)
+
+            self.debug = data.get("debug", False)
+            self.connectorDrops = data.get("connectorDropsUrl", "")
+        except Exception as e:
+            print("Failed to load config file. Exiting")
+            raise e
+
+    def __createConfig(self, configFile: Path) -> None:
+        """
+        Create a config file and save it
+        :param configFile: Path, path where the config file will be saved
+        """
+        print("Welcome to the config generator")
+        print("For more information about what each setting does check the wiki")
+        print("https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/wiki/Configuration")
+
+        if not configFile.parent.is_dir():
+            configFile.parent.mkdir()
+        config = {}
+        accs = {}
+        while True:
+            accs.update(
+                {
+                    getUserInput(
+                        "Enter account group (unique name for each account group)"
+                    ): {
+                        "username": getUserInput("Enter account username"),
+                        "password": getUserPassword(),
+                    }
+                }
+            )
+            if confirmPrompt("Add another account?"):
+                continue
+            else:
+                break
+        config.update({"accounts": accs})
+        config.update(
+            {
+                "debug": confirmPrompt(
+                    "Enable debug mode? (useful if encountering into problems while program runs)"
+                )
+            }
+        )
+        if confirmPrompt("Enable connectorDropsUrl? (Discord webhook notifications)"):
+            webhookRe = re.compile(r"https://discord.com/api/webhooks/(\d+)/(\w+)")
+            url = getUserInput("Enter discord webhook url")
+            if not webhookRe.match(url):
+                print("Invalid webhook url")
+                print("shoudld look like https://discord.com/api/webhooks/id/token")
+            else:
+                config.update({"connectorDropsUrl": url})
+        print("Done!")
+        print(f"Writing to {configFile}")
+        configFile.write_text(yaml.dump(config))
+
+    def __isValidAccount(self, acc: dict[str, str]) -> bool:
+        """
+        Check if the account has default username and password
+        """
+        if (
+            acc.get("username", "username") == "username"
+            or acc.get("password", "password") == "password"
+        ):
+            return False
+        return True
+
+
+def getUserInput(prompt: str) -> str:
+    """
+    Get user input from terminal
+    :param prompt: string, message to be displayed
+    """
+    print(prompt)
+    return input("> ").strip()
+
+
+def getUserPassword() -> str:
+    print("Enter account password")
+    return getpass("Password hidden > ")
+
+
+def confirmPrompt(prompt: str) -> bool:
+    """
+    Allow user to confirm action
+    :param prompt: string, message to be displayed
+    """
+    print(prompt)
+    return input("[y/n]> ").lower().strip() in ["y", "yes"]
