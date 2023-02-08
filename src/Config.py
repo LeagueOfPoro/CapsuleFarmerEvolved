@@ -56,31 +56,17 @@ class Config:
             input()
             raise ex
 
-        # Get bestreams from URL or Local file
-        self.bestStreams = None
+        # Get bestStreams from URL
         try:
             remoteBestStreamsFile = requests.get(self.REMOTE_BEST_STREAMS_URL)
             if remoteBestStreamsFile.status_code == 200:
                 self.bestStreams = remoteBestStreamsFile.text.split()
-        except Exception:
-            pass
-        # Fallback to local file
-        if self.bestStreams is None:
-            print(f"[yellow]WARNING: The bestStreamsUrl is not available. Are you sure it's a accessible to the public? Using local file instead.")
-            try:
-                bestStreams = Path("bestStreams.txt")
-                if Path("../config/bestStreams.txt").exists():
-                    bestStreams = Path("../config/bestStreams.txt")
-                elif Path("config/bestStreams.txt").exists():
-                    bestStreams = Path("config/bestStreams.txt")
-                with open(bestStreams, "r", encoding='utf-8') as f:
-                    self.bestStreams = f.read().splitlines()
-            except FileNotFoundError as ex:
-                print(
-                    f"[red]CRITICAL ERROR: The file bestStreams.txt was not found. Is it in the same folder as the executable?")
-                print("Press any key to exit...")
-                input()
-                raise ex
+        except Exception as ex:
+            print(f"[red]CRITICAL ERROR: Beststreams couldn't be loaded. Are you connected to the internet?")
+            print("Press any key to exit...")
+            input()
+            raise ex
+
 
     def getAccount(self, account: str) -> dict:
         """
