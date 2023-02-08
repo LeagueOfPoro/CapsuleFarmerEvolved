@@ -2,7 +2,7 @@ from threading import Thread
 from time import sleep
 from rich.live import Live
 from rich.table import Table
-
+from rich.console import Console
 
 class GuiThread(Thread):
     """
@@ -42,7 +42,8 @@ class GuiThread(Thread):
         """
         Report the status of all accounts
         """
-        with Live(self.generateTable(), auto_refresh=False) as live:
+        console = Console(force_terminal=True)
+        with Live(self.generateTable(), auto_refresh=False, console=console) as live:
             while True:
                 live.update(self.generateTable())
                 sleep(1)
