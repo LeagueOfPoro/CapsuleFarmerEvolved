@@ -75,7 +75,7 @@ def main(log: logging.Logger, config: Config):
                 toDelete.append(account)
                 restarter.setRestartDelay(account)
                 stats.updateStatus(account, f"[red]ERROR - restart at {restarter.getNextStart(account).strftime('%H:%M:%S')}, failed logins: {stats.getFailedLogins(account)}")
-                log.warning(f"Thread {account} has finished.")
+                log.warning(f"Thread {account} has finished and will restart at {restarter.getNextStart(account).strftime('%H:%M:%S')}. Number of consecutively failed logins: {stats.getFailedLogins(account)}")
         for account in toDelete:
             del farmThreads[account]
 
