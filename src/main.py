@@ -11,6 +11,7 @@ import argparse
 from rich import print
 from pathlib import Path
 from time import sleep
+from Restarter import Restarter
 
 from Stats import Stats
 from VersionManager import VersionManager
@@ -50,34 +51,21 @@ def main(log: logging.Logger, config: Config):
     stats = Stats(farmThreads)
     for account in config.accounts:
         stats.initNewAccount(account)
-
+    restarter = Restarter(stats)
     log.info(f"Starting a GUI thread.")
     gui = GuiThread(log, config, stats, locks)
     gui.daemon = True
     gui.start()
 
     while True:
-        toDelete = []
         for account in config.accounts:
-            if account not in farmThreads:
-                if stats.getFailedLogins(account) < 3:
-                    if stats.getFailedLogins(account) > 0:
-                        log.debug("Sleeping {account} before retrying login.")
-                        sleep(30)
-                    log.info(f"Starting a thread for {account}.")
-                    thread = FarmThread(log, config, account, stats, locks)
-                    thread.daemon = True
-                    thread.start()
-                    farmThreads[account] = thread
-                    log.info(f"Thread for {account} was created.")
-                else:
-                    stats.updateStatus(account, "[red]LOGIN FAILED")
-                    log.error(f"Maximum login retries reached for account {account}")
-                    toDelete.append(account)
-        if not farmThreads:
-            break
-        for account in toDelete:
-            del config.accounts[account]    
+            if account not in farmThreads and restarter.canRestart(account):
+                log.info(f"Starting a thread for {account}.")
+                thread = FarmThread(log, config, account, stats, locks)
+                thread.daemon = True
+                thread.start()
+                farmThreads[account] = thread
+                log.info(f"Thread for {account} was created.")    
 
         toDelete = []
         for account in farmThreads:
@@ -85,7 +73,9 @@ def main(log: logging.Logger, config: Config):
                 farmThreads[account].join(1)
             else:
                 toDelete.append(account)
-                log.warning(f"Thread {account} has finished.")
+                restarter.setRestartDelay(account)
+                stats.updateStatus(account, f"[red]ERROR - restart at {restarter.getNextStart(account).strftime('%H:%M:%S')}, failed logins: {stats.getFailedLogins(account)}")
+                log.warning(f"Thread {account} has finished and will restart at {restarter.getNextStart(account).strftime('%H:%M:%S')}. Number of consecutively failed logins: {stats.getFailedLogins(account)}")
         for account in toDelete:
             del farmThreads[account]
 
