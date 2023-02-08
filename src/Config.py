@@ -24,16 +24,13 @@ class Config:
             with open(configPath, "r",  encoding='utf-8') as f:
                 config = yaml.safe_load(f)
                 accs = config.get("accounts")
-                onlyDefaultUsername = True
                 for account in accs:
-                    self.accounts[account] = {
-                        "username": accs[account]["username"],
-                        "password": accs[account]["password"],
-
-                    }
                     if "username" != accs[account]["username"]:
-                        onlyDefaultUsername = False
-                if onlyDefaultUsername:
+                        self.accounts[account] = {
+                            "username": accs[account]["username"],
+                            "password": accs[account]["password"]
+                        }                    
+                if not self.accounts:
                     raise InvalidCredentialsException                    
                 self.debug = config.get("debug", False)
                 self.connectorDrops = config.get("connectorDropsUrl", "")
