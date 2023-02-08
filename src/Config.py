@@ -52,9 +52,19 @@ class Config:
             print("Press any key to exit...")
             input()
             raise ex
-            
-        with open("bestStreams.txt", "r",  encoding='utf-8') as f:
-            self.bestStreams = f.read().splitlines()
+        try:
+            bestStreams = Path("bestStreams.txt")
+            if Path("../config/bestStreams.txt").exists():
+                bestStreams = Path("../config/bestStreams.txt")
+            elif Path("config/bestStreams.txt").exists():
+                bestStreams = Path("config/bestStreams.txt")
+            with open(bestStreams, "r",  encoding='utf-8') as f:
+                self.bestStreams = f.read().splitlines()
+        except FileNotFoundError as ex:
+            print(f"[red]CRITICAL ERROR: The file bestStreams.txt was not found. Is it in the same folder as the executable?")
+            print("Press any key to exit...")
+            input()
+            raise ex
 
     def getAccount(self, account: str) -> dict:
         """
@@ -76,8 +86,8 @@ class Config:
         if configPath.exists():
             return configPath
         if Path("../config/config.yaml").exists():
-            print(f"[red]ERROR: The configuration file cannot be found at {configPath}\nUsing the one from '../config/config.yaml'.\nRemember you can specify alternative configuration file using --config argument.")
             return Path("../config/config.yaml")
+        if Path("config/config.yaml").exists():
+            return Path("config/config.yaml")
         
         return configPath
-
