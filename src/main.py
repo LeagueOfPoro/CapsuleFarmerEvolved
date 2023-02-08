@@ -3,8 +3,9 @@ from Exceptions.CapsuleFarmerEvolvedException import CapsuleFarmerEvolvedExcepti
 from FarmThread import FarmThread
 from GuiThread import GuiThread
 from threading import Lock
-import logging
 from Config import Config
+from Logger import Logger
+import logging
 import sys
 import argparse
 from rich import print
@@ -13,7 +14,6 @@ from time import sleep
 
 from Stats import Stats
 from VersionManager import VersionManager
-from Logger import Logger
 
 CURRENT_VERSION = 1.2
 
