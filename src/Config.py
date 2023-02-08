@@ -31,7 +31,7 @@ class Config:
                 self.bestStreams = f.read().splitlines()
         except FileNotFoundError as ex:
             print(
-                f"[red]CRITICAL ERROR: The file bestStreams.txt was not found. Is it in the same folder as the executable?"
+                "[red]CRITICAL ERROR: The file bestStreams.txt was not found. Is it in the same folder as the executable?"
             )
             print("Press any key to exit...")
             input()
@@ -79,7 +79,7 @@ class Config:
             try:
                 data = yaml.safe_load(configFile.read_text())
             except ParserError:
-                print("Config file is invalid")
+                print("[red]Config file is invalid")
                 self.__createConfig(configFile)
                 self.__loadConfig(configPath)
                 return
@@ -90,14 +90,14 @@ class Config:
                     self.accounts.update({accountGroup: accounts[accountGroup]})
 
             if len(self.accounts) == 0:
-                print("Found no valid accounts")
+                print("[red]Found no valid accounts")
                 self.__createConfig(configFile)
                 self.__loadConfig(configPath)
 
             self.debug = data.get("debug", False)
             self.connectorDrops = data.get("connectorDropsUrl", "")
         except Exception as e:
-            print("Failed to load config file. Exiting")
+            print("[red]Failed to load config file. Exiting")
             raise e
 
     def __createConfig(self, configFile: Path) -> None:
@@ -105,8 +105,8 @@ class Config:
         Create a config file and save it
         :param configFile: Path, path where the config file will be saved
         """
-        print("Welcome to the config generator")
-        print("For more information about what each setting does check the wiki")
+        print("[blue]Welcome to the config generator")
+        print("[blue]For more information about what each setting does check the wiki")
         print("https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/wiki/Configuration")
 
         if not configFile.parent.is_dir():
@@ -132,7 +132,7 @@ class Config:
         config.update(
             {
                 "debug": confirmPrompt(
-                    "Enable debug mode? (useful if encountering into problems while program runs)"
+                    "Enable debug mode? (useful if encountering problems while program runs)"
                 )
             }
         )
@@ -140,12 +140,13 @@ class Config:
             webhookRe = re.compile(r"https://discord.com/api/webhooks/(\d+)/(\w+)")
             url = getUserInput("Enter discord webhook url")
             if not webhookRe.match(url):
-                print("Invalid webhook url")
-                print("shoudld look like https://discord.com/api/webhooks/id/token")
+                print("[red]Invalid webhook url")
+                print("Url shoudld look like https://discord.com/api/webhooks/id/token")
             else:
                 config.update({"connectorDropsUrl": url})
-        print("Done!")
-        print(f"Writing to {configFile}")
+        print("[green]Done!")
+        print(f"[green]Writing to [/green][purple]{configFile}")
+        exit()
         configFile.write_text(yaml.dump(config))
 
     def __isValidAccount(self, acc: dict[str, str]) -> bool:
