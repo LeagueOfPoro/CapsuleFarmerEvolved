@@ -1,3 +1,4 @@
+bestStreamsUrl: "https://raw.githubusercontent.com/LeagueOfPoro/CapsuleFarmerEvolved/master/config/bestStreams.txt"
 accounts:
   accountname:
     username: "username"
