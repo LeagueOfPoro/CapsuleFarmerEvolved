@@ -2,6 +2,7 @@ import re
 from getpass import getpass
 from pathlib import Path
 
+import requests
 import yaml
 from rich import print
 from yaml.parser import ParserError
@@ -12,6 +13,8 @@ class Config:
     A class that loads and stores the configuration
     """
 
+    REMOTE_BEST_STREAMS_URL = "https://raw.githubusercontent.com/LeagueOfPoro/CapsuleFarmerEvolved/master/config/bestStreams.txt"
+
     def __init__(self, configPath: str) -> None:
         """
         Loads the configuration file into the Config object
@@ -21,17 +24,15 @@ class Config:
 
         self.accounts = {}
         self.__loadConfig(configPath)
+
+        # Get bestStreams from URL
         try:
-            bestStreams = Path("bestStreams.txt")
-            if Path("../config/bestStreams.txt").exists():
-                bestStreams = Path("../config/bestStreams.txt")
-            elif Path("config/bestStreams.txt").exists():
-                bestStreams = Path("config/bestStreams.txt")
-            with open(bestStreams, "r", encoding="utf-8") as f:
-                self.bestStreams = f.read().splitlines()
-        except FileNotFoundError as ex:
+            remoteBestStreamsFile = requests.get(self.REMOTE_BEST_STREAMS_URL)
+            if remoteBestStreamsFile.status_code == 200:
+                self.bestStreams = remoteBestStreamsFile.text.split()
+        except Exception as ex:
             print(
-                "[red]CRITICAL ERROR: The file bestStreams.txt was not found. Is it in the same folder as the executable?"
+                f"[red]CRITICAL ERROR: Beststreams couldn't be loaded. Are you connected to the internet?"
             )
             print("Press any key to exit...")
             input()
