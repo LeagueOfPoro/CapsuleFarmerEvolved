@@ -30,11 +30,12 @@ class GuiThread(Thread):
         table.add_column("Live matches")
         table.add_column("Heartbeat")
         table.add_column("Last drop")
+        table.add_column("League")
         table.add_column("Drops")
 
         for acc in self.stats.accountData:
             status = self.stats.accountData[acc]["status"]
-            table.add_row(f"{acc}", f"{status}", f"{self.stats.accountData[acc]['liveMatches']}", f"{self.stats.accountData[acc]['lastCheck']}", f"{self.stats.accountData[acc]['lastDrop']}", f"{self.stats.accountData[acc]['totalDrops']}")
+            table.add_row(f"{acc}", f"{status}", f"{self.stats.accountData[acc]['liveMatches']}", f"{self.stats.accountData[acc]['lastCheck']}", f"{self.stats.accountData[acc]['lastDrop']}",f"{self.stats.accountData[acc]['lastDropLeague']}", f"{self.stats.accountData[acc]['totalDrops']}")
             # table.add_row(f"{acc}", f"{status}", f"{self.stats.accountData[acc]['liveMatches']}", f"{self.stats.accountData[acc]['lastCheck']}")
         return table
 

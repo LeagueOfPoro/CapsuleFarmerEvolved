@@ -44,12 +44,14 @@ class FarmThread(Thread):
                         liveMatchesStatus = []
                         for m in self.browser.liveMatches.values():
                             liveMatchesStatus.append(f"{m.league}")
-                        self.log.debug(f"{', '.join(liveMatchesStatus)}")    
+                        self.log.debug(f"{', '.join(liveMatchesStatus)}")
                         liveMatchesMsg = f"{', '.join(liveMatchesStatus)}"
                         newDrops = self.browser.checkNewDrops(self.stats.getLastDropCheck(self.account))
-                        self.stats.updateLastDropCheck(self.account, int(datetime.now().timestamp()*1e3))
+                        self.stats.updateLastDropCheck(self.account, int(datetime.now().timestamp() * 1e3))
                     else:
                         liveMatchesMsg = "None"
+                    if newDrops:
+                        self.stats.updateLastDropLeague(self.account, getLeagueFromID(newDrops[-1]["leagueID"]))
                     self.stats.update(self.account, len(newDrops), liveMatchesMsg)
                     if self.config.connectorDrops:
                         self.__notifyConnectorDrops(newDrops)
@@ -94,3 +96,16 @@ class FarmThread(Thread):
                     requests.post(self.config.connectorDrops, headers={"Content-type":"application/json"}, json=params)
             else:
                 requests.post(self.config.connectorDrops, json=newDrops)
+
+def getLeagueFromID(leagueId):
+    allLeagues = getLeagues()
+    for league in allLeagues:
+        if leagueId in league["id"]:
+            return league["name"]
+
+def getLeagues():
+    headers = {"Origin": "https://lolesports.com", "Referrer": "https://lolesports.com",
+               "x-api-key": "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"}
+    res = requests.get(
+        "https://esports-api.lolesports.com/persisted/gw/getLeagues?hl=en-GB", headers=headers)
+    return res.json()["data"].get("leagues", [])

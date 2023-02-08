@@ -6,7 +6,7 @@ class Stats:
         self.accountData = {}
 
     def initNewAccount(self, accountName: str):
-        self.accountData[accountName] = {"lastCheck": "", "totalDrops": 0, "lastDrop": "N/A", "liveMatches": "", "status": "[yellow]WAIT", "failedLoginCounter": 0, "lastDropCheck": int(datetime.now().timestamp()*1e3)}
+        self.accountData[accountName] = {"lastCheck": "", "totalDrops": 0, "lastDrop": "N/A", "liveMatches": "", "status": "[yellow]WAIT", "failedLoginCounter": 0, "lastDropCheck": int(datetime.now().timestamp()*1e3), "lastDropLeague": "N/A"}
     
     def update(self, accountName: str, newDrops: int = 0, liveMatches: str = ""):
         self.accountData[accountName]["lastCheck"] = datetime.now().strftime("%H:%M:%S %d/%m")
@@ -20,7 +20,10 @@ class Stats:
     
     def updateLastDropCheck(self, accountName: str, lastDropCheck: int):
         self.accountData[accountName]["lastDropCheck"] = lastDropCheck
-    
+
+    def updateLastDropLeague(self, accountName: str, leagueName: str):
+        self.accountData[accountName]['lastDropLeague'] = leagueName
+
     def getLastDropCheck(self, accountName: str) -> int:
         return self.accountData[accountName]["lastDropCheck"]
 
