@@ -5,3 +5,12 @@ accounts:
   anotheraccountname:
     username: "username"
     password: "password"
+notificationOnStart: True
+notificationOn2FA: True
+notificationOnDrop: True
+notificationOnFault: True
+soundOnStart: True
+soundOn2FA: True
+soundOnDrop: True
+soundOnFault: True
+debug: True
