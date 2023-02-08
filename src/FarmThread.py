@@ -34,6 +34,7 @@ class FarmThread(Thread):
         try:
             self.stats.updateStatus(self.account, "[green]LOGIN")
             if self.browser.login(self.config.getAccount(self.account)["username"], self.config.getAccount(self.account)["password"], self.locks["refreshLock"]):
+                self.config.getNotificationManager().makeNotificationOnStart(self.account, "Account login success")
                 self.stats.updateStatus(self.account, "[green]LIVE")
                 self.stats.resetLoginFailed(self.account)
                 while True:
@@ -56,6 +57,7 @@ class FarmThread(Thread):
                         self.__notifyConnectorDrops(newDrops)
                     sleep(Browser.STREAM_WATCH_INTERVAL)
             else:
+                self.config.getNotificationManager().makeNotificationOnFault(self.account, "Account login failed")
                 self.log.error(f"Login for {self.account} FAILED!")
                 self.stats.addLoginFailed(self.account)
                 if self.stats.getFailedLogins(self.account) < 3:
