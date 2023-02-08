@@ -12,6 +12,8 @@ class Config:
     A class that loads and stores the configuration
     """
 
+    REMOTE_BEST_STREAMS_URL = "https://raw.githubusercontent.com/LeagueOfPoro/CapsuleFarmerEvolved/master/config/bestStreams.txt"
+
     def __init__(self, configPath: str) -> None:
         """
         Loads the configuration file into the Config object
@@ -25,7 +27,6 @@ class Config:
             with open(configPath, "r", encoding='utf-8') as f:
                 config = yaml.safe_load(f)
                 accs = config.get("accounts")
-                bestStreamsUrl = config.get("bestStreamsUrl", "")
                 onlyDefaultUsername = True
                 for account in accs:
                     self.accounts[account] = {
@@ -57,13 +58,12 @@ class Config:
 
         # Get bestreams from URL or Local file
         self.bestStreams = None
-        if "http://" or "https://" in bestStreamsUrl:
-            try:
-                remoteBestStreamsFile = requests.get(bestStreamsUrl)
-                if remoteBestStreamsFile.status_code == 200:
-                    self.bestStreams = remoteBestStreamsFile.text.split()
-            except Exception:
-                pass
+        try:
+            remoteBestStreamsFile = requests.get(self.REMOTE_BEST_STREAMS_URL)
+            if remoteBestStreamsFile.status_code == 200:
+                self.bestStreams = remoteBestStreamsFile.text.split()
+        except Exception:
+            pass
         # Fallback to local file
         if self.bestStreams is None:
             print(f"[yellow]WARNING: The bestStreamsUrl is not available. Are you sure it's a accessible to the public? Using local file instead.")
