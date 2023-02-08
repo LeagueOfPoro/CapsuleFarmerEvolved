@@ -1,3 +1,4 @@
+import requests
 import yaml
 from yaml.parser import ParserError
 from rich import print
@@ -11,29 +12,28 @@ class Config:
     A class that loads and stores the configuration
     """
 
+    REMOTE_BEST_STREAMS_URL = "https://raw.githubusercontent.com/LeagueOfPoro/CapsuleFarmerEvolved/master/config/bestStreams.txt"
+
     def __init__(self, configPath: str) -> None:
         """
         Loads the configuration file into the Config object
 
         :param configPath: string, path to the configuration file
         """
-        
+
         self.accounts = {}
         try:
             configPath = self.__findConfig(configPath)
-            with open(configPath, "r",  encoding='utf-8') as f:
+            with open(configPath, "r", encoding='utf-8') as f:
                 config = yaml.safe_load(f)
                 accs = config.get("accounts")
-                onlyDefaultUsername = True
                 for account in accs:
-                    self.accounts[account] = {
-                        "username": accs[account]["username"],
-                        "password": accs[account]["password"],
-
-                    }
                     if "username" != accs[account]["username"]:
-                        onlyDefaultUsername = False
-                if onlyDefaultUsername:
+                        self.accounts[account] = {
+                            "username": accs[account]["username"],
+                            "password": accs[account]["password"]
+                        }                    
+                if not self.accounts:
                     raise InvalidCredentialsException                    
                 self.debug = config.get("debug", False)
                 self.connectorDrops = config.get("connectorDropsUrl", "")
@@ -52,19 +52,18 @@ class Config:
             print("Press any key to exit...")
             input()
             raise ex
+
+        # Get bestStreams from URL
         try:
-            bestStreams = Path("bestStreams.txt")
-            if Path("../config/bestStreams.txt").exists():
-                bestStreams = Path("../config/bestStreams.txt")
-            elif Path("config/bestStreams.txt").exists():
-                bestStreams = Path("config/bestStreams.txt")
-            with open(bestStreams, "r",  encoding='utf-8') as f:
-                self.bestStreams = f.read().splitlines()
-        except FileNotFoundError as ex:
-            print(f"[red]CRITICAL ERROR: The file bestStreams.txt was not found. Is it in the same folder as the executable?")
+            remoteBestStreamsFile = requests.get(self.REMOTE_BEST_STREAMS_URL)
+            if remoteBestStreamsFile.status_code == 200:
+                self.bestStreams = remoteBestStreamsFile.text.split()
+        except Exception as ex:
+            print(f"[red]CRITICAL ERROR: Beststreams couldn't be loaded. Are you connected to the internet?")
             print("Press any key to exit...")
             input()
             raise ex
+
 
     def getAccount(self, account: str) -> dict:
         """
@@ -74,7 +73,7 @@ class Config:
         :return: dictionary, account information
         """
         return self.accounts[account]
-    
+
     def __findConfig(self, configPath):
         """
         Try to find configuartion file in alternative locations.
@@ -89,5 +88,4 @@ class Config:
             return Path("../config/config.yaml")
         if Path("config/config.yaml").exists():
             return Path("config/config.yaml")
-        
         return configPath

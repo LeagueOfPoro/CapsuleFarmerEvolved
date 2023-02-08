@@ -118,7 +118,6 @@ class Browser:
         resAccessToken = self.client.get(
             "https://account.rewards.lolesports.com/v1/session/refresh", headers=headers)
         if resAccessToken.status_code == 200:
-            self.maintainSession()
             self.__dumpCookies()
         else:
             self.log.error("Failed to refresh session")
