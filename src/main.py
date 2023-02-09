@@ -18,7 +18,7 @@ from VersionManager import VersionManager
 
 CURRENT_VERSION = 1.2
 
-def init() -> tuple[Logger, Config]:
+def init() -> tuple[logging.Logger, Config]:
     parser = argparse.ArgumentParser(description='Farm Esports Capsules by watching all matches on lolesports.com.')
     parser.add_argument('-c', '--config', dest="configPath", default="./config.yaml",
                         help='Path to a custom config file')
@@ -35,14 +35,14 @@ def init() -> tuple[Logger, Config]:
     Path("./logs/").mkdir(parents=True, exist_ok=True)
     Path("./sessions/").mkdir(parents=True, exist_ok=True)
     config = Config(args.configPath)
-    log = Logger().createLogger(config.debug)
+    log = Logger.createLogger(config.debug)
     if not VersionManager.isLatestVersion(CURRENT_VERSION):
         log.warning("!!! NEW VERSION AVAILABLE !!! Download it from: https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest")
         print("[bold red]!!! NEW VERSION AVAILABLE !!!\nDownload it from: https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest\n")
 
     return log, config
 
-def main(log: Logger, config: Config):
+def main(log: logging.Logger, config: Config):
     farmThreads = {}
     refreshLock = Lock()
     locks = {"refreshLock": refreshLock}
@@ -88,7 +88,7 @@ if __name__ == '__main__':
         log, config = init()
         main(log, config)
     except (KeyboardInterrupt, SystemExit):
-        print('Exiting. Thank you for farming with us!') #Fixed spelling issue ;)
+        print('Exiting. Thank you for farming with us!')
         sys.exit()
     except CapsuleFarmerEvolvedException as e:
-        log.error(f'An error has occured: {e}')
+        log.error(f'An error has occurred: {e}')
