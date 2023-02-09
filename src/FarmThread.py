@@ -66,7 +66,7 @@ class FarmThread(Thread):
             if InvalidIMAPCredentialsException:
                 self.log.error(f"IMAP login failed for {self.account}")
                 self.stats.updateStatus(self.account, "[red]IMAP LOGIN FAILED")
-                self.stats.accountData[self.account]["failedLoginCounter"] = 3
+                self.stats.updateThreadStatus(self.account)
             else:
                 self.log.exception(f"Error in {self.account}. The program will try to recover.")
 

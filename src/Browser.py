@@ -73,13 +73,14 @@ class Browser:
                     #Handles all IMAP requests
                     try:
                         M = imaplib2.IMAP4_SSL(imapserver)
-                        M.login(imapusername, imappassword)
+                        M.login(imapusername, "imappassword")
                         M.select("INBOX")
                         idler = IMAP(M)
                         idler.start()
-                        self.stats.updateStatus(self.account, f"[green]WAITING FOR 2FA")
                         idler.join()
                         M.logout()
+
+                        self.stats.updateStatus(self.account, f"[green]FETCHED 2FA CODE")
 
                         data = {"type": "multifactor", "code": idler.code, "rememberDevice": True}
                         res = self.client.put(
@@ -142,7 +143,6 @@ class Browser:
         resAccessToken = self.client.get(
             "https://account.rewards.lolesports.com/v1/session/refresh", headers=headers)
         if resAccessToken.status_code == 200:
-            self.maintainSession()
             self.__dumpCookies()
         else:
             self.log.error("Failed to refresh session")

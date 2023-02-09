@@ -1,12 +1,11 @@
 from datetime import datetime
 
 class Stats:
-    def __init__(self, farmThreads) -> None:
-        self.farmThreads = farmThreads
+    def __init__(self) -> None:
         self.accountData = {}
 
     def initNewAccount(self, accountName: str):
-        self.accountData[accountName] = {"lastCheck": "", "totalDrops": 0, "lastDrop": "N/A", "liveMatches": "", "status": "[yellow]WAIT", "failedLoginCounter": 0, "lastDropCheck": int(datetime.now().timestamp()*1e3)}
+        self.accountData[accountName] = {"lastCheck": "", "totalDrops": 0, "lastDrop": "N/A", "liveMatches": "", "status": "[yellow]WAIT", "failedLoginCounter": 0, "lastDropCheck": int(datetime.now().timestamp()*1e3), "valid": True}
     
     def update(self, accountName: str, newDrops: int = 0, liveMatches: str = ""):
         self.accountData[accountName]["lastCheck"] = datetime.now().strftime("%H:%M:%S %d/%m")
@@ -14,7 +13,14 @@ class Stats:
         if newDrops > 0:
             self.accountData[accountName]["totalDrops"] += newDrops
             self.accountData[accountName]["lastDrop"] = datetime.now().strftime("%H:%M:%S %d/%m")
+            
     
+    def updateThreadStatus(self, accountName: str):
+        self.accountData[accountName]["valid"] = not self.accountData[accountName]["valid"]
+    
+    def getThreadStatus(self, accountName: str) -> bool:
+        return self.accountData[accountName]["valid"]
+
     def updateStatus(self, accountName: str, msg: str):
         self.accountData[accountName]["status"] = msg
     
