@@ -155,7 +155,7 @@ class Browser:
                     days, remainder = divmod(total_seconds, 86400)
                     hours, remainder = divmod(remainder, 3600)
                     minutes, seconds = divmod(remainder, 60)
-                    return f'{days}d {hours}h {minutes}m'
+                    return f"None - next in {str(days)}d" if days else f'None - next in {hours}h {minutes}m'
         except:
             return ""
 
