@@ -8,22 +8,22 @@ class Stats:
     def initNewAccount(self, accountName: str):
         self.accountData[accountName] = {"lastCheck": "", "totalDrops": 0, "lastDrop": "N/A", "liveMatches": "", "status": "[yellow]WAIT", "failedLoginCounter": 0, "lastDropCheck": int(datetime.now().timestamp()*1e3), "lastDropLeague": "N/A"}
     
-    def update(self, accountName: str, newDrops: int = 0, liveMatches: str = ""):
+    def update(self, accountName: str, newDrops: int = 0, liveMatches: str = "", lastDropleague: str = None):
         self.accountData[accountName]["lastCheck"] = datetime.now().strftime("%H:%M:%S %d/%m")
         self.accountData[accountName]["liveMatches"] = liveMatches
         if newDrops > 0:
             self.accountData[accountName]["totalDrops"] += newDrops
-            self.accountData[accountName]["lastDrop"] = datetime.now().strftime("%H:%M:%S %d/%m")
+            if lastDropleague:
+                self.accountData[accountName]["lastDrop"] = datetime.now().strftime("%H:%M:%S %d/%m") + f' ({lastDropleague})'
+            else:
+                self.accountData[accountName]["lastDrop"] = datetime.now().strftime("%H:%M:%S %d/%m")
+
     
     def updateStatus(self, accountName: str, msg: str):
         self.accountData[accountName]["status"] = msg
     
     def updateLastDropCheck(self, accountName: str, lastDropCheck: int):
         self.accountData[accountName]["lastDropCheck"] = lastDropCheck
-
-    def updateLastDropLeague(self, accountName: str, leagueName: str):
-        self.accountData[accountName]['lastDropLeague'] = leagueName
-
     def getLastDropCheck(self, accountName: str) -> int:
         return self.accountData[accountName]["lastDropCheck"]
 
