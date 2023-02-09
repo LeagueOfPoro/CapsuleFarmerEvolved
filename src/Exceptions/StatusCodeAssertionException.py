@@ -1,6 +1,7 @@
-from Exceptions.CapsuleFarmerEvolvedException import CapsuleFarmerEvolvedException
+import CapsuleFarmerEvolvedException
 
-class StatusCodeAssertException(CapsuleFarmerEvolvedException):
+
+class StatusCodeAssertionException(CapsuleFarmerEvolvedException):
     def __init__(self, expected, received, url):
         self.expected = expected
         self.received = received

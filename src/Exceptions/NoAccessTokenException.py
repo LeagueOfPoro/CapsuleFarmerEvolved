@@ -1,4 +1,5 @@
-from Exceptions.CapsuleFarmerEvolvedException import CapsuleFarmerEvolvedException
+import CapsuleFarmerEvolvedException
+
 
 class NoAccessTokenException(CapsuleFarmerEvolvedException):
     def __init__(self):

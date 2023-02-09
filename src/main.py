@@ -1,5 +1,5 @@
 
-from Exceptions.CapsuleFarmerEvolvedException import CapsuleFarmerEvolvedException
+from Exceptions import CapsuleFarmerEvolvedException
 from FarmThread import FarmThread
 from GuiThread import GuiThread
 from threading import Lock

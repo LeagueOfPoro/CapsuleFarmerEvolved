@@ -1,5 +1,4 @@
-from Exceptions.NoAccessTokenException import NoAccessTokenException
-from Exceptions.RateLimitException import RateLimitException
+from Exceptions import NoAccessTokenException, RateLimitException, StatusCodeAssertionException
 from Match import Match
 import cloudscraper
 from pprint import pprint
@@ -8,7 +7,6 @@ from datetime import datetime
 import threading
 from time import sleep, time
 from Config import Config
-from Exceptions.StatusCodeAssertException import StatusCodeAssertException
 import pickle
 from pathlib import Path
 import jwt
@@ -121,7 +119,7 @@ class Browser:
             self.__dumpCookies()
         else:
             self.log.error("Failed to refresh session")
-            raise StatusCodeAssertException(200, resAccessToken.status_code, resAccessToken.request.url) 
+            raise StatusCodeAssertionException(200, resAccessToken.status_code, resAccessToken.request.url)
 
     def maintainSession(self):
         """
@@ -140,7 +138,7 @@ class Browser:
         res = self.client.get(
             "https://esports-api.lolesports.com/persisted/gw/getLive?hl=en-GB", headers=headers)
         if res.status_code != 200:
-            raise StatusCodeAssertException(200, res.status_code, res.request.url)
+            raise StatusCodeAssertionException(200, res.status_code, res.request.url)
         resJson = res.json()
         self.liveMatches = {}
         try:
@@ -217,7 +215,7 @@ class Browser:
         res = self.client.post(
             "https://rex.rewards.lolesports.com/v1/events/watch", headers=headers, json=data)
         if res.status_code != 201:
-            raise StatusCodeAssertException(201, res.status_code, res.request.url)
+            raise StatusCodeAssertionException(201, res.status_code, res.request.url)
         return res
 
     def __getLoginTokens(self, form: str) -> tuple[str, str]:

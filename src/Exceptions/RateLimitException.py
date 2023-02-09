@@ -1,4 +1,5 @@
-from Exceptions.CapsuleFarmerEvolvedException import CapsuleFarmerEvolvedException
+import CapsuleFarmerEvolvedException
+
 
 class RateLimitException(CapsuleFarmerEvolvedException):
     def __init__(self, retryAfter: int):
