@@ -15,6 +15,7 @@ from Restarter import Restarter
 
 from Stats import Stats
 from VersionManager import VersionManager
+from NotificationManager import NotificationManager
 
 CURRENT_VERSION = 1.2
 
@@ -43,8 +44,8 @@ def init() -> tuple[logging.Logger, Config]:
 
     return log, config
 
-
 def main(log: logging.Logger, config: Config):
+    notificationManager = NotificationManager(config)
     farmThreads = {}
     refreshLock = Lock()
     locks = {"refreshLock": refreshLock}
@@ -61,7 +62,7 @@ def main(log: logging.Logger, config: Config):
         for account in config.accounts:
             if account not in farmThreads and restarter.canRestart(account):
                 log.info(f"Starting a thread for {account}.")
-                thread = FarmThread(log, config, account, stats, locks)
+                thread = FarmThread(log, config, account, stats, locks, notificationManager)
                 thread.daemon = True
                 thread.start()
                 farmThreads[account] = thread
