@@ -73,7 +73,7 @@ class Browser:
                     #Handles all IMAP requests
                     try:
                         M = imaplib2.IMAP4_SSL(imapserver)
-                        M.login(imapusername, "imappassword")
+                        M.login(imapusername, imappassword)
                         M.select("INBOX")
                         idler = IMAP(M)
                         idler.start()
