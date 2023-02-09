@@ -29,7 +29,7 @@ echo Building application...
 echo. 
 
 @REM Now we need to build the application with pipenv 
-python -m pipenv run pyinstaller -F --icon=src/poro.ico src/main.py --collect-all charset_normalizer -n CapsuleFarmerEvolved
+python -m pipenv run pyinstaller -F --icon=src/assets/poro.ico src/main.py --collect-all charset_normalizer -n CapsuleFarmerEvolved
 
 @REM Now we need to copy all the required files to the build directory
 CALL :LABEL
