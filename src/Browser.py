@@ -12,6 +12,7 @@ from Exceptions.StatusCodeAssertException import StatusCodeAssertException
 import pickle
 from pathlib import Path
 import jwt
+import re
 
 
 class Browser:
@@ -128,13 +129,26 @@ class Browser:
         if self.__needSessionRefresh():
             self.log.debug("Refreshing session.")
             self.refreshSession()
+            
+    def getRiotApiKey(self) -> str:
+        """
+        Gets the unofficial Riot API key from the website.
+        """
+        common_re = r"""<script\ssrc="(\/common.[0-9a-z]+.js)"><\/script>"""
+        stage_re = r'stage:\s?"([0-9a-z-A-Z]*[0-9]+[0-9a-z-A-Z]*)"'
+        
+        les = self.client.get("https://lolesports.com")
+        common_js = re.findall(common_re, les.text)[0]
+        
+        common = self.client.get("https://lolesports.com" + common_js)
+        return re.findall(stage_re, common.text)[0]
 
     def getLiveMatches(self):
         """
         Retrieve data about currently live matches and store them.
         """
         headers = {"Origin": "https://lolesports.com", "Referrer": "https://lolesports.com",
-                   "x-api-key": "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"}
+                   "x-api-key": self.getRiotApiKey()}
         res = self.client.get(
             "https://esports-api.lolesports.com/persisted/gw/getLive?hl=en-GB", headers=headers)
         if res.status_code != 200:
