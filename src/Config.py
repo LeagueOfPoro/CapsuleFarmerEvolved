@@ -36,16 +36,35 @@ class Config:
                 if not self.accounts:
                     raise InvalidCredentialsException
                                     
-                self.notificationOnStart = config.get("notificationOnStart", False)
-                self.notificationOn2FA = config.get("notificationOn2FA", False)
-                self.notificationOnDrop = config.get("notificationOnDrop", False)
-                self.notificationOnFault = config.get("notificationOnFault", False)
+                if config.get("notificationAll", False):
+                    self.notificationOnStart = True
+                    self.notificationOn2FA = True
+                    self.notificationOnDrop = True
+                    self.notificationOnFault = True
+                else:
+                    self.notificationOnStart = config.get("notificationOnStart", False)
+                    self.notificationOn2FA = config.get("notificationOn2FA", False)
+                    self.notificationOnDrop = config.get("notificationOnDrop", False)
+                    self.notificationOnFault = config.get("notificationOnFault", False)
+                
+                if config.get("soundAll", False):
+                    self.soundOnStart = True
+                    self.soundOn2FA = True
+                    self.soundOnDrop = True 
+                    self.soundOnFault = True  
+                else:
+                    self.soundOnStart = config.get("soundOnStart", False)
+                    self.soundOn2FA = config.get("soundOn2FA", False)
+                    self.soundOnDrop = config.get("soundOnDrop", False)
+                    self.soundOnFault = config.get("soundOnFault", False)
                 
                 self.soundPath = config.get("soundPath","./assets/defaultNotificationSound.wav")        
-                self.soundOnStart = config.get("soundOnStart", False)
-                self.soundOn2FA = config.get("soundOn2FA", False)
-                self.soundOnDrop = config.get("soundOnDrop", False)
-                self.soundOnFault = config.get("soundOnFault", False)
+                
+                if (self.soundOnStart or self.soundOn2FA or self.soundOnDrop or self.soundOnFault) and not Path(self.soundPath).exists():
+                    print(f"[red]CRITICAL ERROR: The notification sound file cannot be found at {self.soundPath}\nYou can specify a different file by 'soundPath: \"/path/to/file.wav\"' in config.")
+                    print("Press any key to exit...")
+                    input()
+                    raise FileNotFoundError(self.soundPath)
                 
                 self.debug = config.get("debug", False)
                 self.connectorDrops = config.get("connectorDropsUrl", "")

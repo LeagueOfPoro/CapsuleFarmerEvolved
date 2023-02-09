@@ -49,7 +49,7 @@ def main(log: logging.Logger, config: Config):
     farmThreads = {}
     refreshLock = Lock()
     locks = {"refreshLock": refreshLock}
-    stats = Stats(farmThreads)
+    stats = Stats(farmThreads, notificationManager)
     for account in config.accounts:
         stats.initNewAccount(account)
     restarter = Restarter(stats)
