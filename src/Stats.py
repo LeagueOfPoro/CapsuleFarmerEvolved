@@ -1,5 +1,5 @@
 from datetime import datetime
-from Notifications import NotificationManager
+from NotificationManager import NotificationManager
 
 class Stats:
     def __init__(self, farmThreads) -> None:

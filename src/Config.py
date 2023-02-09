@@ -2,7 +2,6 @@ import yaml
 from yaml.parser import ParserError
 from rich import print
 from pathlib import Path
-from Notifications import NotificationManager
 
 from Exceptions.InvalidCredentialsException import InvalidCredentialsException
 
@@ -36,7 +35,18 @@ class Config:
                         onlyDefaultUsername = False
                 if onlyDefaultUsername:
                     raise InvalidCredentialsException
-                self.notificationManager = NotificationManager(config)
+                
+                self.notificationOnStart = config.get("notificationOnStart", False)
+                self.notificationOn2FA = config.get("notificationOn2FA", False)
+                self.notificationOnDrop = config.get("notificationOnDrop", False)
+                self.notificationOnFault = config.get("notificationOnFault", False)
+                
+                self.soundPath = config.get("soundPath","./assets/defaultNotificationSound.wav")        
+                self.soundOnStart = config.get("soundOnStart", False)
+                self.soundOn2FA = config.get("soundOn2FA", False)
+                self.soundOnDrop = config.get("soundOnDrop", False)
+                self.soundOnFault = config.get("soundOnFault", False)
+                
                 self.debug = config.get("debug", False)
                 self.connectorDrops = config.get("connectorDropsUrl", "")
         except FileNotFoundError as ex:
@@ -68,21 +78,6 @@ class Config:
             input()
             raise ex
 
-    def getAccount(self, account: str) -> dict:
-        """
-        Get account information
-
-        :param account: string, name of the account
-        :return: dictionary, account information
-        """
-        return self.accounts[account]
-    
-    def getNotificationManager(self) -> NotificationManager:
-        """
-        Get notification manager generated from config
-        """
-        return self.notificationManager
-    
     def __findConfig(self, configPath):
         """
         Try to find configuartion file in alternative locations.
@@ -99,3 +94,88 @@ class Config:
             return Path("config/config.yaml")
         
         return configPath
+    
+    ## Getters
+
+    def getAccount(self, account: str) -> dict:
+        """
+        Get account information
+
+        :param account: string, name of the account
+        :return: dictionary, account information
+        """
+        return self.accounts[account]
+    
+    def getSoundPath(self) -> str:
+        """
+        Get custom sound path
+
+        :return: soundPath
+        """
+        return self.soundPath
+    
+    def getNotificationOnStart(self) -> bool:
+        """
+        Get account notificationOnStart Flag
+
+        :return: notificationOnStart
+        """
+        return self.notificationOnStart
+    
+    def getNotificationOn2FA(self) -> bool:
+        """
+        Get account notificationOn2FA Flag
+
+        :return: notificationOn2FA
+        """
+        return self.notificationOn2FA
+    
+    def getNotificationOnDrop(self) -> bool:
+        """
+        Get account notificationOnDrop Flag
+
+        :return: notificationOnDrop
+        """
+        return self.notificationOnDrop
+    
+    def getNotificationOnFault(self) -> bool:
+        """
+        Get account notificationOnFault Flag
+
+        :return: notificationOnFault
+        """
+        return self.notificationOnFault
+    
+    def getSoundOnStart(self) -> bool:
+        """
+        Get account SoundOnStart Flag
+
+        :return: SoundOnStart
+        """
+        return self.soundOnStart
+    
+    def getSoundOn2FA(self) -> bool:
+        """
+        Get account soundOn2FA Flag
+
+        :return: soundOn2FA
+        """
+        return self.soundOn2FA
+
+    def getSoundOnDrop(self) -> bool:
+        """
+        Get account soundOnDrop Flag
+
+        :return: soundOnDrop
+        """
+        return self.soundOnDrop
+
+    def getSoundOnFault(self) -> bool:
+        """
+        Get account soundOnFault Flag
+
+        :return: soundOnFault
+        """
+        return self.soundOnFault
+    
+    

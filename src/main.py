@@ -13,6 +13,7 @@ from time import sleep
 
 from Stats import Stats
 from VersionManager import VersionManager
+from NotificationManager import NotificationManager
 
 
 CURRENT_VERSION = 1.2
@@ -34,6 +35,7 @@ def init() -> tuple[Logger, Config]:
     Path("./logs/").mkdir(parents=True, exist_ok=True)
     Path("./sessions/").mkdir(parents=True, exist_ok=True)
     config = Config(args.configPath)
+    
     log = Logger().createLogger(config.debug)
     if not VersionManager.isLatestVersion(CURRENT_VERSION):
         log.warning("!!! NEW VERSION AVAILABLE !!! Download it from: https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest")
@@ -42,6 +44,7 @@ def init() -> tuple[Logger, Config]:
     return log, config
 
 def main(log: Logger, config: Config):
+    notificationManager = NotificationManager(config)
     farmThreads = {}
     refreshLock = Lock()
     locks = {"refreshLock": refreshLock}
@@ -63,7 +66,7 @@ def main(log: Logger, config: Config):
                         log.debug("Sleeping {account} before retrying login.")
                         sleep(30)
                     log.info(f"Starting a thread for {account}.")
-                    thread = FarmThread(log, config, account, stats, locks)
+                    thread = FarmThread(log, config, account, stats, locks, notificationManager)
                     thread.daemon = True
                     thread.start()
                     farmThreads[account] = thread

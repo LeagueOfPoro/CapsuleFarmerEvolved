@@ -4,13 +4,15 @@ from time import sleep
 from Browser import Browser
 from Config import Config
 import requests
+from NotificationManager import NotificationManager
+
 
 class FarmThread(Thread):
     """
     A thread that creates a capsule farm for a given account
     """
 
-    def __init__(self, log, config: Config, account, stats, locks):
+    def __init__(self, log, config: Config, account, stats, locks, notificationManager: NotificationManager):
         """
         Initializes the FarmThread
 
@@ -23,8 +25,9 @@ class FarmThread(Thread):
         self.log = log
         self.config = config
         self.account = account
+        self.notificationManager = notificationManager
         self.stats = stats
-        self.browser = Browser(self.log, self.config, self.account)
+        self.browser = Browser(self.log, self.config, self.account, self.notificationManager)
         self.locks = locks
 
     def run(self):
@@ -34,7 +37,7 @@ class FarmThread(Thread):
         try:
             self.stats.updateStatus(self.account, "[green]LOGIN")
             if self.browser.login(self.config.getAccount(self.account)["username"], self.config.getAccount(self.account)["password"], self.locks["refreshLock"]):
-                self.config.getNotificationManager().makeNotificationOnStart(self.account, "Account login success")
+                self.notificationManager.makeNotificationOnStart(self.account, "Account login success")
                 self.stats.updateStatus(self.account, "[green]LIVE")
                 self.stats.resetLoginFailed(self.account)
                 while True:
@@ -52,12 +55,12 @@ class FarmThread(Thread):
                         self.stats.updateLastDropCheck(self.account, int(datetime.now().timestamp()*1e3))
                     else:
                         liveMatchesMsg = "None"
-                    self.stats.update(self.config.getNotificationManager(), self.account, len(newDrops), liveMatchesMsg)
+                    self.stats.update(self.notificationManager, self.account, len(newDrops), liveMatchesMsg)
                     if self.config.connectorDrops:
                         self.__notifyConnectorDrops(newDrops)
                     sleep(Browser.STREAM_WATCH_INTERVAL)
             else:
-                self.config.getNotificationManager().makeNotificationOnFault(self.account, "Account login failed")
+                self.notificationManager.makeNotificationOnFault(self.account, "Account login failed")
                 self.log.error(f"Login for {self.account} FAILED!")
                 self.stats.addLoginFailed(self.account)
                 if self.stats.getFailedLogins(self.account) < 3:
