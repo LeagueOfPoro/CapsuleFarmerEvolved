@@ -36,17 +36,13 @@ class FarmThread(Thread):
                 self.stats.updateStatus(self.account, "[green]LIVE")
                 self.stats.resetLoginFailed(self.account)
                 while True:
+                    self.browser.maintainSession()
                     self.browser.getLiveMatches()
-                    dropsAvailable = self.browser.sendWatchToLive()
+                    self.browser.sendWatchToLive()
                     newDrops = []
                     if self.browser.liveMatches:
                         liveMatchesStatus = []
                         for m in self.browser.liveMatches.values():
-                            # Color code "drops available"
-                            # status = dropsAvailable.get(m.league, False)
-                            # if status:
-                            #     liveMatchesStatus.append(f"[green]{m.league}[/]")
-                            # else: 
                             liveMatchesStatus.append(f"{m.league}")
                         self.log.debug(f"{', '.join(liveMatchesStatus)}")    
                         liveMatchesMsg = f"{', '.join(liveMatchesStatus)}"
@@ -60,8 +56,11 @@ class FarmThread(Thread):
                     sleep(Browser.STREAM_WATCH_INTERVAL)
             else:
                 self.log.error(f"Login for {self.account} FAILED!")
-                self.stats.updateStatus(self.account, "[red]LOGIN FAILED")
                 self.stats.addLoginFailed(self.account)
+                if self.stats.getFailedLogins(self.account) < 3:
+                    self.stats.updateStatus(self.account, "[red]LOGIN FAILED - WILL RETRY SOON")
+                else:
+                    self.stats.updateStatus(self.account, "[red]LOGIN FAILED")
         except Exception:
             self.log.exception(f"Error in {self.account}. The program will try to recover.")
 
@@ -73,5 +72,25 @@ class FarmThread(Thread):
 
     def __notifyConnectorDrops(self, newDrops: list):
         if newDrops:
-            requests.post(self.config.connectorDrops, json=newDrops)
+            if "https://discord.com/api/webhooks" in self.config.connectorDrops:
+                for x in range(len(newDrops)):
+                    title = newDrops[x]["dropsetTitle"]
+                    thumbnail = newDrops[x]["dropsetImages"]["cardUrl"]
+                    reward = newDrops[x]["inventory"][0]["localizedInventory"]["title"]["en_US"]
+                    rewardImage = newDrops[x]["inventory"][0]["localizedInventory"]["inventory"]["imageUrl"]
 
+                    embed = {
+                        "title": f"[{self.account}] {title}",
+                        "description": f"We claimed an **{reward}** from <https://lolesports.com/rewards>",
+                        "image" : {"url": f"{thumbnail}"},
+                        "thumbnail": {"url": f"{rewardImage}"},
+                        "color": 6676471,
+                    }
+
+                    params = {
+                        "username" : "CapsuleFarmerEvolved",
+                        "embeds": [embed]
+                    }
+                    requests.post(self.config.connectorDrops, headers={"Content-type":"application/json"}, json=params)
+            else:
+                requests.post(self.config.connectorDrops, json=newDrops)

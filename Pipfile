@@ -10,6 +10,7 @@ httpx = {extras = ["http2"], version = "*"}
 beautifulsoup4 = "*"
 pyyaml = "*"
 rich = "*"
+pyjwt = "*"
 
 [dev-packages]
 autopep8 = "*"

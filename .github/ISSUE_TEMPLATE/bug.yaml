@@ -1,0 +1,71 @@
+name: Bug Report
+description: File a bug report, for example a bug in the code or a typo, or a typo in the documentation.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report! Please ensure this issue is not already reported by searching the [issue tracker](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/issues) for a similar issue. Please do not use this template for questions! If you have a question, please ask it our Discord server. If you have a feature request, please use the feature request template.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What the issue is, where it can be found, and what it affects.
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+  - type: textarea
+    id: what-should-happen
+    attributes:
+      label: What should happen?
+      description: What you expected to happen. If you have a suggestion, tell us how you think it should work.
+      placeholder: Tell us what you expect!
+    validations:
+      required: true
+  - type: textarea
+    id: version
+    attributes:
+      label: Capsule Farmer Version
+      description: Please tell us what version of Capsule Farmer you are running.
+      placeholder: v1.1
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating System
+      description: What operating system are you running?
+      options:
+        - Windows 10
+        - Windows 11
+        - Other (Non Windows are not natively supported)
+    validations:
+      required: true
+  - type: textarea
+    id: os-version
+    attributes:
+      label: Operating System Version
+      description: What version of the operating system are you running? 
+      placeholder: Windows 10 21H1 Build 19043.1237
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      render: shell
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Anything else you would like to add into this issue request, such as notes, credits, etc.
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: My issue is not a question
+      description: Please ensure that you are not asking a question. If you have a question, please ask it our Discord server. If you have a feature request, please use the feature request template. By submitting this issue, you agree this issue is not a question or a feature request. Your issue will be closed if it is a question or feature request.
+      options:
+        - label: I acknowledge that this issue is not a question or feature request.
+          required: true
