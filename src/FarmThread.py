@@ -53,7 +53,7 @@ class FarmThread(Thread):
                     try:
                         if getLeagueFromID(newDrops[-1]["leagueID"]):
                             self.stats.update(self.account, len(newDrops), liveMatchesMsg, getLeagueFromID(newDrops[-1]["leagueID"]))
-                    except IndexError:
+                    except (IndexError, KeyError):
                         self.stats.update(self.account, len(newDrops), liveMatchesMsg)
                     if self.config.connectorDrops:
                         self.__notifyConnectorDrops(newDrops)
@@ -101,10 +101,10 @@ class FarmThread(Thread):
 
 def getLeagueFromID(leagueId):
     allLeagues = getLeagues()
-    if allLeagues:
-        for league in allLeagues:
-            if leagueId in league["id"]:
-                return league["name"]
+    for league in allLeagues:
+        if leagueId in league["id"]:
+            return league["name"]
+    return ""
 def getLeagues():
     headers = {"Origin": "https://lolesports.com", "Referrer": "https://lolesports.com",
                "x-api-key": "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"}
