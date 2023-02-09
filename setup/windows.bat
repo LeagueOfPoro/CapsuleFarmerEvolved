@@ -50,13 +50,7 @@ if %createZipFile%==y set zipFileAnswer=yes
 
 if %zipFileAnswer%==yes (
 
-    cls
-    echo ========================================
-    echo.
-    echo CapsuleFarmerEvolved Windows Build Script
-    echo.
-    echo ========================================
-    echo.
+    CALL :LABEL
     echo Creating zip file...
 
     cd build
@@ -86,13 +80,7 @@ if %deleteDist%==Y set deleteDistAnswer=yes
 if %deleteDist%==y set deleteDistAnswer=yes
 if %deleteDistAnswer%=="yes" (
 
-    cls
-    echo ========================================
-    echo.
-    echo CapsuleFarmerEvolved Windows Build Script
-    echo.
-    echo ========================================
-    echo.
+    CALL :LABEL
     echo Deleting dist directory...
     rmdir /s /q dist
 
