@@ -16,13 +16,7 @@ if not exist src\main.py (
 
 
 @REM First we need to make sure that the dist & build directory exists and is empty.
-cls
-echo ========================================
-echo.
-echo CapsuleFarmerEvolved Windows Build Script
-echo.
-echo ========================================
-echo.
+CALL :LABEL
 echo Creating dist directory...
 if exist dist rmdir /s /q dist
 if not exist dist mkdir dist
@@ -30,13 +24,7 @@ echo Creating build directory...
 if exist build rmdir /s /q build
 if not exist build mkdir build
 
-cls
-echo ========================================
-echo.
-echo CapsuleFarmerEvolved Windows Build Script
-echo.
-echo ========================================
-echo.
+CALL :LABEL
 echo Building application...
 echo. 
 
@@ -44,25 +32,13 @@ echo.
 python -m pipenv run pyinstaller -F --icon=src/poro.ico src/main.py --collect-all charset_normalizer -n CapsuleFarmerEvolved
 
 @REM Now we need to copy all the required files to the build directory
-cls
-echo ========================================
-echo.
-echo CapsuleFarmerEvolved Windows Build Script
-echo.
-echo ========================================
-echo.
+CALL :LABEL
 echo Copying application files...
 xcopy /v /y dist\ build\
 xcopy /v /y config\ build\
 
 @REM Prompt the user to confirm that they want to create the zip file
-cls
-echo ========================================
-echo.
-echo CapsuleFarmerEvolved Windows Build Script
-echo.
-echo ========================================
-echo.
+CALL :LABEL
 echo Would you like to create a zip file of the application? (Requires 7zip on PATH) [Y/N]
 echo.
 
@@ -96,18 +72,10 @@ if %zipFileAnswer%==yes (
 
     cd ..
 
-    pause
-
 ) 
 
 @REM Clean up the dist directory
-cls
-echo ========================================
-echo.
-echo CapsuleFarmerEvolved Windows Build Script
-echo.
-echo ========================================
-echo.
+CALL :LABEL
 
 echo Would you like to delete the dist directory? [Y/N]
 echo.
@@ -130,13 +98,7 @@ if %deleteDistAnswer%=="yes" (
 
 )
 
-cls
-echo ========================================
-echo.
-echo CapsuleFarmerEvolved Windows Build Script
-echo.
-echo ========================================
-echo.
+CALL :LABEL
 echo [OK] Application build complete. You can find the application in the build directory.
 echo.
 pause
@@ -144,3 +106,12 @@ exit /b 0
 
 
 
+:LABEL
+cls
+echo ========================================
+echo.
+echo CapsuleFarmerEvolved Windows Build Script
+echo.
+echo ========================================
+echo.
+goto :EOF
