@@ -78,6 +78,9 @@ class Browser:
             res = self.client.get(resJson["response"]["parameters"]["uri"])
         except KeyError:
             return False
+        except RateLimitException as ex:
+            self.log.error(f"You are being rate-limited. Retry after {ex}")
+            return False
         finally:
             refreshLock.release()
         # Login to lolesports.com, riotgames.com, and playvalorant.com
