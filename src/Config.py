@@ -5,7 +5,6 @@ from rich import print
 from pathlib import Path
 
 from Exceptions.InvalidCredentialsException import InvalidCredentialsException
-from Exceptions.AssetNotFoundException import AssetNotFoundException
 
 
 class Config:
@@ -35,34 +34,7 @@ class Config:
                             "password": accs[account]["password"]
                         }                    
                 if not self.accounts:
-                    raise InvalidCredentialsException
-                                    
-                if config.get("notificationAll", False):
-                    self.notificationOnStart = True
-                    self.notificationOn2FA = True
-                    self.notificationOnDrop = True
-                    self.notificationOnFault = True
-                else:
-                    self.notificationOnStart = config.get("notificationOnStart", False)
-                    self.notificationOn2FA = config.get("notificationOn2FA", False)
-                    self.notificationOnDrop = config.get("notificationOnDrop", False)
-                    self.notificationOnFault = config.get("notificationOnFault", False)
-                
-                if config.get("soundAll", False):
-                    self.soundOnStart = True
-                    self.soundOn2FA = True
-                    self.soundOnDrop = True 
-                    self.soundOnFault = True  
-                else:
-                    self.soundOnStart = config.get("soundOnStart", False)
-                    self.soundOn2FA = config.get("soundOn2FA", False)
-                    self.soundOnDrop = config.get("soundOnDrop", False)
-                    self.soundOnFault = config.get("soundOnFault", False)
-                
-                self.soundPath = config.get("soundPath","./assets/defaultNotificationSound.wav")        
-                if (self.soundOnStart or self.soundOn2FA or self.soundOnDrop or self.soundOnFault) and not Path(self.soundPath).exists():
-                    raise AssetNotFoundException(self.soundPath)
-                
+                    raise InvalidCredentialsException                    
                 self.debug = config.get("debug", False)
                 self.connectorDrops = config.get("connectorDropsUrl", "")
         except FileNotFoundError as ex:
@@ -70,11 +42,6 @@ class Config:
             print("Press any key to exit...")
             input()
             raise ex
-        except AssetNotFoundException as ex:
-            print(f"[red]CRITICAL ERROR: The notification sound file cannot be found at {self.soundPath}\nYou can specify a different file by 'soundPath: \"/path/to/file.wav\"' in config.")
-            print("Press any key to exit...")
-            input()
-            raise AssetNotFoundException(self.soundPath)
         except (ParserError, KeyError) as ex:
             print(f"[red]CRITICAL ERROR: The configuration file does not have a valid format.\nPlease, check it for extra spaces and other characters.\nAlternatively, use confighelper.html to generate a new one.")
             print("Press any key to exit...")
@@ -97,6 +64,16 @@ class Config:
             input()
             raise ex
 
+
+    def getAccount(self, account: str) -> dict:
+        """
+        Get account information
+
+        :param account: string, name of the account
+        :return: dictionary, account information
+        """
+        return self.accounts[account]
+
     def __findConfig(self, configPath):
         """
         Try to find configuartion file in alternative locations.
@@ -112,88 +89,3 @@ class Config:
         if Path("config/config.yaml").exists():
             return Path("config/config.yaml")
         return configPath
-    
-    ## Getters
-
-    def getAccount(self, account: str) -> dict:
-        """
-        Get account information
-
-        :param account: string, name of the account
-        :return: dictionary, account information
-        """
-        return self.accounts[account]
-    
-    def getSoundPath(self) -> str:
-        """
-        Get custom sound path
-
-        :return: soundPath
-        """
-        return self.soundPath
-    
-    def getNotificationOnStart(self) -> bool:
-        """
-        Get account notificationOnStart Flag
-
-        :return: notificationOnStart
-        """
-        return self.notificationOnStart
-    
-    def getNotificationOn2FA(self) -> bool:
-        """
-        Get account notificationOn2FA Flag
-
-        :return: notificationOn2FA
-        """
-        return self.notificationOn2FA
-    
-    def getNotificationOnDrop(self) -> bool:
-        """
-        Get account notificationOnDrop Flag
-
-        :return: notificationOnDrop
-        """
-        return self.notificationOnDrop
-    
-    def getNotificationOnFault(self) -> bool:
-        """
-        Get account notificationOnFault Flag
-
-        :return: notificationOnFault
-        """
-        return self.notificationOnFault
-    
-    def getSoundOnStart(self) -> bool:
-        """
-        Get account SoundOnStart Flag
-
-        :return: SoundOnStart
-        """
-        return self.soundOnStart
-    
-    def getSoundOn2FA(self) -> bool:
-        """
-        Get account soundOn2FA Flag
-
-        :return: soundOn2FA
-        """
-        return self.soundOn2FA
-
-    def getSoundOnDrop(self) -> bool:
-        """
-        Get account soundOnDrop Flag
-
-        :return: soundOnDrop
-        """
-        return self.soundOnDrop
-
-    def getSoundOnFault(self) -> bool:
-        """
-        Get account soundOnFault Flag
-
-        :return: soundOnFault
-        """
-        return self.soundOnFault
-    
-    

@@ -13,7 +13,6 @@ from Exceptions.StatusCodeAssertException import StatusCodeAssertException
 import pickle
 from pathlib import Path
 import jwt
-from NotificationManager import NotificationManager
 
 from SharedData import SharedData
 
@@ -22,14 +21,13 @@ class Browser:
     SESSION_REFRESH_INTERVAL = 1800.0
     STREAM_WATCH_INTERVAL = 60.0
 
-    def __init__(self, log, config: Config, account: str, notificationManager: NotificationManager, sharedData: SharedData):
+    def __init__(self, log, config: Config, account: str, sharedData: SharedData):
         """
         Initialize the Browser class
 
         :param log: log variable
         :param config: Config class object
         :param account: account string
-        :param notificationManager: Notification manager
         """
         self.client = cloudscraper.create_scraper(
             browser={
@@ -40,8 +38,8 @@ class Browser:
             debug=False)
         self.log = log
         self.config = config
+        self.currentlyWatching = {}
         self.account = account
-        self.notificationManager = notificationManager
         self.sharedData = sharedData
 
     def login(self, username: str, password: str, refreshLock) -> bool:
@@ -69,7 +67,6 @@ class Browser:
                 
             resJson = res.json()
             if "multifactor" in resJson.get("type", ""):
-                self.notificationManager.makeNotificationOn2FA(username, "New 2FA code required")
                 twoFactorCode = input(f"Enter 2FA code for {self.account}:\n")
                 print("Code sent")
                 data = {"type": "multifactor", "code": twoFactorCode, "rememberDevice": True}
