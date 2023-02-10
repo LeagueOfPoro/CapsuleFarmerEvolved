@@ -13,12 +13,14 @@ import pickle
 from pathlib import Path
 import jwt
 
+from SharedData import SharedData
+
 
 class Browser:
     SESSION_REFRESH_INTERVAL = 1800.0
     STREAM_WATCH_INTERVAL = 60.0
 
-    def __init__(self, log, config: Config, account: str):
+    def __init__(self, log, config: Config, account: str, sharedData: SharedData):
         """
         Initialize the Browser class
 
@@ -32,12 +34,12 @@ class Browser:
                 'platform': 'windows',
                 'desktop': True
             },
-            debug=config.getAccount(account).get("debug", False))
+            debug=False)
         self.log = log
         self.config = config
         self.currentlyWatching = {}
-        self.liveMatches = {}
         self.account = account
+        self.sharedData = sharedData
 
     def login(self, username: str, password: str, refreshLock) -> bool:
         """
@@ -132,86 +134,18 @@ class Browser:
             self.log.debug("Refreshing session.")
             self.refreshSession()
 
-    def getTimeUntilNextMatch(self):
-        """
-        Retrieve data about currently live matches and store them.
-        """
-        headers = {"Origin": "https://lolesports.com", "Referrer": "https://lolesports.com",
-                   "x-api-key": "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"}
-        try:
-            res = self.client.get(
-                "https://esports-api.lolesports.com/persisted/gw/getSchedule?hl=en-GB", headers=headers)
-            if res.status_code != 200:
-                statusCode = res.status_code
-                url = res.request.url
-                res.close()
-                raise StatusCodeAssertException(200, statusCode, url)
-            resJson = res.json()
-            res.close()
-            events = resJson["data"]["schedule"]["events"]
-            for event in events:
-                try:
-                    if "inProgress" != event["state"]:
-                        startTime = datetime.strptime(event["startTime"], '%Y-%m-%dT%H:%M:%SZ') #Some matches aparrently don't have a starttime
-                except:
-                    continue
-                if datetime.now() < startTime:
-                    timeUntil = startTime - datetime.now()
-                    total_seconds = int(timeUntil.total_seconds() + 3600)
-                    days, remainder = divmod(total_seconds, 86400)
-                    hours, remainder = divmod(remainder, 3600)
-                    minutes, seconds = divmod(remainder, 60)
-                    return f"None - next in {str(days)}d" if days else f'None - next in {hours}h {minutes}m'
-        except StatusCodeAssertException as ex:
-            self.log.error(ex)
-            return "None"
-        except:
-            return "None"
-
-    def getLiveMatches(self):
-        """
-        Retrieve data about currently live matches and store them.
-        """
-        headers = {"Origin": "https://lolesports.com", "Referrer": "https://lolesports.com",
-                   "x-api-key": "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"}
-        res = self.client.get(
-            "https://esports-api.lolesports.com/persisted/gw/getLive?hl=en-GB", headers=headers)
-        if res.status_code != 200:
-            raise StatusCodeAssertException(200, res.status_code, res.request.url)
-        resJson = res.json()
-        res.close()
-        self.liveMatches = {}
-        try:
-            events = resJson["data"]["schedule"].get("events", [])
-            for event in events:
-                tournamentId = event["tournament"]["id"]
-                if tournamentId not in self.liveMatches:
-                    league = event["league"]["name"]
-                    if len(event["streams"]) > 0:
-                        streamChannel = event["streams"][0]["parameter"]
-                        streamSource = event["streams"][0]["provider"]
-                        for stream in event["streams"]:
-                            if stream["parameter"] in self.config.bestStreams:
-                                streamChannel = stream["parameter"]
-                                streamSource = stream["provider"]
-                                break
-                        self.liveMatches[tournamentId] = Match(
-                            tournamentId, league, streamChannel, streamSource)
-        except (KeyError, TypeError):
-            self.log.error("Could not get live matches")
-
     def sendWatchToLive(self) -> list:
         """
         Send watch event for all the live matches
         """
         watchFailed = []
-        for tid in self.liveMatches:
+        for tid in self.sharedData.getLiveMatches():
             try:
-                self.__sendWatch(self.liveMatches[tid])
+                self.__sendWatch(self.sharedData.getLiveMatches()[tid])
             except StatusCodeAssertException as ex:
-                self.log.error(f"Failed to send watch heartbeat for {self.liveMatches[tid].league}")
+                self.log.error(f"Failed to send watch heartbeat for {self.sharedData.getLiveMatches()[tid].league}")
                 self.log.error(ex)
-                watchFailed.append([self.liveMatches[tid].league])
+                watchFailed.append([self.sharedData.getLiveMatches()[tid].league])
         return watchFailed
     
     def checkNewDrops(self, lastCheckTime):
