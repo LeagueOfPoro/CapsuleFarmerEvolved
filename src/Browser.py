@@ -132,6 +132,42 @@ class Browser:
             self.log.debug("Refreshing session.")
             self.refreshSession()
 
+    def getTimeUntilNextMatch(self):
+        """
+        Retrieve data about currently live matches and store them.
+        """
+        headers = {"Origin": "https://lolesports.com", "Referrer": "https://lolesports.com",
+                   "x-api-key": "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"}
+        try:
+            res = self.client.get(
+                "https://esports-api.lolesports.com/persisted/gw/getSchedule?hl=en-GB", headers=headers)
+            if res.status_code != 200:
+                statusCode = res.status_code
+                url = res.request.url
+                res.close()
+                raise StatusCodeAssertException(200, statusCode, url)
+            resJson = res.json()
+            res.close()
+            events = resJson["data"]["schedule"]["events"]
+            for event in events:
+                try:
+                    if "inProgress" != event["state"]:
+                        startTime = datetime.strptime(event["startTime"], '%Y-%m-%dT%H:%M:%SZ') #Some matches aparrently don't have a starttime
+                except:
+                    continue
+                if datetime.now() < startTime:
+                    timeUntil = startTime - datetime.now()
+                    total_seconds = int(timeUntil.total_seconds() + 3600)
+                    days, remainder = divmod(total_seconds, 86400)
+                    hours, remainder = divmod(remainder, 3600)
+                    minutes, seconds = divmod(remainder, 60)
+                    return f"None - next in {str(days)}d" if days else f'None - next in {hours}h {minutes}m'
+        except StatusCodeAssertException as ex:
+            self.log.error(ex)
+            return "None"
+        except:
+            return "None"
+
     def getLiveMatches(self):
         """
         Retrieve data about currently live matches and store them.

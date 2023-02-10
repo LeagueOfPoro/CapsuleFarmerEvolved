@@ -48,12 +48,12 @@ class FarmThread(Thread):
                             else:
                                 leagueName = str(m.league)
                             liveMatchesStatus.append(leagueName)
-                        self.log.debug(f"Live matches: {', '.join(liveMatchesStatus)}")    
+                        self.log.debug(f"Live matches: {', '.join(liveMatchesStatus)}")
                         liveMatchesMsg = f"{', '.join(liveMatchesStatus)}"
                         newDrops = self.browser.checkNewDrops(self.stats.getLastDropCheck(self.account))
                         self.stats.updateLastDropCheck(self.account, int(datetime.now().timestamp()*1e3))
                     else:
-                        liveMatchesMsg = "None"
+                        liveMatchesMsg = self.browser.getTimeUntilNextMatch()
                     self.stats.update(self.account, len(newDrops), liveMatchesMsg)
                     if self.config.connectorDrops:
                         self.__notifyConnectorDrops(newDrops)
