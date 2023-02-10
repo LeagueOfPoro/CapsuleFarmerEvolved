@@ -38,13 +38,17 @@ class FarmThread(Thread):
                 while True:
                     self.browser.maintainSession()
                     self.browser.getLiveMatches()
-                    self.browser.sendWatchToLive()
+                    watchFailed = self.browser.sendWatchToLive()
                     newDrops = []
                     if self.browser.liveMatches:
                         liveMatchesStatus = []
                         for m in self.browser.liveMatches.values():
-                            liveMatchesStatus.append(f"{m.league}")
-                        self.log.debug(f"{', '.join(liveMatchesStatus)}")
+                            if m.league in watchFailed:
+                                leagueName = f"[red]{m.league}[/]"
+                            else:
+                                leagueName = str(m.league)
+                            liveMatchesStatus.append(leagueName)
+                        self.log.debug(f"Live matches: {', '.join(liveMatchesStatus)}")
                         liveMatchesMsg = f"{', '.join(liveMatchesStatus)}"
                         newDrops = self.browser.checkNewDrops(self.stats.getLastDropCheck(self.account))
                         self.stats.updateLastDropCheck(self.account, int(datetime.now().timestamp()*1e3))

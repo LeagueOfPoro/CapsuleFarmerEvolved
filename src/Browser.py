@@ -74,6 +74,9 @@ class Browser:
             res = self.client.get(resJson["response"]["parameters"]["uri"])
         except KeyError:
             return False
+        except RateLimitException as ex:
+            self.log.error(f"You are being rate-limited. Retry after {ex}")
+            return False
         finally:
             refreshLock.release()
         # Login to lolesports.com, riotgames.com, and playvalorant.com
@@ -81,17 +84,15 @@ class Browser:
         if token and state:
             data = {"token": token, "state": state}
             self.client.post(
-                "https://login.riotgames.com/sso/login", data=data)
+                "https://login.riotgames.com/sso/login", data=data).close()
             self.client.post(
-                "https://login.lolesports.com/sso/login", data=data)
+                "https://login.lolesports.com/sso/login", data=data).close()
             self.client.post(
-                "https://login.playvalorant.com/sso/login", data=data)
-
-            res = self.client.post(
-                "https://login.leagueoflegends.com/sso/callback", data=data)
-
-            res = self.client.get(
-                "https://auth.riotgames.com/authorize?client_id=esports-rna-prod&redirect_uri=https://account.rewards.lolesports.com/v1/session/oauth-callback&response_type=code&scope=openid&prompt=none&state=https://lolesports.com/?memento=na.en_GB", allow_redirects=True)
+                "https://login.playvalorant.com/sso/login", data=data).close()
+            self.client.post(
+                "https://login.leagueoflegends.com/sso/callback", data=data).close()
+            self.client.get(
+                "https://auth.riotgames.com/authorize?client_id=esports-rna-prod&redirect_uri=https://account.rewards.lolesports.com/v1/session/oauth-callback&response_type=code&scope=openid&prompt=none&state=https://lolesports.com/?memento=na.en_GB", allow_redirects=True).close()
 
             # Get access and entitlement tokens for the first time
             headers = {"Origin": "https://lolesports.com",
@@ -102,9 +103,8 @@ class Browser:
                 "https://account.rewards.lolesports.com/v1/session/token", headers=headers)
             # Currently unused but the call might be important server-side
             resPasToken = self.client.get(
-                "https://account.rewards.lolesports.com/v1/session/clientconfig/rms", headers=headers)
+                "https://account.rewards.lolesports.com/v1/session/clientconfig/rms", headers=headers).close()
             if resAccessToken.status_code == 200:
-                #self.maintainSession()
                 self.__dumpCookies()
                 return True
         return False
@@ -117,6 +117,7 @@ class Browser:
                    "Referrer": "https://lolesports.com"}
         resAccessToken = self.client.get(
             "https://account.rewards.lolesports.com/v1/session/refresh", headers=headers)
+        resAccessToken.close()
         if resAccessToken.status_code == 200:
             self.__dumpCookies()
         else:
@@ -178,6 +179,7 @@ class Browser:
         if res.status_code != 200:
             raise StatusCodeAssertException(200, res.status_code, res.request.url)
         resJson = res.json()
+        res.close()
         self.liveMatches = {}
         try:
             events = resJson["data"]["schedule"].get("events", [])
@@ -198,20 +200,19 @@ class Browser:
         except (KeyError, TypeError):
             self.log.error("Could not get live matches")
 
-    def sendWatchToLive(self):
+    def sendWatchToLive(self) -> list:
         """
         Send watch event for all the live matches
         """
-        dropsAvailable = {}
+        watchFailed = []
         for tid in self.liveMatches:
-            res = self.__sendWatch(self.liveMatches[tid])
-            self.log.debug(
-                f"{self.account} - {self.liveMatches[tid].league}: {res.json()}")
-            if res.json()["droppability"] == "on":   
-                dropsAvailable[self.liveMatches[tid].league] = True
-            else:
-                dropsAvailable[self.liveMatches[tid].league] = False
-        return dropsAvailable
+            try:
+                self.__sendWatch(self.liveMatches[tid])
+            except StatusCodeAssertException as ex:
+                self.log.error(f"Failed to send watch heartbeat for {self.liveMatches[tid].league}")
+                self.log.error(ex)
+                watchFailed.append([self.liveMatches[tid].league])
+        return watchFailed
     
     def checkNewDrops(self, lastCheckTime):
         try:
@@ -220,6 +221,7 @@ class Browser:
                    "Authorization": "Cookie access_token"}
             res = self.client.get("https://account.service.lolesports.com/fandom-account/v1/earnedDrops?locale=en_GB&site=LOLESPORTS", headers=headers)
             resJson = res.json()
+            res.close()
             return [drop for drop in resJson if lastCheckTime <= drop["unlockedDateMillis"]]
         except (KeyError, TypeError):
             self.log.debug("Drop check failed")
@@ -236,7 +238,7 @@ class Browser:
             return True
         return False
 
-    def __sendWatch(self, match: Match) -> object:
+    def __sendWatch(self, match: Match):
         """
         Sends watch event for a match
 
@@ -253,8 +255,11 @@ class Browser:
         res = self.client.post(
             "https://rex.rewards.lolesports.com/v1/events/watch", headers=headers, json=data)
         if res.status_code != 201:
-            raise StatusCodeAssertException(201, res.status_code, res.request.url)
-        return res
+            statusCode = res.status_code
+            url = res.request.url
+            res.close()
+            raise StatusCodeAssertException(201, statusCode, url)
+        res.close()
 
     def __getLoginTokens(self, form: str) -> tuple[str, str]:
         """
