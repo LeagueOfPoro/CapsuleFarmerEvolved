@@ -96,4 +96,4 @@ if __name__ == '__main__':
         print('Exiting. Thank you for farming with us!')
         sys.exit()
     except CapsuleFarmerEvolvedException as e:
-        log.error(f'An error has occurred: {e}')
+        print(f'[red]An error has occurred: {e}')
