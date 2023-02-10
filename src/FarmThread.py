@@ -7,12 +7,14 @@ import requests
 from NotificationManager import NotificationManager
 
 
+from SharedData import SharedData
+
 class FarmThread(Thread):
     """
     A thread that creates a capsule farm for a given account
     """
 
-    def __init__(self, log, config: Config, account, stats, locks, notificationManager: NotificationManager):
+    def __init__(self, log, config, account, stats, locks, notificationManager: NotificationManager, sharedData: SharedData):
         """
         Initializes the FarmThread
 
@@ -27,8 +29,9 @@ class FarmThread(Thread):
         self.account = account
         self.notificationManager = notificationManager
         self.stats = stats
-        self.browser = Browser(self.log, self.config, self.account, self.notificationManager)
+        self.browser = Browser(self.log, self.config, self.account, self.notificationManager, sharedData)
         self.locks = locks
+        self.sharedData = sharedData
 
     def run(self):
         """
@@ -42,19 +45,22 @@ class FarmThread(Thread):
                 self.stats.resetLoginFailed(self.account)
                 while True:
                     self.browser.maintainSession()
-                    self.browser.getLiveMatches()
-                    self.browser.sendWatchToLive()
+                    watchFailed = self.browser.sendWatchToLive()
                     newDrops = []
-                    if self.browser.liveMatches:
+                    if self.sharedData.getLiveMatches():
                         liveMatchesStatus = []
-                        for m in self.browser.liveMatches.values():
-                            liveMatchesStatus.append(f"{m.league}")
-                        self.log.debug(f"{', '.join(liveMatchesStatus)}")    
+                        for m in self.sharedData.getLiveMatches().values():
+                            if m.league in watchFailed:
+                                leagueName = f"[red]{m.league}[/]"
+                            else:
+                                leagueName = str(m.league)
+                            liveMatchesStatus.append(leagueName)
+                        self.log.debug(f"Live matches: {', '.join(liveMatchesStatus)}")
                         liveMatchesMsg = f"{', '.join(liveMatchesStatus)}"
                         newDrops = self.browser.checkNewDrops(self.stats.getLastDropCheck(self.account))
                         self.stats.updateLastDropCheck(self.account, int(datetime.now().timestamp()*1e3))
                     else:
-                        liveMatchesMsg = "None"
+                        liveMatchesMsg = self.sharedData.getTimeUntilNextMatch()
                     self.stats.update(self.account, len(newDrops), liveMatchesMsg)
                     if self.config.connectorDrops:
                         self.__notifyConnectorDrops(newDrops)
