@@ -139,8 +139,6 @@ class Browser:
                    "x-api-key": "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"}
         res = self.client.get(
             "https://esports-api.lolesports.com/persisted/gw/getSchedule?hl=en-GB", headers=headers)
-        if res.status_code != 200:
-            raise StatusCodeAssertException(200, res.status_code, res.request.url)
         resJson = res.json()
         try:
             events = resJson["data"]["schedule"]["events"]
@@ -157,7 +155,9 @@ class Browser:
                     minutes, seconds = divmod(remainder, 60)
                     return f"None - next in {str(days)}d" if days else f'None - next in {hours}h {minutes}m'
         except:
-            return ""
+            return "None"
+        if res.status_code != 200:
+            raise StatusCodeAssertException(200, res.status_code, res.request.url)
 
 
     def getLiveMatches(self):
