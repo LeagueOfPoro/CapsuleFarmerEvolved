@@ -1,4 +1,5 @@
 
+from DataProviderThread import DataProviderThread
 from Exceptions.CapsuleFarmerEvolvedException import CapsuleFarmerEvolvedException
 from FarmThread import FarmThread
 from GuiThread import GuiThread
@@ -12,6 +13,7 @@ from rich import print
 from pathlib import Path
 from time import sleep
 from Restarter import Restarter
+from SharedData import SharedData
 
 from Stats import Stats
 from VersionManager import VersionManager
@@ -48,20 +50,26 @@ def main(log: logging.Logger, config: Config):
     farmThreads = {}
     refreshLock = Lock()
     locks = {"refreshLock": refreshLock}
+    sharedData = SharedData()
     stats = Stats(farmThreads)
     for account in config.accounts:
         stats.initNewAccount(account)
     restarter = Restarter(stats)
+
     log.info(f"Starting a GUI thread.")
-    gui = GuiThread(log, config, stats, locks)
-    gui.daemon = True
-    gui.start()
+    guiThread = GuiThread(log, config, stats, locks)
+    guiThread.daemon = True
+    guiThread.start()
+
+    dataProviderThread = DataProviderThread(log, config, sharedData)
+    dataProviderThread.daemon = True
+    dataProviderThread.start()
 
     while True:
         for account in config.accounts:
             if account not in farmThreads and restarter.canRestart(account):
                 log.info(f"Starting a thread for {account}.")
-                thread = FarmThread(log, config, account, stats, locks)
+                thread = FarmThread(log, config, account, stats, locks, sharedData)
                 thread.daemon = True
                 thread.start()
                 farmThreads[account] = thread
