@@ -1,5 +1,7 @@
 from notifypy import Notify
 import simpleaudio as sa
+from pathlib import Path
+
 from Config import Config
 
 class NotificationManager:
