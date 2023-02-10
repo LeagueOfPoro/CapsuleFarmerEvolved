@@ -1,3 +1,4 @@
+from AssertCondition import AssertCondition
 from Exceptions.NoAccessTokenException import NoAccessTokenException
 from Exceptions.RateLimitException import RateLimitException
 from Match import Match
@@ -115,16 +116,18 @@ class Browser:
         """
         Refresh access and entitlement tokens
         """
-        headers = {"Origin": "https://lolesports.com",
-                   "Referrer": "https://lolesports.com"}
-        resAccessToken = self.client.get(
-            "https://account.rewards.lolesports.com/v1/session/refresh", headers=headers)
-        resAccessToken.close()
-        if resAccessToken.status_code == 200:
+        try:
+            headers = {"Origin": "https://lolesports.com",
+                    "Referrer": "https://lolesports.com"}
+            resAccessToken = self.client.get(
+                "https://account.rewards.lolesports.com/v1/session/refresh", headers=headers)
+            AssertCondition.statusCodeMatches(200, resAccessToken)
+            resAccessToken.close()
             self.__dumpCookies()
-        else:
+        except StatusCodeAssertException as ex:
             self.log.error("Failed to refresh session")
-            raise StatusCodeAssertException(200, resAccessToken.status_code, resAccessToken.request.url) 
+            self.log.error(ex)
+            raise ex
 
     def maintainSession(self):
         """
@@ -188,11 +191,7 @@ class Browser:
                    "Referrer": "https://lolesports.com"}
         res = self.client.post(
             "https://rex.rewards.lolesports.com/v1/events/watch", headers=headers, json=data)
-        if res.status_code != 201:
-            statusCode = res.status_code
-            url = res.request.url
-            res.close()
-            raise StatusCodeAssertException(201, statusCode, url)
+        AssertCondition.statusCodeMatches(201, res)
         res.close()
 
     def __getLoginTokens(self, form: str) -> tuple[str, str]:
