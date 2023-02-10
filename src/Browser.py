@@ -164,20 +164,19 @@ class Browser:
         except (KeyError, TypeError):
             self.log.error("Could not get live matches")
 
-    def sendWatchToLive(self):
+    def sendWatchToLive(self) -> list:
         """
         Send watch event for all the live matches
         """
-        dropsAvailable = {}
+        watchFailed = []
         for tid in self.liveMatches:
-            resJson = self.__sendWatch(self.liveMatches[tid])
-            self.log.debug(
-                f"{self.account} - {self.liveMatches[tid].league}: {resJson}")
-            if resJson["droppability"] == "on":   
-                dropsAvailable[self.liveMatches[tid].league] = True
-            else:
-                dropsAvailable[self.liveMatches[tid].league] = False
-        return dropsAvailable
+            try:
+                self.__sendWatch(self.liveMatches[tid])
+            except StatusCodeAssertException as ex:
+                self.log.error(f"Failed to send watch heartbeat for {self.liveMatches[tid].league}")
+                self.log.error(ex)
+                watchFailed.append([self.liveMatches[tid].league])
+        return watchFailed
     
     def checkNewDrops(self, lastCheckTime):
         try:
@@ -203,7 +202,7 @@ class Browser:
             return True
         return False
 
-    def __sendWatch(self, match: Match) -> object:
+    def __sendWatch(self, match: Match):
         """
         Sends watch event for a match
 
@@ -219,11 +218,12 @@ class Browser:
                    "Referrer": "https://lolesports.com"}
         res = self.client.post(
             "https://rex.rewards.lolesports.com/v1/events/watch", headers=headers, json=data)
-        resJson = res.json()
-        res.close()
         if res.status_code != 201:
-            raise StatusCodeAssertException(201, res.status_code, res.request.url)
-        return resJson
+            statusCode = res.status_code
+            url = res.request.url
+            res.close()
+            raise StatusCodeAssertException(201, statusCode, url)
+        res.close()
 
     def __getLoginTokens(self, form: str) -> tuple[str, str]:
         """
