@@ -1,9 +1,11 @@
 from datetime import datetime
+from NotificationManager import NotificationManager
 
 class Stats:
-    def __init__(self, farmThreads) -> None:
+    def __init__(self, farmThreads, notificationManager: NotificationManager) -> None:
         self.farmThreads = farmThreads
         self.accountData = {}
+        self.notificationManager = notificationManager
 
     def initNewAccount(self, accountName: str):
         self.accountData[accountName] = {
@@ -20,6 +22,7 @@ class Stats:
         self.accountData[accountName]["lastCheck"] = datetime.now().strftime("%H:%M:%S %d/%m")
         self.accountData[accountName]["liveMatches"] = liveMatches
         if newDrops > 0:
+            self.notificationManager.makeNotificationDrop((accountName),"{} New Drop(s) received".format(newDrops))
             self.accountData[accountName]["totalDrops"] += newDrops
             if lastDropleague:
                 self.accountData[accountName]["lastDrop"] = datetime.now().strftime("%H:%M:%S %d/%m") + f' ({lastDropleague})'
