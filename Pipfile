@@ -12,7 +12,8 @@ pyyaml = "*"
 rich = "*"
 pyjwt = "*"
 notify-py = "*"
-simpleaudio = "*"
+wave = "*"
+pyaudio = "*"
 
 [dev-packages]
 autopep8 = "*"

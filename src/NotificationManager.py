@@ -1,5 +1,7 @@
 from notifypy import Notify
-import simpleaudio as sa
+import pyaudio
+import wave
+
 from pathlib import Path
 
 from Config import Config
@@ -22,6 +24,7 @@ class NotificationManager:
         self.soundOn2FA = config.getSoundOn2FA()
         self.soundOnDrop = config.getSoundOnDrop()
         self.soundOnFault = config.getSoundOnFault()
+
         
     def _make_notification(self, notificationOn, soundOn, title:str ="Capsule Farmer Evolved", message:str ="New message"):
         if notificationOn:
@@ -39,8 +42,7 @@ class NotificationManager:
             notification.send()
             
         elif soundOn:
-            wave_obj = sa.WaveObject.from_wave_file(self.soundPath)
-            play_obj = wave_obj.play()
+            self.playSoundOnly()
 
     def makeNotificationOnStart(self, title, message):
         self._make_notification(self.notificationOnStart, self.soundOnStart, title, message)
@@ -53,3 +55,23 @@ class NotificationManager:
     
     def makeNotificationOnFault(self, title, message):
         self._make_notification(self.notificationOnFault, self.soundOnFault, title, message)
+
+    def playSoundOnly(self):
+        chunk = 1024
+        wf = wave.open(self.soundPath, "rb")
+        p = pyaudio.PyAudio()
+
+        stream = p.open(format = p.get_format_from_width(wf.getsampwidth()),
+                        channels = wf.getnchannels(),
+                        rate = wf.getframerate(),
+                        output = True)
+
+        data = wf.readframes(chunk)
+
+        while data:
+            stream.write(data)
+            data = wf.readframes(chunk)
+
+        stream.stop_stream()
+        stream.close()
+        p.terminate()
