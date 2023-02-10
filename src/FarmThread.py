@@ -53,10 +53,16 @@ class FarmThread(Thread):
                         self.log.debug(f"Live matches: {', '.join(liveMatchesStatus)}")
                         liveMatchesMsg = f"{', '.join(liveMatchesStatus)}"
                         newDrops = self.browser.checkNewDrops(self.stats.getLastDropCheck(self.account))
-                        self.stats.updateLastDropCheck(self.account, int(datetime.now().timestamp()*1e3))
+                        self.stats.updateLastDropCheck(self.account, int(datetime.now().timestamp() * 1e3))
                     else:
                         liveMatchesMsg = self.sharedData.getTimeUntilNextMatch()
-                    self.stats.update(self.account, len(newDrops), liveMatchesMsg)
+                    try:
+                        if newDrops and getLeagueFromID(newDrops[-1]["leagueID"]):
+                            self.stats.update(self.account, len(newDrops), liveMatchesMsg, getLeagueFromID(newDrops[-1]["leagueID"]))
+                        else:
+                            self.stats.update(self.account, 0, liveMatchesMsg)
+                    except (IndexError, KeyError):
+                        self.stats.update(self.account, len(newDrops), liveMatchesMsg)
                     if self.config.connectorDrops:
                         self.__notifyConnectorDrops(newDrops)
                     sleep(Browser.STREAM_WATCH_INTERVAL)
@@ -100,3 +106,18 @@ class FarmThread(Thread):
                     requests.post(self.config.connectorDrops, headers={"Content-type":"application/json"}, json=params)
             else:
                 requests.post(self.config.connectorDrops, json=newDrops)
+
+def getLeagueFromID(leagueId):
+    allLeagues = getLeagues()
+    for league in allLeagues:
+        if leagueId in league["id"]:
+            return league["name"]
+    return ""
+def getLeagues():
+    headers = {"Origin": "https://lolesports.com", "Referrer": "https://lolesports.com",
+               "x-api-key": "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"}
+    res = requests.get(
+        "https://esports-api.lolesports.com/persisted/gw/getLeagues?hl=en-GB", headers=headers)
+    leagues = res.json()["data"].get("leagues", [])
+    res.close()
+    return leagues
