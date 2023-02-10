@@ -1,4 +1,3 @@
-
 from DataProviderThread import DataProviderThread
 from Exceptions.CapsuleFarmerEvolvedException import CapsuleFarmerEvolvedException
 from FarmThread import FarmThread
@@ -89,6 +88,7 @@ def main(log: logging.Logger, config: Config):
 
 
 if __name__ == '__main__':
+    log = None
     try:
         log, config = init()
         main(log, config)
@@ -96,4 +96,7 @@ if __name__ == '__main__':
         print('Exiting. Thank you for farming with us!')
         sys.exit()
     except CapsuleFarmerEvolvedException as e:
-        print(f'[red]An error has occurred: {e}')
+        if isinstance(log, logging.Logger):
+            log.error(f"An error has occurred: {e}")
+        else:
+            print(f'[red]An error has occurred: {e}')
