@@ -151,7 +151,7 @@ class Browser:
             except StatusCodeAssertException as ex:
                 self.log.error(f"Failed to send watch heartbeat for {self.sharedData.getLiveMatches()[tid].league}")
                 self.log.error(ex)
-                watchFailed.append([self.sharedData.getLiveMatches()[tid].league])
+                watchFailed.append(self.sharedData.getLiveMatches()[tid].league)
         return watchFailed
     
     def checkNewDrops(self, lastCheckTime):
