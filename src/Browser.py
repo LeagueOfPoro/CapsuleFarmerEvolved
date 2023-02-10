@@ -144,13 +144,14 @@ class Browser:
                 statusCode = res.status_code
                 url = res.request.url
                 res.close()
-                raise StatusCodeAssertException(200, res.status_code, res.request.url)
+                raise StatusCodeAssertException(200, statusCode, url)
             resJson = res.json()
             res.close()
             events = resJson["data"]["schedule"]["events"]
             for event in events:
                 try:
-                    startTime = datetime.strptime(event["startTime"], '%Y-%m-%dT%H:%M:%SZ') #Some matches aparrently don't have a starttime
+                    if "inProgress" != event["state"]:
+                        startTime = datetime.strptime(event["startTime"], '%Y-%m-%dT%H:%M:%SZ') #Some matches aparrently don't have a starttime
                 except:
                     continue
                 if datetime.now() < startTime:
