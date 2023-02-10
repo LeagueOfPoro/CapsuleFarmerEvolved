@@ -1,4 +1,3 @@
-import warnings
 from notifypy import Notify
 import simpleaudio as sa
 from Config import Config
@@ -27,7 +26,10 @@ class NotificationManager:
             notification = Notify()
             notification.title = title
             notification.message = message
-            notification.icon = "./assets/poro.ico"
+            if Path("./assets/poro.ico").exists():
+                notification.icon = "./assets/poro.ico"
+            elif Path("./src/assets/poro.ico").exists():
+                notification.icon = "./src/assets/poro.ico"
             
             if soundOn:
                 notification.audio = self.soundPath
