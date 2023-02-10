@@ -5,6 +5,7 @@ from rich import print
 from pathlib import Path
 
 from Exceptions.InvalidCredentialsException import InvalidCredentialsException
+from Exceptions.AssetNotFoundException import AssetNotFoundException
 
 
 class Config:
@@ -59,12 +60,8 @@ class Config:
                     self.soundOnFault = config.get("soundOnFault", False)
                 
                 self.soundPath = config.get("soundPath","./assets/defaultNotificationSound.wav")        
-                
                 if (self.soundOnStart or self.soundOn2FA or self.soundOnDrop or self.soundOnFault) and not Path(self.soundPath).exists():
-                    print(f"[red]CRITICAL ERROR: The notification sound file cannot be found at {self.soundPath}\nYou can specify a different file by 'soundPath: \"/path/to/file.wav\"' in config.")
-                    print("Press any key to exit...")
-                    input()
-                    raise FileNotFoundError(self.soundPath)
+                    raise AssetNotFoundException(self.soundPath)
                 
                 self.debug = config.get("debug", False)
                 self.connectorDrops = config.get("connectorDropsUrl", "")
@@ -73,6 +70,11 @@ class Config:
             print("Press any key to exit...")
             input()
             raise ex
+        except AssetNotFoundException as ex:
+            print(f"[red]CRITICAL ERROR: The notification sound file cannot be found at {self.soundPath}\nYou can specify a different file by 'soundPath: \"/path/to/file.wav\"' in config.")
+            print("Press any key to exit...")
+            input()
+            raise AssetNotFoundException(self.soundPath)
         except (ParserError, KeyError) as ex:
             print(f"[red]CRITICAL ERROR: The configuration file does not have a valid format.\nPlease, check it for extra spaces and other characters.\nAlternatively, use confighelper.html to generate a new one.")
             print("Press any key to exit...")
