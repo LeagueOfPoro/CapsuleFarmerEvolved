@@ -11,8 +11,6 @@ beautifulsoup4 = "*"
 pyyaml = "*"
 rich = "*"
 pyjwt = "*"
-notify-py = "*"
-simpleaudio = "*"
 
 [dev-packages]
 autopep8 = "*"
