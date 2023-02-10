@@ -1,5 +1,4 @@
 import logging
-from datetime import datetime
 from logging.handlers import RotatingFileHandler
 
 FILE_SIZE = 1024 * 1024 * 100  # 100 MB
@@ -15,7 +14,7 @@ class Logger:
             level = logging.WARNING
 
         fileHandler = RotatingFileHandler(
-            f'./logs/capsulefarmer-{datetime.now().strftime("%Y-%m-%d")}.log',
+            "./logs/capsulefarmer.log",
             mode="a+",
             maxBytes=FILE_SIZE,
             backupCount=BACKUP_COUNT,
