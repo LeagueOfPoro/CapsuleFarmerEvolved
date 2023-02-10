@@ -33,7 +33,7 @@ class FarmThread(Thread):
         """
         try:
             self.stats.updateStatus(self.account, "[green]LOGIN")
-            if self.browser.login(self.config.getAccount(self.account)["username"], self.config.getAccount(self.account)["password"], self.config.getAccount(self.account)["imapusername"], self.config.getAccount(self.account)["imappassword"], self.config.getAccount(self.account)["imapserver"], self.locks["refreshLock"]):
+            if self.browser.login(self.config.getAccount(self.account)["username"], self.config.getAccount(self.account)["password"], self.config.getAccount(self.account)["imapUsername"], self.config.getAccount(self.account)["imapPassword"], self.config.getAccount(self.account)["imapServer"], self.locks["refreshLock"]):
                 self.stats.updateStatus(self.account, "[green]LIVE")
                 self.stats.resetLoginFailed(self.account)
                 while True:
