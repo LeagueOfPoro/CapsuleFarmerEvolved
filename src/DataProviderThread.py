@@ -1,8 +1,7 @@
-from datetime import datetime
 from threading import Thread
 from time import sleep
 import cloudscraper
-
+from datetime import datetime, timezone
 from AssertCondition import AssertCondition
 from Exceptions.StatusCodeAssertException import StatusCodeAssertException
 from Match import Match
@@ -90,9 +89,9 @@ class DataProviderThread(Thread):
                         startTime = datetime.strptime(event["startTime"], '%Y-%m-%dT%H:%M:%SZ') #Some matches aparrently don't have a starttime
                 except:
                     continue
-                if datetime.now() < startTime:
+                if datetime.now(timezone.utc) < startTime:
                     timeUntil = startTime - datetime.now()
-                    total_seconds = int(timeUntil.total_seconds() + 3600)
+                    total_seconds = int(timeUntil.total_seconds())
                     days, remainder = divmod(total_seconds, 86400)
                     hours, remainder = divmod(remainder, 3600)
                     minutes, seconds = divmod(remainder, 60)
