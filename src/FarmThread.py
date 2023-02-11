@@ -2,6 +2,7 @@ from datetime import datetime
 from threading import Thread
 from time import sleep
 from Browser import Browser
+from Config import Config
 import requests
 
 from SharedData import SharedData
@@ -115,7 +116,7 @@ def getLeagueFromID(leagueId):
     return ""
 def getLeagues():
     headers = {"Origin": "https://lolesports.com", "Referrer": "https://lolesports.com",
-               "x-api-key": "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"}
+               "x-api-key": Config().RIOT_API_KEY}
     res = requests.get(
         "https://esports-api.lolesports.com/persisted/gw/getLeagues?hl=en-GB", headers=headers)
     leagues = res.json()["data"].get("leagues", [])

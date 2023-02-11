@@ -13,6 +13,7 @@ class Config:
     """
 
     REMOTE_BEST_STREAMS_URL = "https://raw.githubusercontent.com/LeagueOfPoro/CapsuleFarmerEvolved/master/config/bestStreams.txt"
+    RIOT_API_KEY = "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"
 
     def __init__(self, configPath: str) -> None:
         """
