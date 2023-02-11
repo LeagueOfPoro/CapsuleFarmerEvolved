@@ -1,4 +1,4 @@
-![# Capsule Farmer Evolved](https://raw.githubusercontent.com/Penguax/CapsuleFarmerEvolved/master/.github/banner.png)
+![# Capsule Farmer Evolved](https://raw.githubusercontent.com/LeagueOfPoro/CapsuleFarmerEvolved/master/.github/banner.png)
 <!-- Font for banner above by Riot Games BeaufortForLoL https://brand.riotgames.com/en-us/league-of-legends/typography/ -->
 <p align="center">
 <a href="https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/blob/master/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-orange"></a>
