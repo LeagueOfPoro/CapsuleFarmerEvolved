@@ -5,12 +5,14 @@ from Browser import Browser
 from Exceptions.InvalidIMAPCredentials import InvalidIMAPCredentialsException
 import requests
 
+from SharedData import SharedData
+
 class FarmThread(Thread):
     """
     A thread that creates a capsule farm for a given account
     """
 
-    def __init__(self, log, config, account, stats, locks):
+    def __init__(self, log, config, account, stats, locks, sharedData: SharedData):
         """
         Initializes the FarmThread
 
@@ -24,8 +26,9 @@ class FarmThread(Thread):
         self.config = config
         self.account = account
         self.stats = stats
-        self.browser = Browser(self.log, self.stats, self.config, self.account)
+        self.browser = Browser(self.log, self.stats, self.config, self.account, sharedData)
         self.locks = locks
+        self.sharedData = sharedData
 
     def run(self):
         """
@@ -38,24 +41,29 @@ class FarmThread(Thread):
                 self.stats.resetLoginFailed(self.account)
                 while True:
                     self.browser.maintainSession()
-                    self.browser.getLiveMatches()
                     watchFailed = self.browser.sendWatchToLive()
                     newDrops = []
-                    if self.browser.liveMatches:
+                    if self.sharedData.getLiveMatches():
                         liveMatchesStatus = []
-                        for m in self.browser.liveMatches.values():
+                        for m in self.sharedData.getLiveMatches().values():
                             if m.league in watchFailed:
                                 leagueName = f"[red]{m.league}[/]"
                             else:
                                 leagueName = str(m.league)
                             liveMatchesStatus.append(leagueName)
-                        self.log.debug(f"Live matches: {', '.join(liveMatchesStatus)}")    
+                        self.log.debug(f"Live matches: {', '.join(liveMatchesStatus)}")
                         liveMatchesMsg = f"{', '.join(liveMatchesStatus)}"
                         newDrops = self.browser.checkNewDrops(self.stats.getLastDropCheck(self.account))
-                        self.stats.updateLastDropCheck(self.account, int(datetime.now().timestamp()*1e3))
+                        self.stats.updateLastDropCheck(self.account, int(datetime.now().timestamp() * 1e3))
                     else:
-                        liveMatchesMsg = "None"
-                    self.stats.update(self.account, len(newDrops), liveMatchesMsg)
+                        liveMatchesMsg = self.sharedData.getTimeUntilNextMatch()
+                    try:
+                        if newDrops and getLeagueFromID(newDrops[-1]["leagueID"]):
+                            self.stats.update(self.account, len(newDrops), liveMatchesMsg, getLeagueFromID(newDrops[-1]["leagueID"]))
+                        else:
+                            self.stats.update(self.account, 0, liveMatchesMsg)
+                    except (IndexError, KeyError):
+                        self.stats.update(self.account, len(newDrops), liveMatchesMsg)
                     if self.config.connectorDrops:
                         self.__notifyConnectorDrops(newDrops)
                     sleep(Browser.STREAM_WATCH_INTERVAL)
@@ -104,3 +112,18 @@ class FarmThread(Thread):
                     requests.post(self.config.connectorDrops, headers={"Content-type":"application/json"}, json=params)
             else:
                 requests.post(self.config.connectorDrops, json=newDrops)
+
+def getLeagueFromID(leagueId):
+    allLeagues = getLeagues()
+    for league in allLeagues:
+        if leagueId in league["id"]:
+            return league["name"]
+    return ""
+def getLeagues():
+    headers = {"Origin": "https://lolesports.com", "Referrer": "https://lolesports.com",
+               "x-api-key": "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"}
+    res = requests.get(
+        "https://esports-api.lolesports.com/persisted/gw/getLeagues?hl=en-GB", headers=headers)
+    leagues = res.json()["data"].get("leagues", [])
+    res.close()
+    return leagues

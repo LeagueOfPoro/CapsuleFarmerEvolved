@@ -1,3 +1,4 @@
+from AssertCondition import AssertCondition
 from Exceptions.NoAccessTokenException import NoAccessTokenException
 from Exceptions.RateLimitException import RateLimitException
 from Exceptions.InvalidIMAPCredentials import InvalidIMAPCredentialsException
@@ -16,12 +17,14 @@ import jwt
 from IMAP import IMAP # Added to automate 2FA
 import imaplib2
 
+from SharedData import SharedData
+
 
 class Browser:
     SESSION_REFRESH_INTERVAL = 1800.0
     STREAM_WATCH_INTERVAL = 60.0
 
-    def __init__(self, log, stats, config: Config, account: str):
+    def __init__(self, log, stats, config: Config, account: str, sharedData: SharedData):
         """
         Initialize the Browser class
 
@@ -35,14 +38,14 @@ class Browser:
                 'platform': 'windows',
                 'desktop': True
             },
-            debug=config.getAccount(account).get("debug", False))
-        
+            debug=False)
+
         self.log = log
         self.stats = stats
         self.config = config
         self.currentlyWatching = {}
-        self.liveMatches = {}
         self.account = account
+        self.sharedData = sharedData
 
     def login(self, username: str, password: str, imapusername: str, imappassword: str, imapserver: str, refreshLock) -> bool:
         """
@@ -138,16 +141,18 @@ class Browser:
         """
         Refresh access and entitlement tokens
         """
-        headers = {"Origin": "https://lolesports.com",
-                   "Referrer": "https://lolesports.com"}
-        resAccessToken = self.client.get(
-            "https://account.rewards.lolesports.com/v1/session/refresh", headers=headers)
-        resAccessToken.close()
-        if resAccessToken.status_code == 200:
+        try:
+            headers = {"Origin": "https://lolesports.com",
+                    "Referrer": "https://lolesports.com"}
+            resAccessToken = self.client.get(
+                "https://account.rewards.lolesports.com/v1/session/refresh", headers=headers)
+            AssertCondition.statusCodeMatches(200, resAccessToken)
+            resAccessToken.close()
             self.__dumpCookies()
-        else:
+        except StatusCodeAssertException as ex:
             self.log.error("Failed to refresh session")
-            raise StatusCodeAssertException(200, resAccessToken.status_code, resAccessToken.request.url) 
+            self.log.error(ex)
+            raise ex
 
     def maintainSession(self):
         """
@@ -157,50 +162,18 @@ class Browser:
             self.log.debug("Refreshing session.")
             self.refreshSession()
 
-    def getLiveMatches(self):
-        """
-        Retrieve data about currently live matches and store them.
-        """
-        headers = {"Origin": "https://lolesports.com", "Referrer": "https://lolesports.com",
-                   "x-api-key": "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"}
-        res = self.client.get(
-            "https://esports-api.lolesports.com/persisted/gw/getLive?hl=en-GB", headers=headers)
-        if res.status_code != 200:
-            raise StatusCodeAssertException(200, res.status_code, res.request.url)
-        resJson = res.json()
-        res.close()
-        self.liveMatches = {}
-        try:
-            events = resJson["data"]["schedule"].get("events", [])
-            for event in events:
-                tournamentId = event["tournament"]["id"]
-                if tournamentId not in self.liveMatches:
-                    league = event["league"]["name"]
-                    if len(event["streams"]) > 0:
-                        streamChannel = event["streams"][0]["parameter"]
-                        streamSource = event["streams"][0]["provider"]
-                        for stream in event["streams"]:
-                            if stream["parameter"] in self.config.bestStreams:
-                                streamChannel = stream["parameter"]
-                                streamSource = stream["provider"]
-                                break
-                        self.liveMatches[tournamentId] = Match(
-                            tournamentId, league, streamChannel, streamSource)
-        except (KeyError, TypeError):
-            self.log.error("Could not get live matches")
-
     def sendWatchToLive(self) -> list:
         """
         Send watch event for all the live matches
         """
         watchFailed = []
-        for tid in self.liveMatches:
+        for tid in self.sharedData.getLiveMatches():
             try:
-                self.__sendWatch(self.liveMatches[tid])
+                self.__sendWatch(self.sharedData.getLiveMatches()[tid])
             except StatusCodeAssertException as ex:
-                self.log.error(f"Failed to send watch heartbeat for {self.liveMatches[tid].league}")
+                self.log.error(f"Failed to send watch heartbeat for {self.sharedData.getLiveMatches()[tid].league}")
                 self.log.error(ex)
-                watchFailed.append([self.liveMatches[tid].league])
+                watchFailed.append(self.sharedData.getLiveMatches()[tid].league)
         return watchFailed
     
     def checkNewDrops(self, lastCheckTime):
@@ -243,11 +216,7 @@ class Browser:
                    "Referrer": "https://lolesports.com"}
         res = self.client.post(
             "https://rex.rewards.lolesports.com/v1/events/watch", headers=headers, json=data)
-        if res.status_code != 201:
-            statusCode = res.status_code
-            url = res.request.url
-            res.close()
-            raise StatusCodeAssertException(201, statusCode, url)
+        AssertCondition.statusCodeMatches(201, res)
         res.close()
 
     def __getLoginTokens(self, form: str) -> tuple[str, str]:

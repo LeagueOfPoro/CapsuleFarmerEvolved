@@ -1,0 +1,25 @@
+name: Wiki Requests 
+description: Suggest an idea for the wiki. You can also use this template for typos, fixes etc. 
+title: "[Wiki]: "
+labels: ["documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this feature request! Please ensure this issue is not already reported by searching the [issue tracker](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/issues) for a similar issue. Please do not use this template for application related inquiries! This is **__only__** for the wiki!
+  - type: textarea
+    id: your-idea
+    attributes:
+      label: What is your request?
+      description: Please be as descriptive as possible. Explain what you want to be improved, and why you think it would be a good addition to the Wiki. If reporting a typo or fix, please also include the URL of the wiki page related to that issue.
+      placeholder: Tell us what you want!
+    validations:
+      required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: My request is not related to the application it self
+      description: Please ensure that you are not asking a question, feature or bug report for the application it self. Thanks for taking the time to fill out this feature request! Please ensure this issue is not already reported by searching the [issue tracker](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/issues) for a similar issue. This is **__only__** for the wiki!
+      options:
+        - label: I acknowledge that this issue is not related to the application and is in fact a wiki request.
+          required: true
