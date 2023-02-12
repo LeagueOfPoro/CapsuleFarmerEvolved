@@ -1,4 +1,4 @@
-
+from DataProviderThread import DataProviderThread
 from Exceptions.CapsuleFarmerEvolvedException import CapsuleFarmerEvolvedException
 from FarmThread import FarmThread
 from GuiThread import GuiThread
@@ -12,11 +12,12 @@ from rich import print
 from pathlib import Path
 from time import sleep
 from Restarter import Restarter
+from SharedData import SharedData
 
 from Stats import Stats
 from VersionManager import VersionManager
 
-CURRENT_VERSION = 1.2
+CURRENT_VERSION = 1.3
 
 
 def init() -> tuple[logging.Logger, Config]:
@@ -48,20 +49,26 @@ def main(log: logging.Logger, config: Config):
     farmThreads = {}
     refreshLock = Lock()
     locks = {"refreshLock": refreshLock}
+    sharedData = SharedData()
     stats = Stats(farmThreads)
     for account in config.accounts:
         stats.initNewAccount(account)
     restarter = Restarter(stats)
+
     log.info(f"Starting a GUI thread.")
-    gui = GuiThread(log, config, stats, locks)
-    gui.daemon = True
-    gui.start()
+    guiThread = GuiThread(log, config, stats, locks)
+    guiThread.daemon = True
+    guiThread.start()
+
+    dataProviderThread = DataProviderThread(log, config, sharedData)
+    dataProviderThread.daemon = True
+    dataProviderThread.start()
 
     while True:
         for account in config.accounts:
             if account not in farmThreads and restarter.canRestart(account):
                 log.info(f"Starting a thread for {account}.")
-                thread = FarmThread(log, config, account, stats, locks)
+                thread = FarmThread(log, config, account, stats, locks, sharedData)
                 thread.daemon = True
                 thread.start()
                 farmThreads[account] = thread
@@ -81,6 +88,7 @@ def main(log: logging.Logger, config: Config):
 
 
 if __name__ == '__main__':
+    log = None
     try:
         log, config = init()
         main(log, config)
@@ -88,4 +96,7 @@ if __name__ == '__main__':
         print('Exiting. Thank you for farming with us!')
         sys.exit()
     except CapsuleFarmerEvolvedException as e:
-        log.error(f'An error has occurred: {e}')
+        if isinstance(log, logging.Logger):
+            log.error(f"An error has occurred: {e}")
+        else:
+            print(f'[red]An error has occurred: {e}')

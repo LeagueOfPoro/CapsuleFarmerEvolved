@@ -1,0 +1,16 @@
+name: Prevent config file change
+on:
+  pull_request:
+    branches:
+    - main
+      
+jobs:
+  title:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prevent file change
+        uses: xalvarez/prevent-file-change-action@v1
+        with:
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          pattern: .*.yaml
+          trustedAuthors: LeagueOfPoro
