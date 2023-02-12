@@ -2,7 +2,9 @@
 
 import imaplib2, time, email #built using https://github.com/jazzband/imaplib2/
 from threading import *
+from datetime import datetime
 import re
+from Exceptions.FailFind2FAException import FailFind2FAException
  
 class IMAP(object):
     def __init__(self, conn):
@@ -21,8 +23,13 @@ class IMAP(object):
         self.thread.join()
  
     def idle(self):
+        cTime = int(datetime.now().timestamp()) + 5
         while True:
             try:
+                if cTime < int(datetime.now().timestamp()): # timeout, just incase the email was sent before the farmer was able to login to the IMAP acct
+                    self.dosync()
+                    if not self.event.isSet():
+                        raise FailFind2FAException
                 if self.event.isSet():
                     return
                 self.needsync = False

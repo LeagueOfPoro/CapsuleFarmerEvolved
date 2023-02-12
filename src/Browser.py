@@ -2,6 +2,8 @@ from AssertCondition import AssertCondition
 from Exceptions.NoAccessTokenException import NoAccessTokenException
 from Exceptions.RateLimitException import RateLimitException
 from Exceptions.InvalidIMAPCredentials import InvalidIMAPCredentialsException
+from Exceptions.Fail2FAException import Fail2FAException
+from Exceptions.FailFind2FAException import FailFind2FAException
 from Match import Match
 import cloudscraper
 from pprint import pprint
@@ -74,23 +76,18 @@ class Browser:
             if "multifactor" in resJson.get("type", ""):
                 if (imapserver != ""):
                     #Handles all IMAP requests
-                    try:
-                        M = imaplib2.IMAP4_SSL(imapserver)
-                        M.login(imapusername, imappassword)
-                        M.select("INBOX")
-                        idler = IMAP(M)
-                        idler.start()
-                        idler.join()
-                        M.logout()
+                    req = self.IMAPHook(imapusername, imappassword, imapserver)
 
-                        self.stats.updateStatus(self.account, f"[green]FETCHED 2FA CODE")
+                    self.stats.updateStatus(self.account, f"[green]FETCHED 2FA CODE")
 
-                        data = {"type": "multifactor", "code": idler.code, "rememberDevice": True}
-                        res = self.client.put(
-                            "https://auth.riotgames.com/api/v1/authorization", json=data)
-                        resJson = res.json()
-                    except:
-                        raise InvalidIMAPCredentialsException()
+                    data = {"type": "multifactor", "code": req.code, "rememberDevice": True}
+                    res = self.client.put(
+                        "https://auth.riotgames.com/api/v1/authorization", json=data)
+                    resJson = res.json()
+                    if 'error' in resJson:
+                        if resJson['error'] == 'multifactor_attempt_failed':
+                            raise Fail2FAException
+
                 else:
                     twoFactorCode = input(f"Enter 2FA code for {self.account}:\n")
                     self.stats.updateStatus(self.account, f"[green]CODE SENT")
@@ -132,10 +129,27 @@ class Browser:
             # Currently unused but the call might be important server-side
             resPasToken = self.client.get(
                 "https://account.rewards.lolesports.com/v1/session/clientconfig/rms", headers=headers).close()
+            print("wow")
             if resAccessToken.status_code == 200:
                 self.__dumpCookies()
                 return True
+            print("thats good")
         return False
+
+    def IMAPHook(self, usern, passw, server):
+        try:
+            M = imaplib2.IMAP4_SSL(server)
+            M.login(usern, passw)
+            M.select("INBOX")
+            idler = IMAP(M)
+            idler.start()
+            idler.join()
+            M.logout()
+            return idler
+        except FailFind2FAException:
+            self.log.error(f"Failed to find 2FA code for {self.account}")
+        except:
+            raise InvalidIMAPCredentialsException()
 
     def refreshSession(self):
         """

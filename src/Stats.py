@@ -1,8 +1,7 @@
 from datetime import datetime
 
 class Stats:
-    def __init__(self, farmThreads) -> None:
-        self.farmThreads = farmThreads
+    def __init__(self) -> None:
         self.accountData = {}
 
     def initNewAccount(self, accountName: str):

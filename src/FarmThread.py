@@ -3,6 +3,7 @@ from threading import Thread
 from time import sleep
 from Browser import Browser
 from Exceptions.InvalidIMAPCredentials import InvalidIMAPCredentialsException
+from Exceptions.Fail2FAException import Fail2FAException
 import requests
 
 from SharedData import SharedData
@@ -74,13 +75,12 @@ class FarmThread(Thread):
                     self.stats.updateStatus(self.account, "[red]LOGIN FAILED - WILL RETRY SOON")
                 else:
                     self.stats.updateStatus(self.account, "[red]LOGIN FAILED")
-        except (Exception, InvalidIMAPCredentialsException):
-            if InvalidIMAPCredentialsException:
-                self.log.error(f"IMAP login failed for {self.account}")
-                self.stats.updateStatus(self.account, "[red]IMAP LOGIN FAILED")
-                self.stats.updateThreadStatus(self.account)
-            else:
-                self.log.exception(f"Error in {self.account}. The program will try to recover.")
+        except InvalidIMAPCredentialsException:
+            self.log.error(f"IMAP login failed for {self.account}")
+            self.stats.updateStatus(self.account, "[red]IMAP LOGIN FAILED")
+            self.stats.updateThreadStatus(self.account)
+        except Exception:
+            self.log.exception(f"Error in {self.account}. The program will try to recover.")
 
     def stop(self):
         """
