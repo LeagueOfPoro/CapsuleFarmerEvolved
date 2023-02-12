@@ -36,7 +36,7 @@ class FarmThread(Thread):
         Start watching every live match
         """
         try:
-            self.stats.updateStatus(self.account, "[green]LOGIN")
+            self.stats.updateStatus(self.account, "[yellow]LOGIN")
             if self.browser.login(self.config.getAccount(self.account)["username"], self.config.getAccount(self.account)["password"], self.config.getAccount(self.account)["imapUsername"], self.config.getAccount(self.account)["imapPassword"], self.config.getAccount(self.account)["imapServer"], self.locks["refreshLock"]):
                 self.stats.updateStatus(self.account, "[green]LIVE")
                 self.stats.resetLoginFailed(self.account)
