@@ -64,7 +64,7 @@ class Browser:
             if res.status_code == 429:
                 retryAfter = res.headers['Retry-after']
                 raise RateLimitException(retryAfter)
-                
+            AssertCondition.statusCodeMatches(200, res)
             resJson = res.json()
             if "multifactor" in resJson.get("type", ""):
                 twoFactorCode = input(f"Enter 2FA code for {self.account}:\n")
@@ -79,6 +79,9 @@ class Browser:
             return False
         except RateLimitException as ex:
             self.log.error(f"You are being rate-limited. Retry after {ex}")
+            return False
+        except StatusCodeAssertException as ex:
+            self.log.error(ex)
             return False
         finally:
             refreshLock.release()
