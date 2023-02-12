@@ -6,6 +6,7 @@ import requests
 
 from SharedData import SharedData
 
+
 class FarmThread(Thread):
     """
     A thread that creates a capsule farm for a given account
@@ -35,7 +36,8 @@ class FarmThread(Thread):
         """
         try:
             self.stats.updateStatus(self.account, "[green]LOGIN")
-            if self.browser.login(self.config.getAccount(self.account)["username"], self.config.getAccount(self.account)["password"], self.locks["refreshLock"]):
+            if self.browser.login(self.config.getAccount(self.account)["username"],
+                                  self.config.getAccount(self.account)["password"], self.locks["refreshLock"]):
                 self.stats.updateStatus(self.account, "[green]LIVE")
                 self.stats.resetLoginFailed(self.account)
                 while True:
@@ -58,7 +60,8 @@ class FarmThread(Thread):
                         liveMatchesMsg = self.sharedData.getTimeUntilNextMatch()
                     try:
                         if newDrops and getLeagueFromID(newDrops[-1]["leagueID"]):
-                            self.stats.update(self.account, len(newDrops), liveMatchesMsg, getLeagueFromID(newDrops[-1]["leagueID"]))
+                            self.stats.update(self.account, len(newDrops), liveMatchesMsg,
+                                              getLeagueFromID(newDrops[-1]["leagueID"]))
                         else:
                             self.stats.update(self.account, 0, liveMatchesMsg)
                     except (IndexError, KeyError):
@@ -94,18 +97,19 @@ class FarmThread(Thread):
                     embed = {
                         "title": f"[{self.account}] {title}",
                         "description": f"We claimed an **{reward}** from <https://lolesports.com/rewards>",
-                        "image" : {"url": f"{thumbnail}"},
+                        "image": {"url": f"{thumbnail}"},
                         "thumbnail": {"url": f"{rewardImage}"},
                         "color": 6676471,
                     }
 
                     params = {
-                        "username" : "CapsuleFarmerEvolved",
+                        "username": "CapsuleFarmerEvolved",
                         "embeds": [embed]
                     }
-                    requests.post(self.config.connectorDrops, headers={"Content-type":"application/json"}, json=params)
+                    requests.post(self.config.connectorDrops, headers={"Content-type": "application/json"}, json=params)
             else:
                 requests.post(self.config.connectorDrops, json=newDrops)
+
 
 def getLeagueFromID(leagueId):
     allLeagues = getLeagues()
@@ -113,6 +117,8 @@ def getLeagueFromID(leagueId):
         if leagueId in league["id"]:
             return league["name"]
     return ""
+
+
 def getLeagues():
     headers = {"Origin": "https://lolesports.com", "Referrer": "https://lolesports.com",
                "x-api-key": "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"}

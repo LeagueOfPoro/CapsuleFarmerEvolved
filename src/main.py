@@ -10,7 +10,6 @@ import sys
 import argparse
 from rich import print
 from pathlib import Path
-from time import sleep
 from Restarter import Restarter
 from SharedData import SharedData
 

@@ -1,5 +1,6 @@
 from Exceptions.CapsuleFarmerEvolvedException import CapsuleFarmerEvolvedException
 
+
 class StatusCodeAssertException(CapsuleFarmerEvolvedException):
     def __init__(self, expected, received, url):
         self.expected = expected
