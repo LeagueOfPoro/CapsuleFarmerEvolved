@@ -48,7 +48,13 @@ class Config:
                   
                 
             else: raise ex
-            
+        except AttributeError as ex: 
+               print(f"[red]CRITICAL ERROR: The configuration file is empty \n")  
+               if UserPrompt(" Do you want to fill it?(Y/N): "):
+                    self.addAccount(configPath,1) 
+                    self.__init__(configPath)
+               else: raise ex    
+ 
         except (ParserError, KeyError) as ex:
             print(f"[red]CRITICAL ERROR: The configuration file does not have a valid format.\nPlease, check it for extra spaces and other characters.\nAlternatively, use confighelper.html to generate a new one.")
             print("Press any key to exit...")
