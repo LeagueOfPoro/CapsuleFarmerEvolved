@@ -36,10 +36,12 @@ This is a successor to the old [EsportsCapsuleFarmer](https://github.com/LeagueO
 - Very lightweight - no external browser needed
 - Simple GUI
 - 2FA (experimental) - programs prompts for the code on startup
+- Docker supported
 - ARM supported (Raspberry Pi)
+- [Discord Webhook support](https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/wiki/Configuration#configuration-options)
 
 ## Community
-If you have any type of issue, need help, or just want to hangout. Come to [League of Poro's Discord server](https://discord.gg/c2Qs9Y83hh).
+If you have any type of issue, need help, or just want to hangout. Come to [League of Poro's Discord server](https://discord.gg/ebm5MJNvHU).
 
 ## Support my work
 [Subscribe to my channel on YouTube](https://www.youtube.com/channel/UCwgpdTScSd788qILhLnyyyw?sub_confirmation=1) or even
