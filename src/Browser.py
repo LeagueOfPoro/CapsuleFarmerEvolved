@@ -129,11 +129,9 @@ class Browser:
             # Currently unused but the call might be important server-side
             resPasToken = self.client.get(
                 "https://account.rewards.lolesports.com/v1/session/clientconfig/rms", headers=headers).close()
-            print("wow")
             if resAccessToken.status_code == 200:
                 self.__dumpCookies()
                 return True
-            print("thats good")
         return False
 
     def IMAPHook(self, usern, passw, server):
