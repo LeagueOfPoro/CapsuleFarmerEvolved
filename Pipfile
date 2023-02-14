@@ -11,6 +11,8 @@ beautifulsoup4 = "*"
 pyyaml = "*"
 rich = "*"
 pyjwt = "*"
+kivy = "*"
+kivymd = "*"
 
 [dev-packages]
 autopep8 = "*"
