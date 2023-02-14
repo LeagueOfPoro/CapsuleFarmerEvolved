@@ -55,4 +55,8 @@ If you have any type of issue, need help, or just want to hangout. Come to [Leag
 - Regularly check if the "Heartbeat" happened within the last few minutes. If not, restart the program.
 
 ## Disclaimer 
+CapsuleFarmerEvolved is not endorsed by Riot Games and does not reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games and all associated properties are trademarks or registered trademarks of Riot Games, Inc
+
 This project comes with no guarantee or warranty. You are responsible for whatever happens from using this project. No bans have been reported from using this project but it is not a guarantee. This is a personal project and is in no way affiliated with Riot Games.
+<!-- Properly citing disclaimer from Riot Games Developer Portal https://developer.riotgames.com/docs/lol -->
+
