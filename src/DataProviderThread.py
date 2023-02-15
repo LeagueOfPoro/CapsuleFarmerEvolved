@@ -84,18 +84,23 @@ class DataProviderThread(Thread):
             res.close()
             events = resJson["data"]["schedule"]["events"]
             for event in events:
-                try:
-                    if "inProgress" != event["state"]:
-                        startTime = datetime.strptime(event["startTime"], '%Y-%m-%dT%H:%M:%SZ') #Some matches aparrently don't have a starttime
-                except:
-                    continue
-                if datetime.now(timezone.utc) < startTime:
-                    timeUntil = startTime - datetime.now()
-                    total_seconds = int(timeUntil.total_seconds())
-                    days, remainder = divmod(total_seconds, 86400)
-                    hours, remainder = divmod(remainder, 3600)
-                    minutes, seconds = divmod(remainder, 60)
-                    self.sharedData.setTimeUntilNextMatch(f"None - next in {str(days)}d" if days else f'None - next in {hours}h {minutes}m')
+                if event["state"] == "unstarted":
+                    startTime = datetime.strptime(event["startTime"], '%Y-%m-%dT%H:%M:%SZ')
+                    currentTimeString = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+                    currentTimeDatetime = datetime.strptime(currentTimeString, '%Y-%m-%dT%H:%M:%SZ')
+
+                    if currentTimeDatetime < startTime:
+                        timeUntil = startTime - currentTimeDatetime
+                        total_seconds = int(timeUntil.total_seconds())
+                        days, remainder = divmod(total_seconds, 86400)
+                        hours, remainder = divmod(remainder, 3600)
+                        minutes, seconds = divmod(remainder, 60)
+                        self.sharedData.setTimeUntilNextMatch(
+                            f"None - next in {days}d {hours}h" if days else f'None - next in {hours}h {minutes}m')
+                    else:
+                        self.sharedData.setTimeUntilNextMatch("None - could not determine when next match starts")
+
+                    break
         except StatusCodeAssertException as ex:
             self.log.error(ex)
             self.sharedData.setTimeUntilNextMatch("None")
