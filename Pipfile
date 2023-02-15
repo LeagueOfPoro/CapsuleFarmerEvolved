@@ -17,6 +17,9 @@ kivymd = "*"
 [dev-packages]
 autopep8 = "*"
 pyinstaller = "*"
+python-for-android = "*"
+buildozer = "*"
+pipdeptree = "*"
 
 [requires]
 python_version = "3.10"
