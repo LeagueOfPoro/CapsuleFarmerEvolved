@@ -27,23 +27,24 @@ class Config:
             configPath = self.__findConfig(configPath)
             with open(configPath, "r", encoding='utf-8') as f:
                 config = yaml.safe_load(f)
+                self.debug = config.get("debug", False)
+                self.connectorDrops = config.get("connectorDropsUrl", "")
                 accs = config.get("accounts")
                 for account in accs:
                     if "username" != accs[account]["username"]:
                         self.accounts[account] = {
                             "username": accs[account]["username"],
                             "password": accs[account]["password"]
-                        }                    
+                        }                          
                 if not self.accounts:
                     raise InvalidCredentialsException                    
-                self.debug = config.get("debug", False)
-                self.connectorDrops = config.get("connectorDropsUrl", "")
+                
         except FileNotFoundError as ex:
             print(f"[red]CRITICAL ERROR: The configuration file cannot be found at {configPath}\nHave you extracted the ZIP archive and edited the configuration file?")
             if UserPrompt("Do you want to create config file and add new account? (Y/N): "):
                 
                  
-                self.addAccount(configPath,1) 
+                self.addAccount(configPath) 
                 self.__init__(configPath)  
                   
                 
@@ -51,9 +52,9 @@ class Config:
         except AttributeError as ex: 
                print(f"[red]CRITICAL ERROR: The configuration file is empty \n")  
                if UserPrompt(" Do you want to fill it?(Y/N): "):
-                    self.addAccount(configPath,1) 
+                    self.addAccount(configPath) 
                     self.__init__(configPath)
-               else: raise ex    
+                  
  
         except (ParserError, KeyError) as ex:
             print(f"[red]CRITICAL ERROR: The configuration file does not have a valid format.\nPlease, check it for extra spaces and other characters.\nAlternatively, use confighelper.html to generate a new one.")
@@ -65,9 +66,8 @@ class Config:
             
             if UserPrompt("Do you want to add new account? (Y/N): "):
                 
-                self.debug = config.get("debug", False)
-                self.connectorDrops = config.get("connectorDropsUrl", "")   
-                self.addAccount(configPath,1)    
+                   
+                self.addAccount(configPath)    
                 
             else: raise ex
 
@@ -107,12 +107,11 @@ class Config:
         if Path("config/config.yaml").exists():
             return Path("config/config.yaml")
         return configPath
-    def addAccount(self,configPath,new):
+    def addAccount(self,configPath):
         """
         Add account to config.yaml file
 
         :param configPath: user suplied configuration file path
-        :param new: pass 'False' if you want to append to config file or 'True' if you want to rewrite it completely
 
         """
         
@@ -126,12 +125,11 @@ class Config:
                     "password": password
                                 }
         configPath = self.__findConfig(configPath)
-        
-        f = open(configPath, "w" if new else "a", encoding='utf-8')
-         
-        f.write(yaml.dump({'accounts':self.accounts})) 
+        with open(configPath, "w", encoding='utf-8') as f:
+            f.write(yaml.dump({'accounts':self.accounts})) 
+
         if UserPrompt("Do you want to add another account? (Y/N): ") :
-            self.addAccount(configPath,0)
+            self.addAccount(configPath)
               
         
 def UserPrompt(text):
@@ -142,6 +140,6 @@ def UserPrompt(text):
     :return: True or False depending on user's input
     """
     a= input(text).lower()
-    if a=='y' or a=='yes':
+    if "y" in a:
         return True
     else: return False                       
