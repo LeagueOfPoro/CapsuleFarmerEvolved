@@ -97,10 +97,6 @@ class Browser:
             self.client.get(
                 "https://auth.riotgames.com/authorize?client_id=esports-rna-prod&redirect_uri=https://account.rewards.lolesports.com/v1/session/oauth-callback&response_type=code&scope=openid&prompt=none&state=https://lolesports.com/?memento=na.en_GB", allow_redirects=True).close()
 
-            # Get access and entitlement tokens for the first time
-            headers = {"Origin": "https://lolesports.com",
-                        "Referrer": "https://lolesports.com"}
-
             # This requests sometimes returns 404
             resAccessToken = self.client.get(
                 "https://account.rewards.lolesports.com/v1/session/token", headers=headers)
