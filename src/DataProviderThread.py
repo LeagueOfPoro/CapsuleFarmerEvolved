@@ -2,6 +2,7 @@ from datetime import datetime
 from threading import Thread
 from time import sleep
 import cloudscraper
+from unidecode import unidecode
 
 from AssertCondition import AssertCondition
 from Exceptions.StatusCodeAssertException import StatusCodeAssertException
@@ -55,7 +56,7 @@ class DataProviderThread(Thread):
             for event in events:
                 tournamentId = event["tournament"]["id"]
                 if tournamentId not in liveMatches:
-                    league = event["league"]["name"]
+                    league = unidecode(event["league"]["name"])
                     if len(event["streams"]) > 0:
                         streamChannel = event["streams"][0]["parameter"]
                         streamSource = event["streams"][0]["provider"]
