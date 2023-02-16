@@ -34,9 +34,9 @@ class Config:
                         "password": accs[account]["password"],
                         
                         #IMAP data
-                        "imapusername": accs[account].get("imapusername", ""),
-                        "imappassword": accs[account].get("imappassword", ""),
-                        "imapserver": accs[account].get("imapserver", ""),
+                        "imapUsername": accs[account].get("imapUsername", ""),
+                        "imapPassword": accs[account].get("imapPassword", ""),
+                        "imapServer": accs[account].get("imapServer", ""),
                     }
                     if "username" != accs[account]["username"]:
                         onlyDefaultUsername = False
