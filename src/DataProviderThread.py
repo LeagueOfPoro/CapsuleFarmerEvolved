@@ -42,7 +42,7 @@ class DataProviderThread(Thread):
         """
         Retrieve data about currently live matches and store them.
         """
-        headers = {"Origin": "https://lolesports.com", "Referrer": "https://lolesports.com",
+        headers = {"Origin": "https://lolesports.com",
                    "x-api-key": "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"}
         res = self.client.get(
             "https://esports-api.lolesports.com/persisted/gw/getLive?hl=en-GB", headers=headers)
@@ -75,7 +75,7 @@ class DataProviderThread(Thread):
         """
         Retrieve data about currently live matches and store them.
         """
-        headers = {"Origin": "https://lolesports.com", "Referrer": "https://lolesports.com",
+        headers = {"Origin": "https://lolesports.com",
                    "x-api-key": "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"}
         try:
             res = self.client.get(

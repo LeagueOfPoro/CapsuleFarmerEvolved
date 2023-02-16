@@ -98,8 +98,8 @@ class Browser:
                 "https://auth.riotgames.com/authorize?client_id=esports-rna-prod&redirect_uri=https://account.rewards.lolesports.com/v1/session/oauth-callback&response_type=code&scope=openid&prompt=none&state=https://lolesports.com/?memento=na.en_GB", allow_redirects=True).close()
 
             # Get access and entitlement tokens for the first time
-            headers = {"Origin": "https://lolesports.com",
-                        "Referrer": "https://lolesports.com"}
+            headers = {"Origin": "https://lolesports.com"}
+
 
             # This requests sometimes returns 404
             resAccessToken = self.client.get(
@@ -117,8 +117,8 @@ class Browser:
         Refresh access and entitlement tokens
         """
         try:
-            headers = {"Origin": "https://lolesports.com",
-                    "Referrer": "https://lolesports.com"}
+            headers = {"Origin": "https://lolesports.com"}
+
             resAccessToken = self.client.get(
                 "https://account.rewards.lolesports.com/v1/session/refresh", headers=headers)
             AssertCondition.statusCodeMatches(200, resAccessToken)
@@ -154,7 +154,7 @@ class Browser:
     def checkNewDrops(self, lastCheckTime):
         try:
             headers = {"Origin": "https://lolesports.com",
-                   "Referrer": "https://lolesports.com",
+
                    "Authorization": "Cookie access_token"}
             res = self.client.get("https://account.service.lolesports.com/fandom-account/v1/earnedDrops?locale=en_GB&site=LOLESPORTS", headers=headers)
             resJson = res.json()
@@ -187,8 +187,8 @@ class Browser:
                 "stream_position_time": datetime.utcnow().isoformat(sep='T', timespec='milliseconds')+'Z',
                 "geolocation": {"code": "CZ", "area": "EU"},
                 "tournament_id": match.tournamentId}
-        headers = {"Origin": "https://lolesports.com",
-                   "Referrer": "https://lolesports.com"}
+        headers = {"Origin": "https://lolesports.com"}
+
         res = self.client.post(
             "https://rex.rewards.lolesports.com/v1/events/watch", headers=headers, json=data)
         AssertCondition.statusCodeMatches(201, res)
