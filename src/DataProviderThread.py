@@ -27,6 +27,8 @@ class DataProviderThread(Thread):
                 'desktop': True
             },
             debug=False)
+        self.currentTime = None
+        self.startTime = None
 
     def run(self):
         while True:
@@ -85,24 +87,45 @@ class DataProviderThread(Thread):
             events = resJson["data"]["schedule"]["events"]
             for event in events:
                 if event["state"] == "unstarted":
-                    startTime = datetime.strptime(event["startTime"], '%Y-%m-%dT%H:%M:%SZ')
-                    currentTimeString = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
-                    currentTimeDatetime = datetime.strptime(currentTimeString, '%Y-%m-%dT%H:%M:%SZ')
-
-                    if currentTimeDatetime < startTime:
-                        timeUntil = startTime - currentTimeDatetime
+                    if self._isStartTimeLater(event["startTime"]):  # startTime is later
+                        timeUntil = self.startTime - self.currentTime
                         total_seconds = int(timeUntil.total_seconds())
                         days, remainder = divmod(total_seconds, 86400)
                         hours, remainder = divmod(remainder, 3600)
                         minutes, seconds = divmod(remainder, 60)
                         self.sharedData.setTimeUntilNextMatch(
                             f"None - next in {days}d {hours}h" if days else f'None - next in {hours}h {minutes}m')
-                    else:
-                        self.sharedData.setTimeUntilNextMatch("None - could not determine when next match starts")
-
-                    break
+                        break
+                    else:  # We're past the startTime due to delay or cancellation i'm guessing
+                        niceStartTime = datetime.strftime(self.startTime, '%H:%M')
+                        self.sharedData.setTimeUntilNextMatch(f"{event['league']['name']} should've started at {niceStartTime} but hasn't.")
+                        for nextEvent in events:  # Looping again to find next match that weren't supposed to have started already
+                            if nextEvent["state"] == "unstarted":
+                                if self._isStartTimeLater(nextEvent["startTime"]):
+                                    timeUntil = self.startTime - self.currentTime
+                                    total_seconds = int(timeUntil.total_seconds())
+                                    days, remainder = divmod(total_seconds, 86400)
+                                    hours, remainder = divmod(remainder, 3600)
+                                    minutes, seconds = divmod(remainder, 60)
+                                    self.sharedData.addTimeUntilNextMatch(
+                                        f"Next in {days}d {hours}h" if days else f'Next in {hours}h {minutes}m')
+                                    break
         except StatusCodeAssertException as ex:
             self.log.error(ex)
             self.sharedData.setTimeUntilNextMatch("None")
-        except:
+        except Exception as ex:
+            self.log.error(ex)
             self.sharedData.setTimeUntilNextMatch("None")
+
+    def _isStartTimeLater(self, time) -> bool:
+        """
+        Checks if an events starttime is later than now
+
+        :param time: string
+        :return: bool
+        """
+        datetimeFormat = '%Y-%m-%dT%H:%M:%SZ'
+        self.startTime = datetime.strptime(time, datetimeFormat)
+        currentTimeString = datetime.now(timezone.utc).strftime(datetimeFormat)
+        self.currentTime = datetime.strptime(currentTimeString, datetimeFormat)
+        return self.currentTime < self.startTime

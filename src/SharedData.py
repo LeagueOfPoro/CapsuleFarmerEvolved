@@ -12,5 +12,8 @@ class SharedData:
     def setTimeUntilNextMatch(self, timeUntilNextMatch):
         self.timeUntilNextMatch = timeUntilNextMatch
 
+    def addTimeUntilNextMatch(self, timeUntilNextMatch):
+        self.timeUntilNextMatch += "\n" + timeUntilNextMatch
+
     def getTimeUntilNextMatch(self):
         return self.timeUntilNextMatch
