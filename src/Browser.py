@@ -41,6 +41,8 @@ class Browser:
         self.currentlyWatching = {}
         self.account = account
         self.sharedData = sharedData
+        self.header = "Referrer"
+
 
     def login(self, username: str, password: str, refreshLock) -> bool:
         """
@@ -176,21 +178,27 @@ class Browser:
         return False
 
     def __sendWatch(self, match: Match):
+        
         """
         Sends watch event for a match
 
         :param match: Match object
         :return: object, response of the request
         """
-        data = {"stream_id": match.streamChannel,
+        def sendRequest(match):
+            data = {"stream_id": match.streamChannel,
                 "source": match.streamSource,
                 "stream_position_time": datetime.utcnow().isoformat(sep='T', timespec='milliseconds')+'Z',
                 "geolocation": {"code": "CZ", "area": "EU"},
                 "tournament_id": match.tournamentId}
-        headers = {"Origin": "https://lolesports.com",
-                   "Referrer": "https://lolesports.com"}
-        res = self.client.post(
-            "https://rex.rewards.lolesports.com/v1/events/watch", headers=headers, json=data)
+            return self.client.post("https://rex.rewards.lolesports.com/v1/events/watch", json=data)
+        res = sendRequest(match)
+        if res.status_code == 403 and self.header == "Referrer":
+            self.header = "Referer"
+            res = sendRequest(match)
+        else:
+            self.header = "Referrer"
+            res = sendRequest(match)
         AssertCondition.statusCodeMatches(201, res)
         res.close()
 
