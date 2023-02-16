@@ -74,6 +74,7 @@ class Browser:
             
             resJson = res.json()
             if "multifactor" in resJson.get("type", ""):
+                refreshLock.release()
                 if (imapserver != ""):
                     #Handles all IMAP requests
                     req = self.IMAPHook(imapusername, imappassword, imapserver)
@@ -103,7 +104,8 @@ class Browser:
             self.log.error(f"You are being rate-limited. Retry after {ex}")
             return False
         finally:
-            refreshLock.release()
+            if refreshLock.locked():
+                refreshLock.release()
         # Login to lolesports.com, riotgames.com, and playvalorant.com
         token, state = self.__getLoginTokens(res.text)
         if token and state:
@@ -129,9 +131,11 @@ class Browser:
             # Currently unused but the call might be important server-side
             resPasToken = self.client.get(
                 "https://account.rewards.lolesports.com/v1/session/clientconfig/rms", headers=headers).close()
+            print("wow")
             if resAccessToken.status_code == 200:
                 self.__dumpCookies()
                 return True
+            print("thats good")
         return False
 
     def IMAPHook(self, usern, passw, server):
