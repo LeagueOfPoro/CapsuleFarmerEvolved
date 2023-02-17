@@ -1,5 +1,5 @@
 from datetime import datetime
-from threading import Thread
+from threading import Thread, Lock
 from time import sleep
 from Browser import Browser
 import requests
@@ -26,6 +26,7 @@ class FarmThread(Thread):
         self.account = account
         self.stats = stats
         self.browser = Browser(self.log, self.config, self.account, sharedData)
+        self.lock = Lock()
         self.locks = locks
         self.sharedData = sharedData
 
@@ -58,7 +59,9 @@ class FarmThread(Thread):
                         liveMatchesMsg = self.sharedData.getTimeUntilNextMatch()
                     try:
                         if newDrops and getLeagueFromID(newDrops[-1]["leagueID"]):
+                            self.lock.acquire()
                             self.stats.update(self.account, len(newDrops), liveMatchesMsg, getLeagueFromID(newDrops[-1]["leagueID"]))
+                            self.lock.release()
                         else:
                             self.stats.update(self.account, 0, liveMatchesMsg)
                     except (IndexError, KeyError):

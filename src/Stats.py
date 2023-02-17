@@ -1,4 +1,5 @@
 from datetime import datetime
+import json
 
 class Stats:
     def __init__(self, farmThreads) -> None:
@@ -6,9 +7,11 @@ class Stats:
         self.accountData = {}
 
     def initNewAccount(self, accountName: str):
+        totalDrops = self.loadTotalDrops(accountName)
         self.accountData[accountName] = {
             "lastCheck": "",
-            "totalDrops": 0,
+            "totalDrops": totalDrops,
+            "sessionDrops": 0,
             "lastDrop": "N/A",
             "liveMatches": "",
             "status": "[yellow]WAIT",
@@ -21,10 +24,33 @@ class Stats:
         self.accountData[accountName]["liveMatches"] = liveMatches
         if newDrops > 0:
             self.accountData[accountName]["totalDrops"] += newDrops
+            self.accountData[accountName]["sessionDrops"] += newDrops
+            self.saveTotalDrops()
             if lastDropleague:
                 self.accountData[accountName]["lastDrop"] = datetime.now().strftime("%H:%M:%S %d/%m") + f' ({lastDropleague})'
             else:
                 self.accountData[accountName]["lastDrop"] = datetime.now().strftime("%H:%M:%S %d/%m")
+
+    def loadTotalDrops(self, accountName: str):
+        try:
+            with open("./saves/save.json", "r") as f:
+                saveData = json.load(f)
+                totalDrops = saveData[accountName]["totalDrops"]
+        except (FileNotFoundError, KeyError):
+            totalDrops = 0
+
+        return totalDrops
+
+    def saveTotalDrops(self):
+        allTotalDrops = {}
+
+        for account in self.accountData:
+            allTotalDrops[account] = {
+                "totalDrops": self.accountData[account]["totalDrops"],
+            }
+
+        with open("./saves/save.json", "w") as f:
+            json.dump(allTotalDrops, f)
 
     def updateStatus(self, accountName: str, msg: str):
         self.accountData[accountName]["status"] = msg
