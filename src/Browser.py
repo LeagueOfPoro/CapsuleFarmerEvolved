@@ -41,6 +41,7 @@ class Browser:
         self.currentlyWatching = {}
         self.account = account
         self.sharedData = sharedData
+        self.ref = "Referer"
 
     def login(self, username: str, password: str, refreshLock) -> bool:
         """
@@ -97,16 +98,23 @@ class Browser:
             self.client.get(
                 "https://auth.riotgames.com/authorize?client_id=esports-rna-prod&redirect_uri=https://account.rewards.lolesports.com/v1/session/oauth-callback&response_type=code&scope=openid&prompt=none&state=https://lolesports.com/?memento=na.en_GB", allow_redirects=True).close()
 
-            # Get access and entitlement tokens for the first time
-            headers = {"Origin": "https://lolesports.com"}
+            def reqAcc():
+                # This requests sometimes returns 404
+                return self.client.get(
+                    "https://account.rewards.lolesports.com/v1/session/token", headers={"Origin": "https://lolesports.com", self.ref: "https://lolesports.com"})
+                    
+            
+            resAccessToken = reqAcc()
 
+            if resAccessToken.status_code != 200 and self.ref == "Referer":
+                self.ref = "Referrer"
+                reqAcc()
+            elif resAccessToken.status_code != 200 and self.ref == "Referrer":
+                self.ref = "Referer"
+                reqAcc()
 
-            # This requests sometimes returns 404
-            resAccessToken = self.client.get(
-                "https://account.rewards.lolesports.com/v1/session/token", headers=headers)
-            # Currently unused but the call might be important server-side
             resPasToken = self.client.get(
-                "https://account.rewards.lolesports.com/v1/session/clientconfig/rms", headers=headers).close()
+                "https://account.rewards.lolesports.com/v1/session/clientconfig/rms", headers={"Origin": "https://lolesports.com", self.ref: "https://lolesports.com"}).close()
             if resAccessToken.status_code == 200:
                 self.__dumpCookies()
                 return True
