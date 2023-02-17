@@ -17,7 +17,7 @@ from SharedData import SharedData
 from Stats import Stats
 from VersionManager import VersionManager
 
-CURRENT_VERSION = 1.3
+CURRENT_VERSION = "1.3.1"
 
 
 def init() -> tuple[logging.Logger, Config]:
