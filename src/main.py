@@ -17,7 +17,7 @@ from SharedData import SharedData
 from Stats import Stats
 from VersionManager import VersionManager
 
-CURRENT_VERSION = "1.3.1"
+CURRENT_VERSION = 1.31
 
 
 def init() -> tuple[logging.Logger, Config]:
@@ -27,7 +27,7 @@ def init() -> tuple[logging.Logger, Config]:
     args = parser.parse_args()
 
     print("*********************************************************")
-    print(f"*   Thank you for using Capsule Farmer Evolved v{CURRENT_VERSION}!    *")
+    print(f"*   Thank you for using Capsule Farmer Evolved v{str(CURRENT_VERSION)}!    *")
     print("* [steel_blue1]Please consider supporting League of Poro on YouTube.[/] *")
     print("*    If you need help with the app, join our Discord    *")
     print("*             https://discord.gg/ebm5MJNvHU             *")
