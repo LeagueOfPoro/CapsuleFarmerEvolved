@@ -37,8 +37,6 @@ class IMAP(object):
                     if not self.event.isSet():
                         self.needsync = True
                         self.event.set()
-                self.M.idle(callback=callback)
-                self.event.wait()
                 if self.needsync:
                     self.event.clear()
                     self.dosync()
@@ -54,6 +52,7 @@ class IMAP(object):
                     object = email.message_from_bytes(info[0][1])
                     if object['From'].find('noreply@mail.accounts.riotgames.com') > -1:
                         self.code = re.findall(r'\d{6}', object["Subject"])[0]
+                        print(self.code)
                         self.event.set()
         except:
             self.event.set()

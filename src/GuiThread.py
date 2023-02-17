@@ -49,7 +49,8 @@ class GuiThread(Thread):
                 sleep(1)
                 self.locks["refreshLock"].acquire()
                 live.refresh()
-                self.locks["refreshLock"].release()
+                if self.locks["refreshLock"].locked():
+                    self.locks["refreshLock"].release()
                 
     def stop(self):
         """

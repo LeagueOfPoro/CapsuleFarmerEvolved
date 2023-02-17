@@ -2,7 +2,7 @@ from datetime import datetime
 from threading import Thread
 from time import sleep
 from Browser import Browser
-from Exceptions.InvalidIMAPCredentials import InvalidIMAPCredentialsException
+from Exceptions.InvalidIMAPCredentialsException import InvalidIMAPCredentialsException
 from Exceptions.Fail2FAException import Fail2FAException
 import requests
 

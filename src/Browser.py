@@ -1,7 +1,7 @@
 from AssertCondition import AssertCondition
 from Exceptions.NoAccessTokenException import NoAccessTokenException
 from Exceptions.RateLimitException import RateLimitException
-from Exceptions.InvalidIMAPCredentials import InvalidIMAPCredentialsException
+from Exceptions.InvalidIMAPCredentialsException import InvalidIMAPCredentialsException
 from Exceptions.Fail2FAException import Fail2FAException
 from Exceptions.FailFind2FAException import FailFind2FAException
 from Match import Match
@@ -48,6 +48,7 @@ class Browser:
         self.currentlyWatching = {}
         self.account = account
         self.sharedData = sharedData
+        self.ref = "Referer"
 
     def login(self, username: str, password: str, imapusername: str, imappassword: str, imapserver: str, refreshLock) -> bool:
         """
@@ -62,7 +63,6 @@ class Browser:
             "https://login.leagueoflegends.com/?redirect_uri=https://lolesports.com/&lang=en")
         self.__loadCookies()
         try:
-            refreshLock.acquire()
             # Submit credentials
             data = {"type": "auth", "username": username,
                     "password": password, "remember": True, "language": "en_US"}
@@ -121,16 +121,23 @@ class Browser:
             self.client.get(
                 "https://auth.riotgames.com/authorize?client_id=esports-rna-prod&redirect_uri=https://account.rewards.lolesports.com/v1/session/oauth-callback&response_type=code&scope=openid&prompt=none&state=https://lolesports.com/?memento=na.en_GB", allow_redirects=True).close()
 
+            def reqAcc():
+                # This requests sometimes returns 404
+                return self.client.get(
+                    "https://account.rewards.lolesports.com/v1/session/token", headers={"Origin": "https://lolesports.com", self.ref: "https://lolesports.com"})
+                    
             
-            
-            
+            resAccessToken = reqAcc()
 
-            # This requests sometimes returns 404
-            resAccessToken = self.client.get(
-                "https://account.rewards.lolesports.com/v1/session/token")
-            # Currently unused but the call might be important server-side
+            if resAccessToken.status_code != 200 and self.ref == "Referer":
+                self.ref = "Referrer"
+                reqAcc()
+            elif resAccessToken.status_code != 200 and self.ref == "Referrer":
+                self.ref = "Referer"
+                reqAcc()
+
             resPasToken = self.client.get(
-                "https://account.rewards.lolesports.com/v1/session/clientconfig/rms").close()
+                "https://account.rewards.lolesports.com/v1/session/clientconfig/rms", headers={"Origin": "https://lolesports.com", self.ref: "https://lolesports.com"}).close()
             if resAccessToken.status_code == 200:
                 self.__dumpCookies()
                 return True
