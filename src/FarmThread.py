@@ -1,5 +1,5 @@
 from datetime import datetime
-from threading import Thread, Lock
+from threading import Thread
 from time import sleep
 from Browser import Browser
 import requests
