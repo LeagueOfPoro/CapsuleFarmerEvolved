@@ -34,7 +34,6 @@ def init() -> tuple[logging.Logger, Config]:
     print("*********************************************************")
     print()
 
-    Path("./saves/").mkdir(parents=True, exist_ok=True)
     Path("./logs/").mkdir(parents=True, exist_ok=True)
     Path("./sessions/").mkdir(parents=True, exist_ok=True)
     config = Config(args.configPath)

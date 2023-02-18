@@ -25,7 +25,7 @@ class Stats:
         if newDrops > 0:
             self.accountData[accountName]["totalDrops"] += newDrops
             self.accountData[accountName]["sessionDrops"] += newDrops
-            self.saveTotalDrops()
+            self.saveTotalDrops(accountName)
             if lastDropleague:
                 self.accountData[accountName]["lastDrop"] = datetime.now().strftime("%H:%M:%S %d/%m") + f' ({lastDropleague})'
             else:
@@ -33,24 +33,22 @@ class Stats:
 
     def loadTotalDrops(self, accountName: str):
         try:
-            with open("./saves/save.json", "r") as f:
+            with open(f"./sessions/{accountName}.json", "r") as f:
                 saveData = json.load(f)
-                totalDrops = saveData[accountName]["totalDrops"]
+                totalDrops = saveData["totalDrops"]
         except (FileNotFoundError, KeyError):
             totalDrops = 0
 
         return totalDrops
 
-    def saveTotalDrops(self):
-        allTotalDrops = {}
+    def saveTotalDrops(self, accountName: str):
 
-        for account in self.accountData:
-            allTotalDrops[account] = {
-                "totalDrops": self.accountData[account]["totalDrops"],
-            }
+        totalDrops = {
+            "totalDrops": self.accountData[accountName]["totalDrops"],
+        }
 
-        with open("./saves/save.json", "w") as f:
-            json.dump(allTotalDrops, f)
+        with open(f"./sessions/{accountName}.json", "w") as f:
+            json.dump(totalDrops, f)
 
     def updateStatus(self, accountName: str, msg: str):
         self.accountData[accountName]["status"] = msg
