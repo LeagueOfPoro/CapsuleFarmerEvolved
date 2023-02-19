@@ -153,21 +153,7 @@ class Browser:
                 watchFailed.append(self.sharedData.getLiveMatches()[tid].league)
         return watchFailed
 
-    def getTotalDrops(self):
-        try:
-            headers = {"Origin": "https://lolesports.com",
-                   "Referrer": "https://lolesports.com",
-                   "Authorization": "Cookie access_token"}
-            res = self.client.get("https://account.service.lolesports.com/fandom-account/v1/earnedDrops?locale=en_GB&site=LOLESPORTS", headers=headers)
-            resJson = res.json()
-            res.close()
-            return [drop for drop in resJson]
-        except (KeyError, TypeError):
-            self.log.debug("Drop check failed")
-            return []
-
-
-    def checkNewDrops(self, lastCheckTime):
+    def checkNewDrops(self, lastCheckTime = 0):
         try:
             headers = {"Origin": "https://lolesports.com",
                    "Referrer": "https://lolesports.com",
