@@ -3,6 +3,7 @@ import yaml
 from yaml.parser import ParserError
 from rich import print
 from pathlib import Path
+import getpass
 
 from Exceptions.InvalidCredentialsException import InvalidCredentialsException
 
@@ -26,22 +27,35 @@ class Config:
             configPath = self.__findConfig(configPath)
             with open(configPath, "r", encoding='utf-8') as f:
                 config = yaml.safe_load(f)
+                self.debug = config.get("debug", False)
+                self.connectorDrops = config.get("connectorDropsUrl", "")
                 accs = config.get("accounts")
                 for account in accs:
                     if "username" != accs[account]["username"]:
                         self.accounts[account] = {
                             "username": accs[account]["username"],
                             "password": accs[account]["password"]
-                        }                    
+                        }                          
                 if not self.accounts:
                     raise InvalidCredentialsException                    
-                self.debug = config.get("debug", False)
-                self.connectorDrops = config.get("connectorDropsUrl", "")
+                
         except FileNotFoundError as ex:
-            print(f"[red]CRITICAL ERROR: The configuration file cannot be found at {configPath}\nHave you extacted the ZIP archive and edited the configuration file?")
-            print("Press any key to exit...")
-            input()
-            raise ex
+            print(f"[red]CRITICAL ERROR: The configuration file cannot be found at {configPath}\nHave you extracted the ZIP archive and edited the configuration file?")
+            if UserPrompt("Do you want to create config file and add new account? (Y/N): "):
+                
+                 
+                self.addAccount(configPath) 
+                self.__init__(configPath)  
+                  
+                
+            else: raise ex
+        except AttributeError as ex: 
+               print(f"[red]CRITICAL ERROR: The configuration file is empty \n")  
+               if UserPrompt(" Do you want to fill it?(Y/N): "):
+                    self.addAccount(configPath) 
+                    self.__init__(configPath)
+                  
+ 
         except (ParserError, KeyError) as ex:
             print(f"[red]CRITICAL ERROR: The configuration file does not have a valid format.\nPlease, check it for extra spaces and other characters.\nAlternatively, use confighelper.html to generate a new one.")
             print("Press any key to exit...")
@@ -49,9 +63,13 @@ class Config:
             raise ex
         except InvalidCredentialsException as ex:
             print(f"[red]CRITICAL ERROR: There are only default credentials in the configuration file.\nYou need to add you Riot account login to config.yaml to receive drops.")
-            print("Press any key to exit...")
-            input()
-            raise ex
+            
+            if UserPrompt("Do you want to add new account? (Y/N): "):
+                
+                   
+                self.addAccount(configPath)    
+                
+            else: raise ex
 
         # Get bestStreams from URL
         try:
@@ -78,7 +96,7 @@ class Config:
         """
         Try to find configuartion file in alternative locations.
 
-        :param configPath: user suplied configuartion file path
+        :param configPath: user suplied configuration file path
         :return: pathlib.Path, path to the configuration file
         """
         configPath = Path(configPath)
@@ -89,3 +107,39 @@ class Config:
         if Path("config/config.yaml").exists():
             return Path("config/config.yaml")
         return configPath
+    def addAccount(self,configPath):
+        """
+        Add account to config.yaml file
+
+        :param configPath: user suplied configuration file path
+
+        """
+        
+        name= input("Enter desired name for your account: ")
+        
+        username= input("Enter your username: ")
+        
+        password= getpass.getpass("Enter your password: ")
+        self.accounts[name] = {
+                    "username": username,
+                    "password": password
+                                }
+        configPath = self.__findConfig(configPath)
+        with open(configPath, "w", encoding='utf-8') as f:
+            f.write(yaml.dump({'accounts':self.accounts})) 
+
+        if UserPrompt("Do you want to add another account? (Y/N): ") :
+            self.addAccount(configPath)
+              
+        
+def UserPrompt(text):
+    """
+    Prompt user with the passed text
+
+    :param text: Text you want to display
+    :return: True or False depending on user's input
+    """
+    a= input(text).lower()
+    if "y" in a:
+        return True
+    else: return False                       
