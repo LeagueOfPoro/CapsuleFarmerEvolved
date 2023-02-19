@@ -97,21 +97,16 @@ class Browser:
                 "https://login.leagueoflegends.com/sso/callback", data=data).close()
             self.client.get(
                 "https://auth.riotgames.com/authorize?client_id=esports-rna-prod&redirect_uri=https://account.rewards.lolesports.com/v1/session/oauth-callback&response_type=code&scope=openid&prompt=none&state=https://lolesports.com/?memento=na.en_GB", allow_redirects=True).close()
-
-            def reqAcc():
-                # This requests sometimes returns 404
-                return self.client.get(
-                    "https://account.rewards.lolesports.com/v1/session/token", headers={"Origin": "https://lolesports.com", self.ref: "https://lolesports.com"})
                     
             
-            resAccessToken = reqAcc()
+            resAccessToken = self.client.get("https://account.rewards.lolesports.com/v1/session/token", headers={"Origin": "https://lolesports.com", self.ref: "https://lolesports.com"})
 
             if resAccessToken.status_code != 200 and self.ref == "Referer":
                 self.ref = "Referrer"
-                reqAcc()
+                resAccessToken = self.client.get("https://account.rewards.lolesports.com/v1/session/token", headers={"Origin": "https://lolesports.com", self.ref: "https://lolesports.com"})
             elif resAccessToken.status_code != 200 and self.ref == "Referrer":
                 self.ref = "Referer"
-                reqAcc()
+                resAccessToken = self.client.get("https://account.rewards.lolesports.com/v1/session/token", headers={"Origin": "https://lolesports.com", self.ref: "https://lolesports.com"})
 
             resPasToken = self.client.get(
                 "https://account.rewards.lolesports.com/v1/session/clientconfig/rms", headers={"Origin": "https://lolesports.com", self.ref: "https://lolesports.com"}).close()
