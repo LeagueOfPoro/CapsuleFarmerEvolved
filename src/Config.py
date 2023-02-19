@@ -11,7 +11,7 @@ class Config:
     A class that loads and stores the configuration
     """
 
-    REMOTE_BEST_STREAMS_URL = "https://raw.githubusercontent.com/LeagueOfPoro/CapsuleFarmerEvolved/master/config/bestStreams.txt"
+    REMOTE_BEST_STREAMS_URL = "https://raw.githubusercontent.com/LeagueOfPoro/CapsuleFarmerEvolved/master/config/bestStreams.txt" 
 
     def __init__(self, configPath: str) -> None:
         """
