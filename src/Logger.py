@@ -7,7 +7,7 @@ BACKUP_COUNT = 5  # keep up to 5 files
 
 class Logger:
     @staticmethod
-    def createLogger(debug: bool):
+    def createLogger(debug: bool, version: float):
         if debug:
             level = logging.DEBUG
         else:
@@ -28,6 +28,6 @@ class Logger:
         )
         log = logging.getLogger("League of Poro")
         log.info("-------------------------------------------------")
-        log.info("---------------- Program started ----------------")
+        log.info(f"----------- Program started  v{version} ---------------")
         log.info("-------------------------------------------------")
         return log
