@@ -197,8 +197,7 @@ class Browser:
     
     def checkNewDrops(self, lastCheckTime):
         try:
-            headers = {"Authorization": "Cookie access_token"}
-            res = self.client.get("https://account.service.lolesports.com/fandom-account/v1/earnedDrops?locale=en_GB&site=LOLESPORTS")
+            res = self.client.get("https://account.service.lolesports.com/fandom-account/v1/earnedDrops?locale=en_GB&site=LOLESPORTS", headers={"Origin": "https://lolesports.com", "Authorization": "Cookie access_token"})
             resJson = res.json()
             res.close()
             return [drop for drop in resJson if lastCheckTime <= drop["unlockedDateMillis"]]
