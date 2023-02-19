@@ -18,6 +18,7 @@ class Logger:
             mode="a+",
             maxBytes=FILE_SIZE,
             backupCount=BACKUP_COUNT,
+            encoding='utf-8'
         )
 
         logging.basicConfig(
