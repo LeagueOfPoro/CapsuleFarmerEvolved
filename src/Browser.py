@@ -1,3 +1,5 @@
+import sys
+
 from AssertCondition import AssertCondition
 from Exceptions.NoAccessTokenException import NoAccessTokenException
 from Exceptions.RateLimitException import RateLimitException
@@ -150,7 +152,21 @@ class Browser:
                 self.log.error(ex)
                 watchFailed.append(self.sharedData.getLiveMatches()[tid].league)
         return watchFailed
-    
+
+    def getTotalDrops(self):
+        try:
+            headers = {"Origin": "https://lolesports.com",
+                   "Referrer": "https://lolesports.com",
+                   "Authorization": "Cookie access_token"}
+            res = self.client.get("https://account.service.lolesports.com/fandom-account/v1/earnedDrops?locale=en_GB&site=LOLESPORTS", headers=headers)
+            resJson = res.json()
+            res.close()
+            return [drop for drop in resJson]
+        except (KeyError, TypeError):
+            self.log.debug("Drop check failed")
+            return []
+
+
     def checkNewDrops(self, lastCheckTime):
         try:
             headers = {"Origin": "https://lolesports.com",
