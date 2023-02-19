@@ -1,5 +1,4 @@
 from datetime import datetime
-import json
 
 class Stats:
     def __init__(self, farmThreads) -> None:
