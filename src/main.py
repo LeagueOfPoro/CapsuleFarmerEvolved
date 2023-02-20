@@ -1,3 +1,5 @@
+from distutils.util import strtobool
+from dotenv import load_dotenv
 from DataProviderThread import DataProviderThread
 from Exceptions.CapsuleFarmerEvolvedException import CapsuleFarmerEvolvedException
 from FarmThread import FarmThread
@@ -13,20 +15,19 @@ from pathlib import Path
 from time import sleep
 from Restarter import Restarter
 from SharedData import SharedData
-
+import os
 from Stats import Stats
 from VersionManager import VersionManager
 from WebServer import PoroWebServer
 
 CURRENT_VERSION = 1.3
-HOST = "0.0.0.0"
-PORT = 5000
 
 def init() -> tuple[logging.Logger, Config]:
     parser = argparse.ArgumentParser(description='Farm Esports Capsules by watching all matches on lolesports.com.')
     parser.add_argument('-c', '--config', dest="configPath", default="./config.yaml",
                         help='Path to a custom config file')
     args = parser.parse_args()
+    print(args._get_args())
 
     print("*********************************************************")
     print(f"*   Thank you for using Capsule Farmer Evolved v{CURRENT_VERSION}!    *")
@@ -58,9 +59,17 @@ def main(log: logging.Logger, config: Config):
     restarter = Restarter(stats)
 
     log.info(f"Starting the WebServer thread.")
-    webServer = PoroWebServer(HOST,PORT,stats)
-    webServer.daemon = True
-    webServer.start()
+    # Web-server settings
+    load_dotenv()
+    host = os.getenv('HOST','0.0.0.0')
+    port = int(os.getenv('PORT','5000'))
+    enableWebServer = strtobool(os.getenv('WEBSERVER','False'))
+    
+    if enableWebServer:
+        print(f"Web-server online: http://{host}:{port}/")
+        webServer = PoroWebServer(host,port,stats)
+        webServer.daemon = True
+        webServer.start()
 
     log.info(f"Starting a GUI thread.")
     guiThread = GuiThread(log, config, stats, locks)
