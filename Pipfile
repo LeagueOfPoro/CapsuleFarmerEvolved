@@ -11,6 +11,8 @@ beautifulsoup4 = "*"
 pyyaml = "*"
 rich = "*"
 pyjwt = "*"
+flask = "*"
+flask-socketio = "*"
 
 [dev-packages]
 autopep8 = "*"

@@ -16,9 +16,11 @@ from SharedData import SharedData
 
 from Stats import Stats
 from VersionManager import VersionManager
+from WebServer import PoroWebServer
 
 CURRENT_VERSION = 1.3
-
+HOST = "localhost"
+PORT = 5000
 
 def init() -> tuple[logging.Logger, Config]:
     parser = argparse.ArgumentParser(description='Farm Esports Capsules by watching all matches on lolesports.com.')
@@ -54,6 +56,11 @@ def main(log: logging.Logger, config: Config):
     for account in config.accounts:
         stats.initNewAccount(account)
     restarter = Restarter(stats)
+
+    log.info(f"Starting the WebServer thread.")
+    webServer = PoroWebServer(HOST,PORT,stats)
+    webServer.daemon = True
+    webServer.start()
 
     log.info(f"Starting a GUI thread.")
     guiThread = GuiThread(log, config, stats, locks)
