@@ -1,15 +1,16 @@
 FROM python:3.10-slim-buster as base
 
-EXPOSE 5000:5000
-
 # Setup env
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONFAULTHANDLER 1
+
+# Webserver settings
 ENV HOST="0.0.0.0"
 ENV PORT="5000"
-ENV WEBSERVER="True"
+ENV WEBSERVER="False"
+
 FROM base AS python-deps
 
 # Install pipenv and compilation dependencies
