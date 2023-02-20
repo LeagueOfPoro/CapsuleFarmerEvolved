@@ -28,7 +28,7 @@ class Stats:
             else:
                 self.accountData[accountName]["lastDrop"] = datetime.now().strftime("%H:%M:%S %d/%m")
 
-    def updateTotalDrops(self, accountName: str, amount: int):
+    def setTotalDrops(self, accountName: str, amount: int):
         self.accountData[accountName]["totalDrops"] = amount
 
     def updateStatus(self, accountName: str, msg: str):
