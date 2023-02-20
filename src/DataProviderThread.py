@@ -1,7 +1,9 @@
+from datetime import datetime, timezone, timedelta
 from threading import Thread
 from time import sleep
+
 import cloudscraper
-from datetime import datetime, timezone
+
 from AssertCondition import AssertCondition
 from Exceptions.StatusCodeAssertException import StatusCodeAssertException
 from Match import Match
@@ -88,20 +90,18 @@ class DataProviderThread(Thread):
             for event in events:
                 if event["state"] == "unstarted":
                     if self._isStartTimeLater(event["startTime"]):  # startTime is later
-                        days, hours, minutes = self._calculateTime()
+                        timeDiff = self._calculateTimeDifference(event["startTime"])
+                        systemTimeDT = self._getSystemTime()
+
+                        #  This line calculates a timezone-correct startime no matter which timezone you're in
+                        startTime = systemTimeDT + timeDiff
+
+                        niceStartTime = datetime.strftime(startTime, '%H:%M')
                         self.sharedData.setTimeUntilNextMatch(
-                            f"None - next in {days}d {hours}h" if days else f'None - next in {hours}h {minutes}m')
+                            f"Up next: {event['league']['name']} at {niceStartTime}")
                         break
                     else:  # We're past the startTime due to delay or cancellation i'm guessing
-                        niceStartTime = datetime.strftime(self.startTime, '%H:%M')
-                        self.sharedData.setTimeUntilNextMatch(f"{event['league']['name']} should've started at {niceStartTime} but hasn't.")
-                        for nextEvent in events:  # Looping again to find next match that weren't supposed to have started already
-                            if nextEvent["state"] == "unstarted":
-                                if self._isStartTimeLater(nextEvent["startTime"]):
-                                    days, hours, minutes = self._calculateTime()
-                                    self.sharedData.addTimeUntilNextMatch(
-                                        f"Next in {days}d {hours}h" if days else f'Next in {hours}h {minutes}m')
-                                    break
+                        continue  # Continue for loop to find next 'unstarted' event
         except StatusCodeAssertException as ex:
             self.log.error(ex)
             self.sharedData.setTimeUntilNextMatch("None")
@@ -109,9 +109,9 @@ class DataProviderThread(Thread):
             self.log.error(ex)
             self.sharedData.setTimeUntilNextMatch("None")
 
-    def _isStartTimeLater(self, time) -> bool:
+    def _isStartTimeLater(self, time: str) -> bool:
         """
-        Checks if an events starttime is later than now
+        Checks if an events starttime is greater than the current time
 
         :param time: string
         :return: bool
@@ -122,15 +122,28 @@ class DataProviderThread(Thread):
         self.currentTime = datetime.strptime(currentTimeString, datetimeFormat)
         return self.currentTime < self.startTime
 
-    def _calculateTime(self) -> tuple:
+    def _calculateTimeDifference(self, time: str) -> timedelta:
         """
-        Calculates time until next match
+        Calculates the time difference between the current time and a starttime
 
-        :return: tuple, days, hours, minutes
+        :param time: string
+        :return: timedelta, timedelta object containing time difference
         """
-        timeUntil = self.startTime - self.currentTime
-        total_seconds = int(timeUntil.total_seconds())
-        days, remainder = divmod(total_seconds, 86400)
-        hours, remainder = divmod(remainder, 3600)
-        minutes, seconds = divmod(remainder, 60)
-        return days, hours, minutes
+        datetimeFormat = '%Y-%m-%dT%H:%M:%SZ'
+        self.startTime = datetime.strptime(time, datetimeFormat)
+        currentTimeString = datetime.now(timezone.utc).strftime(datetimeFormat)
+        self.currentTime = datetime.strptime(currentTimeString, datetimeFormat)
+
+        timeDifference = self.startTime - self.currentTime
+        return timeDifference
+
+    def _getSystemTime(self) -> datetime:
+        """
+        Gets the systems current time
+
+        :return: datetime, systems current time as datetime
+        """
+        datetimeFormat = '%Y-%m-%dT%H:%M:%SZ'
+        systemTimeStr = datetime.now().strftime(datetimeFormat)
+        systemTimeDT = datetime.strptime(systemTimeStr, datetimeFormat)
+        return systemTimeDT
