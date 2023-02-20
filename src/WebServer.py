@@ -26,7 +26,7 @@ class WebServerThread(Thread):
             """Sends the account data to front-end server"""
             while True:
                 self.socketio.emit('my_response',{'stats':self.stats.accountData})
-                self.socketio.sleep(1)
+                self.socketio.sleep(10)
 
         @self.socketio.event
         def connect():    
