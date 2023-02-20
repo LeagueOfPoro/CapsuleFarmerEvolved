@@ -88,11 +88,7 @@ class DataProviderThread(Thread):
             for event in events:
                 if event["state"] == "unstarted":
                     if self._isStartTimeLater(event["startTime"]):  # startTime is later
-                        timeUntil = self.startTime - self.currentTime
-                        total_seconds = int(timeUntil.total_seconds())
-                        days, remainder = divmod(total_seconds, 86400)
-                        hours, remainder = divmod(remainder, 3600)
-                        minutes, seconds = divmod(remainder, 60)
+                        days, hours, minutes = self._calculateTime()
                         self.sharedData.setTimeUntilNextMatch(
                             f"None - next in {days}d {hours}h" if days else f'None - next in {hours}h {minutes}m')
                         break
@@ -102,11 +98,7 @@ class DataProviderThread(Thread):
                         for nextEvent in events:  # Looping again to find next match that weren't supposed to have started already
                             if nextEvent["state"] == "unstarted":
                                 if self._isStartTimeLater(nextEvent["startTime"]):
-                                    timeUntil = self.startTime - self.currentTime
-                                    total_seconds = int(timeUntil.total_seconds())
-                                    days, remainder = divmod(total_seconds, 86400)
-                                    hours, remainder = divmod(remainder, 3600)
-                                    minutes, seconds = divmod(remainder, 60)
+                                    days, hours, minutes = self._calculateTime()
                                     self.sharedData.addTimeUntilNextMatch(
                                         f"Next in {days}d {hours}h" if days else f'Next in {hours}h {minutes}m')
                                     break
@@ -129,3 +121,16 @@ class DataProviderThread(Thread):
         currentTimeString = datetime.now(timezone.utc).strftime(datetimeFormat)
         self.currentTime = datetime.strptime(currentTimeString, datetimeFormat)
         return self.currentTime < self.startTime
+
+    def _calculateTime(self) -> tuple:
+        """
+        Calculates time until next match
+
+        :return: tuple, days, hours, minutes
+        """
+        timeUntil = self.startTime - self.currentTime
+        total_seconds = int(timeUntil.total_seconds())
+        days, remainder = divmod(total_seconds, 86400)
+        hours, remainder = divmod(remainder, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        return days, hours, minutes
