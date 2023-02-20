@@ -13,6 +13,8 @@ from Exceptions.StatusCodeAssertException import StatusCodeAssertException
 import pickle
 from pathlib import Path
 import jwt
+import re
+import json
 
 from SharedData import SharedData
 
@@ -42,6 +44,25 @@ class Browser:
         self.account = account
         self.sharedData = sharedData
 
+    def getGeolocation(self):
+        """
+        Get geolocation parameters to configure future requests
+        """
+        try:
+            headers = {"Origin": "https://lolesports.com",
+                    "Referrer": "https://lolesports.com"}
+            resGeolocation = self.client.get(
+                "https://lolesports.com/location.js", headers=headers)
+            AssertCondition.statusCodeMatches(200, resGeolocation)
+            resGeolocation.close()
+            geoinfo = re.search('({[\s\S]+})', resGeolocation.text).group(1)
+            geoinfo_json = json.loads(geoinfo)
+            self.geoinfo = geoinfo_json
+        except StatusCodeAssertException as ex:
+            self.log.error("Failed to get location")
+            self.log.error(ex)
+            raise ex
+
     def login(self, username: str, password: str, refreshLock) -> bool:
         """
         Login to the website using given credentials. Obtain necessary tokens.
@@ -50,6 +71,8 @@ class Browser:
         :param password: string, password of the account
         :return: boolean, login successful or not
         """
+        # Get geolocation data only once for future calls
+        self.getGeolocation()
         # Get necessary cookies from the main page
         self.client.get(
             "https://login.leagueoflegends.com/?redirect_uri=https://lolesports.com/&lang=en")
@@ -185,7 +208,7 @@ class Browser:
         data = {"stream_id": match.streamChannel,
                 "source": match.streamSource,
                 "stream_position_time": datetime.utcnow().isoformat(sep='T', timespec='milliseconds')+'Z',
-                "geolocation": {"code": "CZ", "area": "EU"},
+                "geolocation": {"code": self.geoinfo["code"], "area": self.geoinfo["area"]},
                 "tournament_id": match.tournamentId}
         headers = {"Origin": "https://lolesports.com",
                    "Referrer": "https://lolesports.com"}
