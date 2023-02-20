@@ -27,7 +27,6 @@ def init() -> tuple[logging.Logger, Config]:
     parser.add_argument('-c', '--config', dest="configPath", default="./config.yaml",
                         help='Path to a custom config file')
     args = parser.parse_args()
-    print(args._get_args())
 
     print("*********************************************************")
     print(f"*   Thank you for using Capsule Farmer Evolved v{CURRENT_VERSION}!    *")
