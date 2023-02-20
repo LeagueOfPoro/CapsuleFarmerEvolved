@@ -19,7 +19,7 @@ from VersionManager import VersionManager
 from WebServer import PoroWebServer
 
 CURRENT_VERSION = 1.3
-HOST = "localhost"
+HOST = "0.0.0.0"
 PORT = 5000
 
 def init() -> tuple[logging.Logger, Config]:
