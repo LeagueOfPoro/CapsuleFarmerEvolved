@@ -105,13 +105,14 @@
                 lastCheckCell.innerText = userStats.lastCheck;
                 statsRow.appendChild(lastCheckCell);
 
-                var totalDropsCell = document.createElement('td');
-                totalDropsCell.innerText = userStats.totalDrops;
-                statsRow.appendChild(totalDropsCell);
-
                 var lastDropCell = document.createElement('td');
                 lastDropCell.innerText = userStats.lastDrop;
                 statsRow.appendChild(lastDropCell);
+
+                var totalDropsCell = document.createElement('td');
+                totalDropsCell.innerText = userStats.totalDrops;
+                statsRow.appendChild(totalDropsCell);
+                
                 var failedLoginCounterCell = document.createElement('td');
                 failedLoginCounterCell.innerText = userStats.failedLoginCounter;
                 statsRow.appendChild(failedLoginCounterCell);
