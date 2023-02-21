@@ -1,3 +1,4 @@
+from distutils.util import strtobool
 import requests
 import yaml
 from yaml.parser import ParserError
@@ -22,10 +23,27 @@ class Config:
         """
 
         self.accounts = {}
+
+        # Default webserver settings
+        self.webserver = {
+            "host": "0.0.0.0",
+            "port": 5000,
+            "enableWebServer": False
+        }
         try:
             configPath = self.__findConfig(configPath)
             with open(configPath, "r", encoding='utf-8') as f:
                 config = yaml.safe_load(f)
+
+                # Process webserver settings from config.yaml
+                webserver = config.get("webserver")
+                if webserver != None:
+                    self.webserver = {
+                        "host": webserver["host"] if webserver["host"] != None else "0.0.0.0",
+                        "port": int(webserver["port"] if webserver["port"] != None else "5000"),
+                        "enableWebServer": strtobool(webserver["enablewebserver"] if webserver["enablewebserver"] != None else "False")
+                    }
+                # Process accounts settings from config.yaml
                 accs = config.get("accounts")
                 for account in accs:
                     if "username" != accs[account]["username"]:

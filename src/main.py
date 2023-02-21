@@ -1,5 +1,3 @@
-from distutils.util import strtobool
-from dotenv import load_dotenv
 from DataProviderThread import DataProviderThread
 from Exceptions.CapsuleFarmerEvolvedException import CapsuleFarmerEvolvedException
 from FarmThread import FarmThread
@@ -48,22 +46,21 @@ def init() -> tuple[logging.Logger, Config]:
 
 
 def main(log: logging.Logger, config: Config):
+
+    host = config.webserver["host"]
+    port = config.webserver["port"]
+    enableWebServer = config.webserver["enableWebServer"]
     farmThreads = {}
     refreshLock = Lock()
     locks = {"refreshLock": refreshLock}
     sharedData = SharedData()
     stats = Stats(farmThreads)
+    
     for account in config.accounts:
         stats.initNewAccount(account)
     restarter = Restarter(stats)
 
     log.info(f"Starting the WebServer thread.")
-    # Web-server settings
-    load_dotenv()
-    host = os.getenv('HOST','0.0.0.0')
-    port = int(os.getenv('PORT','5000'))
-    enableWebServer = strtobool(os.getenv('WEBSERVER','False'))
-    
     if enableWebServer:
         print(f"Web-server online: http://{host}:{port}/")
         webServer = PoroWebServer(host,port,stats)
