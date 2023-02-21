@@ -13,7 +13,6 @@ rich = "*"
 pyjwt = "*"
 flask = "*"
 flask-socketio = "*"
-python-dotenv = "*"
 
 [dev-packages]
 autopep8 = "*"
