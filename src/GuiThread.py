@@ -30,12 +30,17 @@ class GuiThread(Thread):
         table.add_column("Live matches")
         table.add_column("Heartbeat")
         table.add_column("Last drop")
-        table.add_column("Drops")
+        table.add_column("Session Drops")
+        if self.config.showHistoricalDrops:
+            table.add_column("Lifetime Drops")
 
         for acc in self.stats.accountData:
             status = self.stats.accountData[acc]["status"]
-            table.add_row(f"{acc}", f"{status}", f"{self.stats.accountData[acc]['liveMatches']}", f"{self.stats.accountData[acc]['lastCheck']}", f"{self.stats.accountData[acc]['lastDrop']}", f"{self.stats.accountData[acc]['totalDrops']}")
-            # table.add_row(f"{acc}", f"{status}", f"{self.stats.accountData[acc]['liveMatches']}", f"{self.stats.accountData[acc]['lastCheck']}")
+            if self.config.showHistoricalDrops:
+                table.add_row(f"{acc}", f"{status}", f"{self.stats.accountData[acc]['liveMatches']}", f"{self.stats.accountData[acc]['lastCheck']}", f"{self.stats.accountData[acc]['lastDrop']}", f"{self.stats.accountData[acc]['sessionDrops']}", f"{self.stats.accountData[acc]['totalDrops']}")
+            else:
+                table.add_row(f"{acc}", f"{status}", f"{self.stats.accountData[acc]['liveMatches']}", f"{self.stats.accountData[acc]['lastCheck']}", f"{self.stats.accountData[acc]['lastDrop']}", f"{self.stats.accountData[acc]['sessionDrops']}")
+
         return table
 
     def run(self):
