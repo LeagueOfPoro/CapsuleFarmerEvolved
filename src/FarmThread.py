@@ -46,15 +46,11 @@ class FarmThread(Thread):
                 self.stats.setTotalDrops(self.account, totalDrops)
                 while True:
                     self.browser.maintainSession()
-                    watchFailed = self.browser.sendWatchToLive()
                     newDrops = []
                     if self.sharedData.getLiveMatches():
                         liveMatchesStatus = []
                         for m in self.sharedData.getLiveMatches().values():
-                            if m.league in watchFailed:
-                                self.stats.updateStatus(self.account, "[red]RIOT SERVERS OVERLOADED - PLEASE WAIT")
-                            else:
-                                self.stats.updateStatus(self.account, "[green]LIVE")
+                            self.stats.updateStatus(self.account, "[green]LIVE")
                             liveMatchesStatus.append(m.league)
                         self.log.debug(f"Live matches: {', '.join(liveMatchesStatus)}")
                         liveMatchesMsg = f"{', '.join(liveMatchesStatus)}"
