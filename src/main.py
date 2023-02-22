@@ -56,7 +56,7 @@ def main(log: logging.Logger, config: Config):
 
     sharedData = SharedData()
     stats = Stats()
-
+    
     for account in config.accounts:
         stats.initNewAccount(account)
 

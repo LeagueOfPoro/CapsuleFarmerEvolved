@@ -14,7 +14,7 @@
         table {
             font-family: Arial, Helvetica, sans-serif;
             border-collapse: collapse;
-            width: 50%;
+            width: 100%;
         }
         td,th {
             border: 1px solid #ddd;
@@ -54,8 +54,8 @@
                     <th>Live Matches</th>
                     <th>Heartbeat</th>
                     <th>Last Drop</th>
-                    <th>Total Drops</th>
-                    <th>Failed Login Counter</th>
+                    <th>Session Drops</th>
+                    <th>Lifetime Drops</th>
                 </tr>
             </thead>
             <tbody>
@@ -105,13 +105,15 @@
                 lastDropCell.innerText = userStats.lastDrop;
                 statsRow.appendChild(lastDropCell);
 
+                var sessionDropsCell = document.createElement('td');
+                sessionDropsCell.innerText = userStats.sessionDrops;
+                statsRow.appendChild(sessionDropsCell);
+
                 var totalDropsCell = document.createElement('td');
                 totalDropsCell.innerText = userStats.totalDrops;
                 statsRow.appendChild(totalDropsCell);
                 
-                var failedLoginCounterCell = document.createElement('td');
-                failedLoginCounterCell.innerText = userStats.failedLoginCounter;
-                statsRow.appendChild(failedLoginCounterCell);
+               
 
                 tableBody.appendChild(statsRow);
             }
