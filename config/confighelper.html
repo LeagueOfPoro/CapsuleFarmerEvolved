@@ -1,9 +1,10 @@
+<!-- Added support for IMAP - Skribb11es#0001 -->
 <html>
 <head>
   <title>Capsule Farmer Evolved</title>
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <style>
-  @import url(https://fonts.cdnfonts.com/css/nexa-bold);*{margin:0;padding:0;outline:none;box-sizing:border-box;-webkit-tap-highlight-color:transparent}:root{--white-0:#FFF;--white-1:#ebebeb;--white-2:#eee;--white-3:#f9f9f9;--white-4:#b8b8b8;--black-0:#000;--black-1:#0a0a0a;--black-2:#141213;--black-3:#1f1f1f;--black-4:#252423;--grey-1:#656462;--grey-2:#8a8887;--blue-1:#2accf0;--blue-2:#1ba6dd;--blue-3:#1983da;--deepblue:#1e1e24;--light-blue:#8be9fd;--pink:#ff79c6;--yellow:#f1fa8c;--green-1:#34f585;--green-2:#3bdb5e;--green-3:#26bd46;--golden-1:#d1a34c;--red:#d1363a;--black-background:var(--black-2);--text-color:var(--black-1);--highlight-dark:#80808033;--highlight-white:#adacaa33;--font-primary:'Nexa',sans-serif;--soft:cubic-bezier(0,0,0,1);--soft-stern:cubic-bezier(.2,.9,0,1);--stern:cubic-bezier(1,0,1,1)}body{background-color:var(--black-background);color:var(--white-3);font-family:var(--font-primary);display:flex;justify-content:center}*{scrollbar-width:auto;scrollbar-color:var(--highlight-dark) var(--highlight-dark)}*::-webkit-scrollbar{width:14px}*::-webkit-scrollbar-track{background:var(--highlight-dark)}*::-webkit-scrollbar-thumb{background-color:var(--highlight-dark)}.main{width:90%;padding:32 24px}h1,h2,h3,h4{color:var(--white-1)}h1{text-align:center;text-transform:uppercase}h1 span{font-size:24px;color:var(--white-4)}a{color:var(--blue-1)}hr{border:none;margin:15px auto;height:1px;background:var(--highlight-dark);width:calc(100% -24px)}#vitu{color:rgb(70,70,70);font-size:14px;display:flex;justify-content:flex-end;margin-right:16px;transition:all ease-in-out 0.2s}#vitu:hover{color:var(--grey-1)}.card{padding:24px;font-size:1.1em;width:100%}.card p{color:var(--grey-2);font-style:italic;margin-top:3px}.secure{color:var(--green-1);font-style:normal}.card p img{height:20px;vertical-align:sub;user-select:none}.card-inputs{width:100%;padding:24px;font-size:1.1em;display:grid;grid-template-columns:1fr 1fr 0.9fr;gap:24px;height:324px;max-height:324px}.grid1,.grid2{height:100%;display:flex;flex-direction:column;justify-content:space-between}.grid3{display:flex;flex-wrap:wrap;flex-direction:column;justify-content:flex-end;align-items:stretch;justify-self:right;opacity:.5}.socials{margin-top:12px;display:flex;justify-content:space-between}.socials img{transition:all ease-in-out 0.2s;width:24px}.socials img:hover{transform:scale(1.2)}.input-box{position:relative;width:100%}input::placeholder{color:transparent;user-select:none}input{color:var(--white-1);border:none;background:none;padding:12px 16px 8px 16px;transition:1s all var(--soft);border-radius:3px;background-color:var(--black-3);font-size:16px;font-weight:500;font-family:var(--font-primary);letter-spacing:.5px;width:100%}label{position:absolute;color:var(--grey-2);font-size:16px;font-weight:500;letter-spacing:.5px;top:12px;left:16px;user-select:none;cursor:text;transition:0.5s all var(--soft-stern)}input:focus~label{transition:0.5s all var(--soft-stern);color:var(--blue-1)!important;font-size:14px;letter-spacing:1px;top:-16px;left:0}input:focus{outline:1px solid var(--blue-1)}input:not(:placeholder-shown)~label{color:var(--white-4);font-size:14px;letter-spacing:1px;top:-16px;left:0}button{width:100%;cursor:pointer;padding:12px 16px 8px 16px;font-weight:700;border:none;border-radius:3px;color:var(--white-0);text-shadow:var(--black-0) 0 0 15px;letter-spacing:.5px;font-family:var(--font-primary);transition:all ease-in-out 0.3s;text-transform:uppercase;user-select:none}button.add{background-color:var(--blue-2)}button.add:hover{background-color:var(--blue-3)}button.download{background-color:var(--green-2)}button.download:hover{background-color:var(--green-3)}pre{background:var(--deepblue);border:1px solid var(--highlight-dark);border-left:3px solid var(--green-2);page-break-inside:avoid;font-family:monospace;font-size:15px;line-height:1.6;margin-top:24px;margin-bottom:1.6em;max-width:100%;overflow:auto;padding:1em 1.5em;display:block;word-wrap:break-word;height:100%;max-height:167.27px}code{background:transparent;color:var(--yellow);border:none;word-wrap:break-word;box-decoration-break:clone;padding:.1rem .3rem .2rem;border-radius:.2rem;width:100%;max-height:100%}.lightblue{color:var(--light-blue)}.pink{color:var(--pink)}.yellow{color:var(--yellow)}@media screen and (max-width:990px){.card{font-size:1em}}@media screen and (max-width:900px){.main{width:100%}.card{font-size:1em}.card-inputs{max-height:unset;grid-template-columns:1fr 1fr;grid-template-rows:95% 5%;grid-auto-flow:row;grid-template-areas:"input-area code-area" "socials-area socials-area"}.grid3{grid-area:socials-area;justify-self:unset}hr{margin:2px auto}#vitu{margin:0;margin-top:16px;justify-content:center}}@media screen and (max-width:824px){.main{width:98%;padding:24px 0}}@media screen and (max-width:640px){.card-inputs{grid-template-columns:1fr;grid-template-rows:1fr 1fr 0fr;grid-auto-flow:column;grid-template-areas:"input-area" "code-area" "socials-area";min-height:756px}#vitu{margin-top:8px}.socials a{width:100%;text-align:center}}
+  @import url(https://fonts.cdnfonts.com/css/nexa-bold);*{margin:0;padding:0;outline:none;box-sizing:border-box;-webkit-tap-highlight-color:transparent}:root{--white-0:#FFF;--white-1:#ebebeb;--white-2:#eee;--white-3:#f9f9f9;--white-4:#b8b8b8;--black-0:#000;--black-1:#0a0a0a;--black-2:#141213;--black-3:#1f1f1f;--black-4:#252423;--grey-1:#656462;--grey-2:#8a8887;--blue-1:#2accf0;--blue-2:#1ba6dd;--blue-3:#1983da;--deepblue:#1e1e24;--light-blue:#8be9fd;--pink:#ff79c6;--yellow:#f1fa8c;--green-1:#34f585;--green-2:#3bdb5e;--green-3:#26bd46;--golden-1:#d1a34c;--red:#d1363a;--black-background:var(--black-2);--text-color:var(--black-1);--highlight-dark:#80808033;--highlight-white:#adacaa33;--font-primary:'Nexa',sans-serif;--soft:cubic-bezier(0,0,0,1);--soft-stern:cubic-bezier(.2,.9,0,1);--stern:cubic-bezier(1,0,1,1)}body{background-color:var(--black-background);color:var(--white-3);font-family:var(--font-primary);display:flex;justify-content:center}*{scrollbar-width:auto;scrollbar-color:var(--highlight-dark) var(--highlight-dark)}*::-webkit-scrollbar{width:14px}*::-webkit-scrollbar-track{background:var(--highlight-dark)}*::-webkit-scrollbar-thumb{background-color:var(--highlight-dark)}.main{width:90%;padding:32 24px}h1,h2,h3,h4{color:var(--white-1)}h1{text-align:center;text-transform:uppercase}h1 span{font-size:24px;color:var(--white-4)}a{color:var(--blue-1)}hr{border:none;margin:15px auto;height:1px;background:var(--highlight-dark);width:calc(100% -24px)}#vitu{color:rgb(70,70,70);font-size:14px;display:flex;justify-content:flex-end;margin-right:16px;transition:all ease-in-out 0.2s}#vitu:hover{color:var(--grey-1)}.card{padding:24px;font-size:1.1em;width:100%}.card p{color:var(--grey-2);font-style:italic;margin-top:3px}.secure{color:var(--green-1);font-style:normal}.card p img{height:20px;vertical-align:sub;user-select:none}.card-inputs{width:100%;padding:24px;font-size:1.1em;display:grid;grid-template-columns:1fr 1fr 0.9fr;gap:24px;height:486px;max-height:486px}.grid1,.grid2{height:100%;display:flex;flex-direction:column;justify-content:space-between}.grid3{display:flex;flex-wrap:wrap;flex-direction:column;justify-content:flex-end;align-items:stretch;justify-self:right;opacity:.5}.socials{margin-top:12px;display:flex;justify-content:space-between}.socials img{transition:all ease-in-out 0.2s;width:24px}.socials img:hover{transform:scale(1.2)}.input-box{position:relative;width:100%}input::placeholder{color:transparent;user-select:none}input{color:var(--white-1);border:none;background:none;padding:12px 16px 8px 16px;transition:1s all var(--soft);border-radius:3px;background-color:var(--black-3);font-size:16px;font-weight:500;font-family:var(--font-primary);letter-spacing:.5px;width:100%}label{position:absolute;color:var(--grey-2);font-size:16px;font-weight:500;letter-spacing:.5px;top:12px;left:16px;user-select:none;cursor:text;transition:0.5s all var(--soft-stern)}input:focus~label{transition:0.5s all var(--soft-stern);color:var(--blue-1)!important;font-size:14px;letter-spacing:1px;top:-16px;left:0}input:focus{outline:1px solid var(--blue-1)}input:not(:placeholder-shown)~label{color:var(--white-4);font-size:14px;letter-spacing:1px;top:-16px;left:0}button{width:100%;cursor:pointer;padding:12px 16px 8px 16px;font-weight:700;border:none;border-radius:3px;color:var(--white-0);text-shadow:var(--black-0) 0 0 15px;letter-spacing:.5px;font-family:var(--font-primary);transition:all ease-in-out 0.3s;text-transform:uppercase;user-select:none}button.add{background-color:var(--blue-2)}button.add:hover{background-color:var(--blue-3)}button.download{background-color:var(--green-2)}button.download:hover{background-color:var(--green-3)}pre{background:var(--deepblue);border:1px solid var(--highlight-dark);border-left:3px solid var(--green-2);page-break-inside:avoid;font-family:monospace;font-size:15px;line-height:1.6;margin-top:24px;margin-bottom:1.6em;max-width:100%;overflow:auto;padding:1em 1.5em;display:block;word-wrap:break-word;height:100%;max-height:187px}code{background:transparent;color:var(--yellow);border:none;word-wrap:break-word;box-decoration-break:clone;padding:.1rem .3rem .2rem;border-radius:.2rem;width:100%;max-height:100%}.lightblue{color:var(--light-blue)}.pink{color:var(--pink)}.yellow{color:var(--yellow)}@media screen and (max-width:990px){.card{font-size:1em}}@media screen and (max-width:900px){.main{width:100%}.card{font-size:1em}.card-inputs{max-height:unset;grid-template-columns:1fr 1fr;grid-template-rows:95% 5%;grid-auto-flow:row;grid-template-areas:"input-area code-area" "socials-area socials-area"}.grid3{grid-area:socials-area;justify-self:unset}hr{margin:2px auto}#vitu{margin:0;margin-top:16px;justify-content:center}}@media screen and (max-width:824px){.main{width:98%;padding:24px 0}}@media screen and (max-width:640px){.card-inputs{grid-template-columns:1fr;grid-template-rows:1fr 1fr 0fr;grid-auto-flow:column;grid-template-areas:"input-area" "code-area" "socials-area";min-height:756px}#vitu{margin-top:8px}.socials a{width:100%;text-align:center}}
   </style>
   <link rel="shortcut icon" href="https://raw.githubusercontent.com/LeagueOfPoro/CapsuleFarmerEvolved/master/poro.ico">
 </head>
@@ -16,8 +17,8 @@
       <p>- The account name will only be visible in the software.</p>
       <p>- The username and password are the ones you use to login to <a href="https://lolesports.com">lolesports.com</a>.</p>
       <p><span class="secure">- Your account is secure <img src="https://i.imgur.com/OCCsXLv_d.png" alt="safe icon" ondragstart="return false"></span>
-        Your login information, or any other data are not sent to us, the internet, or any third party outside of your personal computer.</p>
-      <p>- Open source on <a href="https://raw.githubusercontent.com/LeagueOfPoro/CapsuleFarmerEvolved/master/confighelper.html">github</a></p>
+        Your login information, nor any other data is sent to us, the internet, or any third party outside your personal computer.</p>
+      <p>- Open source on <a href="https://raw.githubusercontent.com/LeagueOfPoro/CapsuleFarmerEvolved/master/config/confighelper.html">github</a></p>
       <p>- When you're done with adding accounts, copy the config below and paste it into config.yaml</p>
       <p>- Alternatively, you can use the
         Download Button under the config to download it.</p>
@@ -26,8 +27,8 @@
     </div>
     <hr>
     <div class="card-inputs">
-      <div class="grid1">
-        <h3>Settings</h3>
+      <div class="grid2">
+        <h3>Account Settings</h3>
         <div class="input-box">
           <input type="text" name="accountname" id="accountname" spellcheck="false" placeholder="Account Name:" />
           <label for="accountname">Account Name:</label>
@@ -40,6 +41,18 @@
           <input type="password" name="password" id="password" spellcheck="false" placeholder="Riot Password:" />
           <label for="password">Riot Password:</label>
         </div>
+        <div class="input-box">
+          <input type="text" name="imapusername" id="imapusername" spellcheck="false" placeholder="IMAP Username: (OPTIONAL)" />
+          <label for="imapusername">IMAP Username: (OPTIONAL)</label>
+        </div>
+        <div class="input-box">
+          <input type="password" name="imappassword" id="imappassword" spellcheck="false" placeholder="IMAP Password: (OPTIONAL)" />
+          <label for="imappassword">IMAP Password: (OPTIONAL)</label>
+        </div>
+        <div class="input-box">
+          <input type="text" name="imapserver" id="imapserver" spellcheck="false" placeholder="IMAP Server: (OPTIONAL)" />
+          <label for="imapserver">IMAP Server: (OPTIONAL)</label>
+        </div>
         <button class="add" onclick="addAccount()">Add Account</button>
       </div>
       <div class="grid2">
@@ -47,6 +60,9 @@
         <pre><code id="config"><span class="lightblue">accounts</span><span class="pink">:</span></code></pre>
         <button name="test" id="test" class="download">Download</button>
       </div>
+      <div></div>
+      <div></div>
+      <div></div>
       <div class="grid3">
         <h4>Powered by League of Poro</h4>
         <div class="socials">
@@ -59,6 +75,7 @@
         </div>
       </div>
     </div>
+    <div></div>
     <a id="vitu" target="_blank" href="https://github.com/vitorsammarco">css powered by vitor</a>
   </div>
 
@@ -75,6 +92,12 @@
       );
       var username = addslashes(document.getElementById("username").value);
       var password = addslashes(document.getElementById("password").value);
+
+      // added for IMAP support
+      var imapusername = document.getElementById("imapusername").value;
+      var imappassword = document.getElementById("imappassword").value;
+      var imapserver = document.getElementById("imapserver").value;
+      var isImap = false
       toDownload +=
         "\n  " +
         accountname +
@@ -82,19 +105,42 @@
         username +
         '"\n    password: "' +
         password +
+        '"'
+        
+      if ((imapusername != "") && (imappassword != "") && (imapserver != "")) {
+        isImap = true;
+        toDownload +=
+        '"\n    imapUsername: "' +
+        addslashes(imapusername) +
+        '"\n    imapPassword: "' +
+        addslashes(imappassword) +
+        '"\n    imapServer: "' +
+        addslashes(imapserver) +
         '"';
-      document.getElementById("config").innerHTML +=
-        "<br>&nbsp;&nbsp;<span class=lightblue>" +
-        accountname +
-        '</span><span class="pink">:</span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="lightblue">username</span><span class="pink">:</span>&nbsp;<span class="yellow">"</span>' +
-        username +
-        '<span class="yellow">"</span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="lightblue">password</span><span class="pink">:</span>&nbsp;<span class="yellow">"</span>' +
-        password +
-        '<span class="yellow">"</span>';
+      };
+
+      document.getElementById("config").innerHTML += "<br>&nbsp;&nbsp;<span class=lightblue>" + accountname + '</span><span class="pink">:</span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="lightblue">username</span><span class="pink">:</span>&nbsp;<span class="yellow">"</span>' + username + '<span class="yellow">"</span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="lightblue">password</span><span class="pink">:</span>&nbsp;<span class="yellow">"</span>';
+
+      if (isImap) {
+        document.getElementById("config").innerHTML += password + '<span class="yellow">"</span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="lightblue">imapusername</span><span class="pink">:</span>&nbsp;<span class="yellow">"</span>' +
+        imapusername + '<span class="yellow">"</span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="lightblue">imappassword</span><span class="pink">:</span>&nbsp;<span class="yellow">"</span>' +
+        imappassword + '<span class="yellow">"</span><br>&nbsp;&nbsp;&nbsp;&nbsp;<span class="lightblue">imapserver</span><span class="pink">:</span>&nbsp;<span class="yellow">"</span>' +
+        imapserver + '<span class="yellow">"</span>';
+        isImap = false;
+      } else {
+        document.getElementById("config").innerHTML += password + '<span class="yellow">"</span>';
+      };
+
       // clear inputs
       document.getElementById("username").value = null
       document.getElementById("password").value = null
       document.getElementById("accountname").value = null
+      document.getElementById("imapusername").value = null
+      document.getElementById("imappassword").value = null
+      document.getElementById("imapserver").value = null
+    }
+    function clear() {
+
     }
     function download() {
       var hiddenElement = document.createElement("a");
