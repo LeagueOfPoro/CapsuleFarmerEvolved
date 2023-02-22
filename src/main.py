@@ -10,7 +10,7 @@ import sys
 import argparse
 from rich import print
 from pathlib import Path
-from time import sleep
+from time import sleep, strftime, localtime
 from Restarter import Restarter
 from SharedData import SharedData
 
@@ -30,6 +30,7 @@ def init() -> tuple[logging.Logger, Config]:
     print("* [steel_blue1]Please consider supporting League of Poro on YouTube.[/] *")
     print("*    If you need help with the app, join our Discord    *")
     print("*             https://discord.gg/ebm5MJNvHU             *")
+    print(f"*                 Started: [green]{strftime('%b %d, %H:%M', localtime())}[/]                *")
     print("*********************************************************")
     print()
 
