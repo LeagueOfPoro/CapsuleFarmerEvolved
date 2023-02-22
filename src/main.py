@@ -18,7 +18,7 @@ from Stats import Stats
 from VersionManager import VersionManager
 from WebServer import PoroWebServer
 
-CURRENT_VERSION = 1.3
+CURRENT_VERSION = 1.4
 
 def init() -> tuple[logging.Logger, Config]:
     parser = argparse.ArgumentParser(description='Farm Esports Capsules by watching all matches on lolesports.com.')
@@ -104,6 +104,7 @@ def main(log: logging.Logger, config: Config):
         for account in toDelete:
             del farmThreads[account]
 
+        sleep(5)
 if __name__ == '__main__':
     log = None
     try:

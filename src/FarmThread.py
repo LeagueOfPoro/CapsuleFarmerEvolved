@@ -38,9 +38,12 @@ class FarmThread(Thread):
         """
         try:
             self.stats.updateStatus(self.account, "[yellow]LOGIN")
+
             if self.browser.login(self.config.getAccount(self.account)["username"], self.config.getAccount(self.account)["password"], self.config.getAccount(self.account)["imapUsername"], self.config.getAccount(self.account)["imapPassword"], self.config.getAccount(self.account)["imapServer"], self.locks["refreshLock"]):
-                self.stats.updateStatus(self.account, "[green]LIVE")
                 self.stats.resetLoginFailed(self.account)
+                self.stats.updateStatus(self.account, "[green]LIVE")
+                _, totalDrops = self.browser.checkNewDrops(0)
+                self.stats.setTotalDrops(self.account, totalDrops)
                 while True:
                     self.browser.maintainSession()
                     watchFailed = self.browser.sendWatchToLive()
@@ -55,7 +58,8 @@ class FarmThread(Thread):
                             liveMatchesStatus.append(m.league)
                         self.log.debug(f"Live matches: {', '.join(liveMatchesStatus)}")
                         liveMatchesMsg = f"{', '.join(liveMatchesStatus)}"
-                        newDrops = self.browser.checkNewDrops(self.stats.getLastDropCheck(self.account))
+                        newDrops, totalDrops = self.browser.checkNewDrops(self.stats.getLastDropCheck(self.account))
+                        self.stats.setTotalDrops(self.account, totalDrops)
                         self.stats.updateLastDropCheck(self.account, int(datetime.now().timestamp() * 1e3))
                     else:
                         liveMatchesMsg = self.sharedData.getTimeUntilNextMatch()

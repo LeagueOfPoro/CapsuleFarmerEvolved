@@ -8,6 +8,7 @@ class Stats:
         self.accountData[accountName] = {
             "lastCheck": "",
             "totalDrops": 0,
+            "sessionDrops": 0,
             "lastDrop": "N/A",
             "liveMatches": "",
             "status": "[yellow]WAIT",
@@ -20,7 +21,7 @@ class Stats:
         self.accountData[accountName]["lastCheck"] = datetime.now().strftime("%H:%M:%S %d/%m")
         self.accountData[accountName]["liveMatches"] = liveMatches
         if newDrops > 0:
-            self.accountData[accountName]["totalDrops"] += newDrops
+            self.accountData[accountName]["sessionDrops"] += newDrops
             if lastDropleague:
                 self.accountData[accountName]["lastDrop"] = datetime.now().strftime("%H:%M:%S %d/%m") + f' ({lastDropleague})'
             else:
@@ -31,6 +32,9 @@ class Stats:
     
     def getThreadStatus(self, accountName: str) -> bool:
         return self.accountData[accountName]["valid"]
+
+    def setTotalDrops(self, accountName: str, amount: int):
+        self.accountData[accountName]["totalDrops"] = amount
 
     def updateStatus(self, accountName: str, msg: str):
         self.accountData[accountName]["status"] = msg
