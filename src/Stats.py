@@ -32,12 +32,9 @@ class Stats:
     
     def getThreadStatus(self, accountName: str) -> bool:
         return self.accountData[accountName]["valid"]
-<<<<<<< HEAD
-=======
 
     def setTotalDrops(self, accountName: str, amount: int):
         self.accountData[accountName]["totalDrops"] = amount
->>>>>>> 0f35a8111b440fc0676ccb62e7934dadf4eedf1c
 
     def updateStatus(self, accountName: str, msg: str):
         self.accountData[accountName]["status"] = msg

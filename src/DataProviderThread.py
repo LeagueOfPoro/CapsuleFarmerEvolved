@@ -45,12 +45,7 @@ class DataProviderThread(Thread):
         """
         Retrieve data about currently live matches and store them.
         """
-<<<<<<< HEAD
         headers = {"Origin": "https://lolesports.com", "x-api-key": "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"}
-=======
-        headers = {"Origin": "https://lolesports.com", "Referrer": "https://lolesports.com",
-                   "x-api-key": Config.RIOT_API_KEY}
->>>>>>> 0f35a8111b440fc0676ccb62e7934dadf4eedf1c
         res = self.client.get(
             "https://esports-api.lolesports.com/persisted/gw/getLive?hl=en-GB", headers=headers)
         AssertCondition.statusCodeMatches(200, res)
@@ -82,12 +77,7 @@ class DataProviderThread(Thread):
         """
         Retrieve data about currently live matches and store them.
         """
-<<<<<<< HEAD
         headers = {"Origin": "https://lolesports.com", "x-api-key": "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"}
-=======
-        headers = {"Origin": "https://lolesports.com", "Referrer": "https://lolesports.com",
-                   "x-api-key": Config.RIOT_API_KEY}
->>>>>>> 0f35a8111b440fc0676ccb62e7934dadf4eedf1c
         try:
             res = self.client.get(
                 "https://esports-api.lolesports.com/persisted/gw/getSchedule?hl=en-GB", headers=headers)
