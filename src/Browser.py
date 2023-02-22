@@ -77,8 +77,8 @@ class Browser:
             
             resJson = res.json()
             if "multifactor" in resJson.get("type", ""):
-                refreshLock.release()
                 if (imapserver != ""):
+                    refreshLock.release()
                     #Handles all IMAP requests
                     req = self.IMAPHook(imapusername, imappassword, imapserver)
 
