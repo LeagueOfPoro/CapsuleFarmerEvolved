@@ -92,6 +92,7 @@ def main(log: logging.Logger, config: Config):
         for account in toDelete:
             del farmThreads[account]
 
+        sleep(5)
 if __name__ == '__main__':
     log = None
     try:
