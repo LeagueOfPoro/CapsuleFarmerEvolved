@@ -125,7 +125,7 @@ class Browser:
             
             resAccessToken = self.client.get("https://account.rewards.lolesports.com/v1/session/token", headers={"Origin": "https://lolesports.com", self.ref: "https://lolesports.com"})
 
-            if resAccessToken.status_code != 200
+            if resAccessToken.status_code != 200:
                 if self.ref == "Referer":
                     self.ref = "Referrer"
                 else:
