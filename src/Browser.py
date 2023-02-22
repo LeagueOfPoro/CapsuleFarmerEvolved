@@ -63,6 +63,7 @@ class Browser:
             "https://login.leagueoflegends.com/?redirect_uri=https://lolesports.com/&lang=en")
         self.__loadCookies()
         try:
+            refreshLock.acquire()
             # Submit credentials
             data = {"type": "auth", "username": username,
                     "password": password, "remember": True, "language": "en_US"}
