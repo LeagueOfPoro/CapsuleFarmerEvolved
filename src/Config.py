@@ -27,9 +27,9 @@ class Config:
             with open(configPath, "r", encoding='utf-8') as f:
                 config = yaml.safe_load(f)
                 accs = config.get("accounts")
-                onlyDefaultUsername = True
                 for account in accs:
-                    self.accounts[account] = {
+                     if "username" != accs[account]["username"]:
+                        self.accounts[account] = {
                         #Orig data
                         "username": accs[account]["username"],
                         "password": accs[account]["password"],
@@ -38,10 +38,8 @@ class Config:
                         "imapUsername": accs[account].get("imapUsername", ""),
                         "imapPassword": accs[account].get("imapPassword", ""),
                         "imapServer": accs[account].get("imapServer", ""),
-                    }
-                    if "username" != accs[account]["username"]:
-                        onlyDefaultUsername = False
-                if onlyDefaultUsername:
+                        }
+                if not self.accounts:
                     raise InvalidCredentialsException                    
                 self.debug = config.get("debug", False)
                 self.connectorDrops = config.get("connectorDropsUrl", "")
