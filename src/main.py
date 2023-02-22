@@ -10,14 +10,18 @@ import sys
 import argparse
 from rich import print
 from pathlib import Path
-from time import sleep
+from time import sleep, strftime, localtime
 from Restarter import Restarter
 from SharedData import SharedData
 
 from Stats import Stats
 from VersionManager import VersionManager
 
+<<<<<<< HEAD
 CURRENT_VERSION = 1.3
+=======
+CURRENT_VERSION = 1.4
+>>>>>>> 0f35a8111b440fc0676ccb62e7934dadf4eedf1c
 
 def init() -> tuple[logging.Logger, Config]:
     parser = argparse.ArgumentParser(description='Farm Esports Capsules by watching all matches on lolesports.com.')
@@ -26,10 +30,11 @@ def init() -> tuple[logging.Logger, Config]:
     args = parser.parse_args()
 
     print("*********************************************************")
-    print(f"*   Thank you for using Capsule Farmer Evolved v{CURRENT_VERSION}!    *")
+    print(f"*   Thank you for using Capsule Farmer Evolved v{str(CURRENT_VERSION)}!    *")
     print("* [steel_blue1]Please consider supporting League of Poro on YouTube.[/] *")
     print("*    If you need help with the app, join our Discord    *")
     print("*             https://discord.gg/ebm5MJNvHU             *")
+    print(f"*                 Started: [green]{strftime('%b %d, %H:%M', localtime())}[/]                *")
     print("*********************************************************")
     print()
 
@@ -91,6 +96,10 @@ def main(log: logging.Logger, config: Config):
         for account in toDelete:
             del farmThreads[account]
 
+<<<<<<< HEAD
+=======
+        sleep(5)
+>>>>>>> 0f35a8111b440fc0676ccb62e7934dadf4eedf1c
 if __name__ == '__main__':
     log = None
     try:
