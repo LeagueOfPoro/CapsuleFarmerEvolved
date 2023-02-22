@@ -13,6 +13,7 @@ rich = "*"
 pyjwt = "*"
 flask = "*"
 flask-socketio = "*"
+imaplib2 = "*"
 
 [dev-packages]
 autopep8 = "*"

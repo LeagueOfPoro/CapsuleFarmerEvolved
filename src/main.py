@@ -10,7 +10,7 @@ import sys
 import argparse
 from rich import print
 from pathlib import Path
-from time import sleep
+from time import sleep, strftime, localtime
 from Restarter import Restarter
 from SharedData import SharedData
 import os
@@ -18,7 +18,7 @@ from Stats import Stats
 from VersionManager import VersionManager
 from WebServer import PoroWebServer
 
-CURRENT_VERSION = 1.3
+CURRENT_VERSION = 1.4
 
 def init() -> tuple[logging.Logger, Config]:
     parser = argparse.ArgumentParser(description='Farm Esports Capsules by watching all matches on lolesports.com.')
@@ -27,10 +27,11 @@ def init() -> tuple[logging.Logger, Config]:
     args = parser.parse_args()
 
     print("*********************************************************")
-    print(f"*   Thank you for using Capsule Farmer Evolved v{CURRENT_VERSION}!    *")
+    print(f"*   Thank you for using Capsule Farmer Evolved v{str(CURRENT_VERSION)}!    *")
     print("* [steel_blue1]Please consider supporting League of Poro on YouTube.[/] *")
     print("*    If you need help with the app, join our Discord    *")
     print("*             https://discord.gg/ebm5MJNvHU             *")
+    print(f"*                 Started: [green]{strftime('%b %d, %H:%M', localtime())}[/]                *")
     print("*********************************************************")
     print()
 
@@ -44,7 +45,6 @@ def init() -> tuple[logging.Logger, Config]:
 
     return log, config
 
-
 def main(log: logging.Logger, config: Config):
 
     host = config.webserver["host"]
@@ -53,11 +53,13 @@ def main(log: logging.Logger, config: Config):
     farmThreads = {}
     refreshLock = Lock()
     locks = {"refreshLock": refreshLock}
+
     sharedData = SharedData()
-    stats = Stats(farmThreads)
-    
+    stats = Stats()
+
     for account in config.accounts:
         stats.initNewAccount(account)
+
     restarter = Restarter(stats)
 
     log.info(f"Starting the WebServer thread.")
@@ -78,27 +80,31 @@ def main(log: logging.Logger, config: Config):
 
     while True:
         for account in config.accounts:
-            if account not in farmThreads and restarter.canRestart(account):
+            if account not in farmThreads and restarter.canRestart(account) and stats.getThreadStatus(account):
                 log.info(f"Starting a thread for {account}.")
                 thread = FarmThread(log, config, account, stats, locks, sharedData)
                 thread.daemon = True
                 thread.start()
                 farmThreads[account] = thread
-                log.info(f"Thread for {account} was created.")    
+                log.info(f"Thread for {account} was created.")
+
+            if account in farmThreads and not stats.getThreadStatus(account):
+                del farmThreads[account]
 
         toDelete = []
+        
         for account in farmThreads:
-            if farmThreads[account].is_alive():
-                farmThreads[account].join(1)
-            else:
+            if not farmThreads[account].is_alive():
                 toDelete.append(account)
+                log.warning(f"Thread {account} has finished.")
                 restarter.setRestartDelay(account)
                 stats.updateStatus(account, f"[red]ERROR - restart at {restarter.getNextStart(account).strftime('%H:%M:%S')}, failed logins: {stats.getFailedLogins(account)}")
                 log.warning(f"Thread {account} has finished and will restart at {restarter.getNextStart(account).strftime('%H:%M:%S')}. Number of consecutively failed logins: {stats.getFailedLogins(account)}")
+                
         for account in toDelete:
             del farmThreads[account]
 
-
+        sleep(5)
 if __name__ == '__main__':
     log = None
     try:
