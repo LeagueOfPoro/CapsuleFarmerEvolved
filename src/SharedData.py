@@ -2,7 +2,7 @@ class SharedData:
     def __init__(self) -> None:
         self.liveMatches = {}
         self.timeUntilNextMatch = "None"
-    
+
     def setLiveMatches(self, liveMatches):
         self.liveMatches = liveMatches
 
