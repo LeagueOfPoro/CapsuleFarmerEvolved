@@ -145,26 +145,26 @@ class Browser:
         return False
 
     def IMAPHook(self, usern, passw, server, tls, port):
-        #try:
-        M = imaplib2.IMAP4_SSL(host=server, port=port)
-        if tls:
-            M.starttls(ssl_context=ssl.create_default_context())
-            print("well")
-            M.login(usern, passw)
-            print("well")
-            M.select("INBOX")
-        else:
-            M.login(usern, passw)
-            M.select("INBOX")
-        idler = IMAP(M)
-        idler.start()
-        idler.join()
-        M.logout()
-        return idler
-        #except FailFind2FAException:
-        #    self.log.error(f"Failed to find 2FA code for {self.account}")
-        #except:
-        #    raise InvalidIMAPCredentialsException()
+        try:
+            M = imaplib2.IMAP4_SSL(host=server, port=port)
+            if tls:
+                M.starttls(ssl_context=ssl.create_default_context())
+                print("well")
+                M.login(usern, passw)
+                print("well")
+                M.select("INBOX")
+            else:
+                M.login(usern, passw)
+                M.select("INBOX")
+            idler = IMAP(M)
+            idler.start()
+            idler.join()
+            M.logout()
+            return idler
+        except FailFind2FAException:
+            self.log.error(f"Failed to find 2FA code for {self.account}")
+        except:
+            raise InvalidIMAPCredentialsException()
 
     def refreshSession(self):
         """
