@@ -13,9 +13,10 @@ from pathlib import Path
 from time import sleep, strftime, localtime
 from Restarter import Restarter
 from SharedData import SharedData
-
+import os
 from Stats import Stats
 from VersionManager import VersionManager
+from WebServer import PoroWebServer
 
 CURRENT_VERSION = 1.3
 
@@ -45,17 +46,28 @@ def init() -> tuple[logging.Logger, Config]:
     return log, config
 
 def main(log: logging.Logger, config: Config):
+
+    host = config.webserver["host"]
+    port = config.webserver["port"]
+    enableWebServer = config.webserver["enableWebServer"]
     farmThreads = {}
     refreshLock = Lock()
     locks = {"refreshLock": refreshLock}
 
     sharedData = SharedData()
-    stats = Stats()
-
+    stats = Stats(farmThreads)
+    
     for account in config.accounts:
         stats.initNewAccount(account)
 
     restarter = Restarter(stats)
+
+    log.info(f"Starting the WebServer thread.")
+    if enableWebServer:
+        print(f"Web-server online: http://{host}:{port}/")
+        webServer = PoroWebServer(host,port,stats)
+        webServer.daemon = True
+        webServer.start()
 
     log.info(f"Starting a GUI thread.")
     guiThread = GuiThread(log, config, stats, locks)

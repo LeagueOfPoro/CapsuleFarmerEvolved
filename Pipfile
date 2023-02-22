@@ -12,6 +12,8 @@ pyyaml = "*"
 rich = "*"
 pyjwt = "*"
 imaplib2 = "*"
+flask = "*"
+flask-socketio = "*"
 
 [dev-packages]
 autopep8 = "*"
