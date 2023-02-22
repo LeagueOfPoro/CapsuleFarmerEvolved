@@ -1,5 +1,4 @@
-import requests
-import yaml
+import yaml, requests
 from yaml.parser import ParserError
 from rich import print
 from pathlib import Path
@@ -20,20 +19,28 @@ class Config:
 
         :param configPath: string, path to the configuration file
         """
-
+        
         self.accounts = {}
         try:
             configPath = self.__findConfig(configPath)
             with open(configPath, "r", encoding='utf-8') as f:
                 config = yaml.safe_load(f)
                 accs = config.get("accounts")
+                onlyDefaultUsername = True
                 for account in accs:
+                    self.accounts[account] = {
+                        #Orig data
+                        "username": accs[account]["username"],
+                        "password": accs[account]["password"],
+                        
+                        #IMAP data
+                        "imapUsername": accs[account].get("imapUsername", ""),
+                        "imapPassword": accs[account].get("imapPassword", ""),
+                        "imapServer": accs[account].get("imapServer", ""),
+                    }
                     if "username" != accs[account]["username"]:
-                        self.accounts[account] = {
-                            "username": accs[account]["username"],
-                            "password": accs[account]["password"]
-                        }                    
-                if not self.accounts:
+                        onlyDefaultUsername = False
+                if onlyDefaultUsername:
                     raise InvalidCredentialsException                    
                 self.debug = config.get("debug", False)
                 self.connectorDrops = config.get("connectorDropsUrl", "")
@@ -52,8 +59,6 @@ class Config:
             print("Press any key to exit...")
             input()
             raise ex
-
-        # Get bestStreams from URL
         try:
             remoteBestStreamsFile = requests.get(self.REMOTE_BEST_STREAMS_URL)
             if remoteBestStreamsFile.status_code == 200:
@@ -64,7 +69,6 @@ class Config:
             input()
             raise ex
 
-
     def getAccount(self, account: str) -> dict:
         """
         Get account information
@@ -73,7 +77,7 @@ class Config:
         :return: dictionary, account information
         """
         return self.accounts[account]
-
+    
     def __findConfig(self, configPath):
         """
         Try to find configuartion file in alternative locations.
@@ -88,4 +92,5 @@ class Config:
             return Path("../config/config.yaml")
         if Path("config/config.yaml").exists():
             return Path("config/config.yaml")
+        
         return configPath
