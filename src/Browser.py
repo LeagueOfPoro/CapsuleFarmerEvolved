@@ -121,22 +121,17 @@ class Browser:
                 "https://login.leagueoflegends.com/sso/callback", data=data).close()
             self.client.get(
                 "https://auth.riotgames.com/authorize?client_id=esports-rna-prod&redirect_uri=https://account.rewards.lolesports.com/v1/session/oauth-callback&response_type=code&scope=openid&prompt=none&state=https://lolesports.com/?memento=na.en_GB", allow_redirects=True).close()
-
-            def reqAcc():
-                # This requests sometimes returns 404
-                return self.client.get(
-                    "https://account.rewards.lolesports.com/v1/session/token", headers={"Origin": "https://lolesports.com", self.ref: "https://lolesports.com"})
                     
             
-            resAccessToken = reqAcc()
+            resAccessToken = self.client.get("https://account.rewards.lolesports.com/v1/session/token", headers={"Origin": "https://lolesports.com", self.ref: "https://lolesports.com"})
 
-            if resAccessToken.status_code != 200 and self.ref == "Referer":
-                self.ref = "Referrer"
-                reqAcc()
-            elif resAccessToken.status_code != 200 and self.ref == "Referrer":
-                self.ref = "Referer"
-                reqAcc()
-
+            if resAccessToken.status_code != 200:
+                if self.ref == "Referer":
+                    self.ref = "Referrer"
+                else:
+                    self.ref = "Referer"
+                resAccessToken = self.client.get("https://account.rewards.lolesports.com/v1/session/token", headers={"Origin": "https://lolesports.com", self.ref: "https://lolesports.com"})
+            
             resPasToken = self.client.get(
                 "https://account.rewards.lolesports.com/v1/session/clientconfig/rms", headers={"Origin": "https://lolesports.com", self.ref: "https://lolesports.com"}).close()
             if resAccessToken.status_code == 200:
@@ -164,8 +159,9 @@ class Browser:
         Refresh access and entitlement tokens
         """
         try:
+            headers = {"Origin": "https://lolesports.com"}
             resAccessToken = self.client.get(
-                "https://account.rewards.lolesports.com/v1/session/refresh")
+                "https://account.rewards.lolesports.com/v1/session/refresh", headers=headers)
             AssertCondition.statusCodeMatches(200, resAccessToken)
             resAccessToken.close()
             self.__dumpCookies()
@@ -198,7 +194,9 @@ class Browser:
     
     def checkNewDrops(self, lastCheckTime):
         try:
-            res = self.client.get("https://account.service.lolesports.com/fandom-account/v1/earnedDrops?locale=en_GB&site=LOLESPORTS", headers={"Origin": "https://lolesports.com", "Authorization": "Cookie access_token"})
+            headers = {"Origin": "https://lolesports.com",
+                   "Authorization": "Cookie access_token"}
+            res = self.client.get("https://account.service.lolesports.com/fandom-account/v1/earnedDrops?locale=en_GB&site=LOLESPORTS", headers=headers)
             resJson = res.json()
             res.close()
             return [drop for drop in resJson if lastCheckTime <= drop["unlockedDateMillis"]]
@@ -229,9 +227,9 @@ class Browser:
                 "stream_position_time": datetime.utcnow().isoformat(sep='T', timespec='milliseconds')+'Z',
                 "geolocation": {"code": "CZ", "area": "EU"},
                 "tournament_id": match.tournamentId}
-        
+        headers = {"Origin": "https://lolesports.com"}
         res = self.client.post(
-            "https://rex.rewards.lolesports.com/v1/events/watch", json=data)
+            "https://rex.rewards.lolesports.com/v1/events/watch", json=data, headers=headers)
         AssertCondition.statusCodeMatches(201, res)
         res.close()
 
