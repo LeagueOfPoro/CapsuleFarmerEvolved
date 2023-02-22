@@ -81,8 +81,6 @@ class Browser:
                 if (imapserver != ""):
                     refreshLock.release()
                     #Handles all IMAP requests
-                    print(port)
-                    print(type(port))
                     req = self.IMAPHook(imapusername, imappassword, imapserver, tls, port)
 
                     self.stats.updateStatus(self.account, f"[green]FETCHED 2FA CODE")
