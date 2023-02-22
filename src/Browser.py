@@ -149,9 +149,7 @@ class Browser:
             M = imaplib2.IMAP4_SSL(host=server, port=port)
             if tls:
                 M.starttls(ssl_context=ssl.create_default_context())
-                print("well")
                 M.login(usern, passw)
-                print("well")
                 M.select("INBOX")
             else:
                 M.login(usern, passw)
