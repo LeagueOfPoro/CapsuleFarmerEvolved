@@ -1,3 +1,5 @@
+import sys
+
 from AssertCondition import AssertCondition
 from Exceptions.NoAccessTokenException import NoAccessTokenException
 from Exceptions.RateLimitException import RateLimitException
@@ -18,6 +20,7 @@ from pathlib import Path
 import jwt
 from IMAP import IMAP # Added to automate 2FA
 import imaplib2
+import ssl
 
 from SharedData import SharedData
 
@@ -50,7 +53,7 @@ class Browser:
         self.sharedData = sharedData
         self.ref = "Referer"
 
-    def login(self, username: str, password: str, imapusername: str, imappassword: str, imapserver: str, refreshLock) -> bool:
+    def login(self, username: str, password: str, imapusername: str, imappassword: str, imapserver: str, tls: bool, port: int, refreshLock) -> bool:
         """
         Login to the website using given credentials. Obtain necessary tokens.
 
@@ -63,6 +66,7 @@ class Browser:
             "https://login.leagueoflegends.com/?redirect_uri=https://lolesports.com/&lang=en")
         self.__loadCookies()
         try:
+            refreshLock.acquire()
             # Submit credentials
             data = {"type": "auth", "username": username,
                     "password": password, "remember": True, "language": "en_US"}
@@ -74,10 +78,12 @@ class Browser:
             
             resJson = res.json()
             if "multifactor" in resJson.get("type", ""):
-                refreshLock.release()
                 if (imapserver != ""):
+                    refreshLock.release()
                     #Handles all IMAP requests
-                    req = self.IMAPHook(imapusername, imappassword, imapserver)
+                    print(port)
+                    print(type(port))
+                    req = self.IMAPHook(imapusername, imappassword, imapserver, tls, port)
 
                     self.stats.updateStatus(self.account, f"[green]FETCHED 2FA CODE")
 
@@ -120,22 +126,17 @@ class Browser:
                 "https://login.leagueoflegends.com/sso/callback", data=data).close()
             self.client.get(
                 "https://auth.riotgames.com/authorize?client_id=esports-rna-prod&redirect_uri=https://account.rewards.lolesports.com/v1/session/oauth-callback&response_type=code&scope=openid&prompt=none&state=https://lolesports.com/?memento=na.en_GB", allow_redirects=True).close()
-
-            def reqAcc():
-                # This requests sometimes returns 404
-                return self.client.get(
-                    "https://account.rewards.lolesports.com/v1/session/token", headers={"Origin": "https://lolesports.com", self.ref: "https://lolesports.com"})
                     
             
-            resAccessToken = reqAcc()
+            resAccessToken = self.client.get("https://account.rewards.lolesports.com/v1/session/token", headers={"Origin": "https://lolesports.com", self.ref: "https://lolesports.com"})
 
-            if resAccessToken.status_code != 200 and self.ref == "Referer":
-                self.ref = "Referrer"
-                reqAcc()
-            elif resAccessToken.status_code != 200 and self.ref == "Referrer":
-                self.ref = "Referer"
-                reqAcc()
-
+            if resAccessToken.status_code != 200:
+                if self.ref == "Referer":
+                    self.ref = "Referrer"
+                else:
+                    self.ref = "Referer"
+                resAccessToken = self.client.get("https://account.rewards.lolesports.com/v1/session/token", headers={"Origin": "https://lolesports.com", self.ref: "https://lolesports.com"})
+            
             resPasToken = self.client.get(
                 "https://account.rewards.lolesports.com/v1/session/clientconfig/rms", headers={"Origin": "https://lolesports.com", self.ref: "https://lolesports.com"}).close()
             if resAccessToken.status_code == 200:
@@ -143,28 +144,36 @@ class Browser:
                 return True
         return False
 
-    def IMAPHook(self, usern, passw, server):
-        try:
-            M = imaplib2.IMAP4_SSL(server)
+    def IMAPHook(self, usern, passw, server, tls, port):
+        #try:
+        M = imaplib2.IMAP4_SSL(host=server, port=port)
+        if tls:
+            M.starttls(ssl_context=ssl.create_default_context())
+            print("well")
+            M.login(usern, passw)
+            print("well")
+            M.select("INBOX")
+        else:
             M.login(usern, passw)
             M.select("INBOX")
-            idler = IMAP(M)
-            idler.start()
-            idler.join()
-            M.logout()
-            return idler
-        except FailFind2FAException:
-            self.log.error(f"Failed to find 2FA code for {self.account}")
-        except:
-            raise InvalidIMAPCredentialsException()
+        idler = IMAP(M)
+        idler.start()
+        idler.join()
+        M.logout()
+        return idler
+        #except FailFind2FAException:
+        #    self.log.error(f"Failed to find 2FA code for {self.account}")
+        #except:
+        #    raise InvalidIMAPCredentialsException()
 
     def refreshSession(self):
         """
         Refresh access and entitlement tokens
         """
         try:
+            headers = {"Origin": "https://lolesports.com"}
             resAccessToken = self.client.get(
-                "https://account.rewards.lolesports.com/v1/session/refresh")
+                "https://account.rewards.lolesports.com/v1/session/refresh", headers=headers)
             AssertCondition.statusCodeMatches(200, resAccessToken)
             resAccessToken.close()
             self.__dumpCookies()
@@ -194,13 +203,15 @@ class Browser:
                 self.log.error(ex)
                 watchFailed.append(self.sharedData.getLiveMatches()[tid].league)
         return watchFailed
-    
-    def checkNewDrops(self, lastCheckTime):
+
+    def checkNewDrops(self, lastCheckTime = 0):
         try:
-            res = self.client.get("https://account.service.lolesports.com/fandom-account/v1/earnedDrops?locale=en_GB&site=LOLESPORTS", headers={"Origin": "https://lolesports.com", "Authorization": "Cookie access_token"})
+            headers = {"Origin": "https://lolesports.com",
+                   "Authorization": "Cookie access_token"}
+            res = self.client.get("https://account.service.lolesports.com/fandom-account/v1/earnedDrops?locale=en_GB&site=LOLESPORTS", headers=headers)
             resJson = res.json()
             res.close()
-            return [drop for drop in resJson if lastCheckTime <= drop["unlockedDateMillis"]]
+            return [drop for drop in resJson if lastCheckTime <= drop["unlockedDateMillis"]], len(resJson)
         except (KeyError, TypeError):
             self.log.debug("Drop check failed")
             return []
@@ -228,9 +239,9 @@ class Browser:
                 "stream_position_time": datetime.utcnow().isoformat(sep='T', timespec='milliseconds')+'Z',
                 "geolocation": {"code": "CZ", "area": "EU"},
                 "tournament_id": match.tournamentId}
-        
+        headers = {"Origin": "https://lolesports.com"}
         res = self.client.post(
-            "https://rex.rewards.lolesports.com/v1/events/watch", json=data)
+            "https://rex.rewards.lolesports.com/v1/events/watch", json=data, headers=headers)
         AssertCondition.statusCodeMatches(201, res)
         res.close()
 

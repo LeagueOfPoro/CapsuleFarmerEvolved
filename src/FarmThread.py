@@ -2,6 +2,7 @@ from datetime import datetime
 from threading import Thread
 from time import sleep
 from Browser import Browser
+from Config import Config
 from Exceptions.InvalidIMAPCredentialsException import InvalidIMAPCredentialsException
 from Exceptions.Fail2FAException import Fail2FAException
 import requests
@@ -37,9 +38,12 @@ class FarmThread(Thread):
         """
         try:
             self.stats.updateStatus(self.account, "[yellow]LOGIN")
-            if self.browser.login(self.config.getAccount(self.account)["username"], self.config.getAccount(self.account)["password"], self.config.getAccount(self.account)["imapUsername"], self.config.getAccount(self.account)["imapPassword"], self.config.getAccount(self.account)["imapServer"], self.locks["refreshLock"]):
-                self.stats.updateStatus(self.account, "[green]LIVE")
+
+            if self.browser.login(self.config.getAccount(self.account)["username"], self.config.getAccount(self.account)["password"], self.config.getAccount(self.account)["imapUsername"], self.config.getAccount(self.account)["imapPassword"], self.config.getAccount(self.account)["imapServer"], self.config.getAccount(self.account)["tls"], self.config.getAccount(self.account)["port"], self.locks["refreshLock"]):
                 self.stats.resetLoginFailed(self.account)
+                self.stats.updateStatus(self.account, "[green]LIVE")
+                _, totalDrops = self.browser.checkNewDrops(0)
+                self.stats.setTotalDrops(self.account, totalDrops)
                 while True:
                     self.browser.maintainSession()
                     watchFailed = self.browser.sendWatchToLive()
@@ -47,14 +51,12 @@ class FarmThread(Thread):
                     if self.sharedData.getLiveMatches():
                         liveMatchesStatus = []
                         for m in self.sharedData.getLiveMatches().values():
-                            if m.league in watchFailed:
-                                self.stats.updateStatus(self.account, "[red]RIOT SERVERS OVERLOADED - PLEASE WAIT")
-                            else:
-                                self.stats.updateStatus(self.account, "[green]LIVE")
+                            self.stats.updateStatus(self.account, "[green]LIVE")
                             liveMatchesStatus.append(m.league)
                         self.log.debug(f"Live matches: {', '.join(liveMatchesStatus)}")
                         liveMatchesMsg = f"{', '.join(liveMatchesStatus)}"
-                        newDrops = self.browser.checkNewDrops(self.stats.getLastDropCheck(self.account))
+                        newDrops, totalDrops = self.browser.checkNewDrops(self.stats.getLastDropCheck(self.account))
+                        self.stats.setTotalDrops(self.account, totalDrops)
                         self.stats.updateLastDropCheck(self.account, int(datetime.now().timestamp() * 1e3))
                     else:
                         liveMatchesMsg = self.sharedData.getTimeUntilNextMatch()
@@ -121,7 +123,7 @@ def getLeagueFromID(leagueId):
     return ""
 def getLeagues():
     headers = {"Origin": "https://lolesports.com", "Referrer": "https://lolesports.com",
-               "x-api-key": "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"}
+               "x-api-key": Config.RIOT_API_KEY}
     res = requests.get(
         "https://esports-api.lolesports.com/persisted/gw/getLeagues?hl=en-GB", headers=headers)
     leagues = res.json()["data"].get("leagues", [])

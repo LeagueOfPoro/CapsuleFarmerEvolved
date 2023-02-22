@@ -12,6 +12,7 @@ class Config:
     """
 
     REMOTE_BEST_STREAMS_URL = "https://raw.githubusercontent.com/LeagueOfPoro/CapsuleFarmerEvolved/master/config/bestStreams.txt"
+    RIOT_API_KEY = "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"
 
     def __init__(self, configPath: str) -> None:
         """
@@ -26,9 +27,9 @@ class Config:
             with open(configPath, "r", encoding='utf-8') as f:
                 config = yaml.safe_load(f)
                 accs = config.get("accounts")
-                onlyDefaultUsername = True
                 for account in accs:
-                    self.accounts[account] = {
+                     if "username" != accs[account]["username"]:
+                        self.accounts[account] = {
                         #Orig data
                         "username": accs[account]["username"],
                         "password": accs[account]["password"],
@@ -37,13 +38,14 @@ class Config:
                         "imapUsername": accs[account].get("imapUsername", ""),
                         "imapPassword": accs[account].get("imapPassword", ""),
                         "imapServer": accs[account].get("imapServer", ""),
-                    }
-                    if "username" != accs[account]["username"]:
-                        onlyDefaultUsername = False
-                if onlyDefaultUsername:
+                        "tls": accs[account].get("tls", False),
+                        "port": accs[account].get("port", 993),
+                        }
+                if not self.accounts:
                     raise InvalidCredentialsException                    
                 self.debug = config.get("debug", False)
                 self.connectorDrops = config.get("connectorDropsUrl", "")
+                self.showHistoricalDrops = config.get("showHistoricalDrops", True)
         except FileNotFoundError as ex:
             print(f"[red]CRITICAL ERROR: The configuration file cannot be found at {configPath}\nHave you extacted the ZIP archive and edited the configuration file?")
             print("Press any key to exit...")
