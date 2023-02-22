@@ -4,8 +4,6 @@ from rich import print
 from pathlib import Path
 
 from Exceptions.InvalidCredentialsException import InvalidCredentialsException
-
-
 class Config:
     """
     A class that loads and stores the configuration
@@ -14,7 +12,7 @@ class Config:
     REMOTE_BEST_STREAMS_URL = "https://raw.githubusercontent.com/LeagueOfPoro/CapsuleFarmerEvolved/master/config/bestStreams.txt"
     RIOT_API_KEY = "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"
 
-    def __init__(self, configPath: str) -> None:
+    def __init__(self, configPath: str, root: str) -> None:
         """
         Loads the configuration file into the Config object
 
@@ -22,8 +20,9 @@ class Config:
         """
         
         self.accounts = {}
+        self.root = root
         try:
-            configPath = self.__findConfig(configPath)
+            configPath = self.__findConfig(configPath, root)
             with open(configPath, "r", encoding='utf-8') as f:
                 config = yaml.safe_load(f)
                 accs = config.get("accounts")
@@ -45,7 +44,7 @@ class Config:
                 self.connectorDrops = config.get("connectorDropsUrl", "")
                 self.showHistoricalDrops = config.get("showHistoricalDrops", True)
         except FileNotFoundError as ex:
-            print(f"[red]CRITICAL ERROR: The configuration file cannot be found at {configPath}\nHave you extacted the ZIP archive and edited the configuration file?")
+            print(f"[red]CRITICAL ERROR: The configuration file cannot be found at {configPath} nor at {root}.\nHave you extacted the ZIP archive and edited the configuration file?")
             print("Press any key to exit...")
             input()
             raise ex
@@ -78,16 +77,19 @@ class Config:
         """
         return self.accounts[account]
     
-    def __findConfig(self, configPath):
+    def __findConfig(self, configPath, root):
         """
         Try to find configuartion file in alternative locations.
 
         :param configPath: user suplied configuartion file path
+        :param root: user predifined root for all file interaction
         :return: pathlib.Path, path to the configuration file
         """
         configPath = Path(configPath)
         if configPath.exists():
             return configPath
+        if (Path(root) / Path("config/config.yaml")).exists():
+            return Path(root) / Path("config/config.yaml")
         if Path("../config/config.yaml").exists():
             return Path("../config/config.yaml")
         if Path("config/config.yaml").exists():
