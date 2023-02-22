@@ -61,7 +61,7 @@ class DataProviderThread(Thread):
                         streamChannel = event["streams"][0]["parameter"]
                         streamSource = event["streams"][0]["provider"]
                         for stream in event["streams"]:
-                            if stream["parameter"] in Config.bestStreams:
+                            if stream["parameter"] in self.config.bestStreams:
                                 streamChannel = stream["parameter"]
                                 streamSource = stream["provider"]
                                 break
