@@ -116,7 +116,7 @@ def getLeagueFromID(leagueId):
     return ""
 def getLeagues():
     headers = {"Origin": "https://lolesports.com", "Referrer": "https://lolesports.com",
-               "x-api-key": Config().RIOT_API_KEY}
+               "x-api-key": Config.RIOT_API_KEY}
     res = requests.get(
         "https://esports-api.lolesports.com/persisted/gw/getLeagues?hl=en-GB", headers=headers)
     leagues = res.json()["data"].get("leagues", [])
