@@ -41,7 +41,6 @@ class GuiThread(Thread):
             else:
                 table.add_row(f"{acc}", f"{status}", f"{self.stats.accountData[acc]['liveMatches']}", f"{self.stats.accountData[acc]['lastCheck']}", f"{self.stats.accountData[acc]['lastDrop']}", f"{self.stats.accountData[acc]['sessionDrops']}")
 
-            # table.add_row(f"{acc}", f"{status}", f"{self.stats.accountData[acc]['liveMatches']}", f"{self.stats.accountData[acc]['lastCheck']}")
         return table
 
     def run(self):

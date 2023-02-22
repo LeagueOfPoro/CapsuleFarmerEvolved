@@ -21,7 +21,6 @@ class Stats:
         self.accountData[accountName]["lastCheck"] = datetime.now().strftime("%H:%M:%S %d/%m")
         self.accountData[accountName]["liveMatches"] = liveMatches
         if newDrops > 0:
-            self.accountData[accountName]["totalDrops"] += newDrops
             self.accountData[accountName]["sessionDrops"] += newDrops
             if lastDropleague:
                 self.accountData[accountName]["lastDrop"] = datetime.now().strftime("%H:%M:%S %d/%m") + f' ({lastDropleague})'

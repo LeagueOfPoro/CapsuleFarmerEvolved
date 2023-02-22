@@ -161,7 +161,7 @@ class Browser:
             res = self.client.get("https://account.service.lolesports.com/fandom-account/v1/earnedDrops?locale=en_GB&site=LOLESPORTS", headers=headers)
             resJson = res.json()
             res.close()
-            return [drop for drop in resJson if lastCheckTime <= drop["unlockedDateMillis"]]
+            return [drop for drop in resJson if lastCheckTime <= drop["unlockedDateMillis"]], len(resJson)
         except (KeyError, TypeError):
             self.log.debug("Drop check failed")
             return []
