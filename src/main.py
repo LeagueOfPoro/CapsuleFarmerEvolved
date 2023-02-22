@@ -55,7 +55,7 @@ def main(log: logging.Logger, config: Config):
     locks = {"refreshLock": refreshLock}
 
     sharedData = SharedData()
-    stats = Stats(farmThreads)
+    stats = Stats()
     
     for account in config.accounts:
         stats.initNewAccount(account)
