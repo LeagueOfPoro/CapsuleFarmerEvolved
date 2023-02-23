@@ -23,7 +23,7 @@ def init() -> tuple[logging.Logger, Config]:
     parser = argparse.ArgumentParser(description='Farm Esports Capsules by watching all matches on lolesports.com.')
     parser.add_argument('-c', '--config', dest="configPath", default="./config.yaml",
                         help='Path to a custom config file')
-    parser.add_argument("--root", dest="root", default=".",
+    parser.add_argument("--rootPath", dest="rootPath", default=".",
                         help="Path to the dir where all files will be manipulated")
     args = parser.parse_args()
 
@@ -36,10 +36,10 @@ def init() -> tuple[logging.Logger, Config]:
     print("*********************************************************")
     print()
 
-    (Path(args.root) / Path("logs/")).mkdir(parents=True, exist_ok=True)
-    (Path(args.root) / Path("sessions/")).mkdir(parents=True, exist_ok=True)
-    config = Config(args.configPath, args.root)
-    log = Logger.createLogger(config.debug, CURRENT_VERSION, args.root)
+    (Path(args.rootPath) / Path("logs/")).mkdir(parents=True, exist_ok=True)
+    (Path(args.rootPath) / Path("sessions/")).mkdir(parents=True, exist_ok=True)
+    config = Config(args.configPath, args.rootPath)
+    log = Logger.createLogger(config.debug, CURRENT_VERSION, args.rootPath)
     if not VersionManager.isLatestVersion(CURRENT_VERSION):
         log.warning("!!! NEW VERSION AVAILABLE !!! Download it from: https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest")
         print("[bold red]!!! NEW VERSION AVAILABLE !!!\nDownload it from: https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest\n")
