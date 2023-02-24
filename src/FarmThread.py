@@ -1,4 +1,4 @@
-from datetime import datetime
+from time import monotonic
 from threading import Thread
 from time import sleep
 from Browser import Browser
@@ -60,7 +60,7 @@ class FarmThread(Thread):
                         liveMatchesMsg = f"{', '.join(liveMatchesStatus)}"
                         newDrops, totalDrops = self.browser.checkNewDrops(self.stats.getLastDropCheck(self.account))
                         self.stats.setTotalDrops(self.account, totalDrops)
-                        self.stats.updateLastDropCheck(self.account, int(datetime.now().timestamp() * 1e3))
+                        self.stats.updateLastDropCheck(self.account, int(monotonic() * 1e3))
                     else:
                         liveMatchesMsg = self.sharedData.getTimeUntilNextMatch()
                     try:

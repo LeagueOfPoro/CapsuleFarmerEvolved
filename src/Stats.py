@@ -1,4 +1,6 @@
 from datetime import datetime
+from time import monotonic
+
 
 class Stats:
     def __init__(self) -> None:
@@ -13,7 +15,7 @@ class Stats:
             "liveMatches": "",
             "status": "[yellow]WAIT",
             "failedLoginCounter": 0,
-            "lastDropCheck": int(datetime.now().timestamp()*1e3),
+            "lastDropCheck": int(monotonic() * 1e3),
             "valid" : True
         }
 
