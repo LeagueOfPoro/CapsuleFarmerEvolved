@@ -3,6 +3,8 @@ from time import sleep
 from rich.live import Live
 from rich.table import Table
 from rich.console import Console
+import sys
+import os
 
 class GuiThread(Thread):
     """
@@ -22,6 +24,8 @@ class GuiThread(Thread):
         self.config = config
         self.stats = stats
         self.locks = locks
+
+        self.terminal_size = os.get_terminal_size()
     
     def generateTable(self):
         table = Table()
@@ -43,6 +47,24 @@ class GuiThread(Thread):
 
         return table
 
+    def update_terminal(self, old_terminal_size):
+        # Check for terminal Size and clear the Screen if it changed in width
+        new_terminal_size = os.get_terminal_size()
+
+        # There's a bug where os.get_terminal_size() returns None
+        if old_terminal_size is None:
+            return new_terminal_size
+
+        if new_terminal_size[0] != old_terminal_size[0]:
+            # Check weather the operating system is windows or something else to clear the screen accordingly
+            if sys.platform.startswith('win'):
+                os.system('cls')
+            else:
+                os.system('clear')
+            
+            # update terminal_size to new_terminal_size
+            return new_terminal_size
+
     def run(self):
         """
         Report the status of all accounts
@@ -50,6 +72,9 @@ class GuiThread(Thread):
         console = Console(force_terminal=True)
         with Live(self.generateTable(), auto_refresh=False, console=console) as live:
             while True:
+                if self.config.clearConsoleWhenResized:
+                    self.terminal_size = self.update_terminal(self.terminal_size)
+                
                 live.update(self.generateTable())
                 sleep(1)
                 self.locks["refreshLock"].acquire()
