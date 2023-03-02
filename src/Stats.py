@@ -17,13 +17,18 @@ class Stats:
             "valid" : True
         }
 
-    def update(self, accountName: str, newDrops: int = 0, liveMatches: str = "", lastDropleague: str = None):
+    def update(self, accountName: str, newDrops: int = 0, liveMatches: str = "", lastDropleague: str = None,
+               reward: str = None):
         self.accountData[accountName]["lastCheck"] = datetime.now().strftime("%H:%M:%S %d/%m")
         self.accountData[accountName]["liveMatches"] = liveMatches
         if newDrops > 0:
             self.accountData[accountName]["sessionDrops"] += newDrops
-            if lastDropleague:
-                self.accountData[accountName]["lastDrop"] = datetime.now().strftime("%H:%M:%S %d/%m") + f' ({lastDropleague})'
+            if reward and lastDropleague:
+                self.accountData[accountName]["lastDrop"] = datetime.now().strftime(
+                    "%H:%M:%S %d/%m") + f' ({lastDropleague})' + f' ({reward})'
+            elif lastDropleague:
+                self.accountData[accountName]["lastDrop"] = datetime.now().strftime(
+                    "%H:%M:%S %d/%m") + f' ({lastDropleague})'
             else:
                 self.accountData[accountName]["lastDrop"] = datetime.now().strftime("%H:%M:%S %d/%m")
                 

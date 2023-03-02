@@ -64,8 +64,14 @@ class FarmThread(Thread):
                     else:
                         liveMatchesMsg = self.sharedData.getTimeUntilNextMatch()
                     try:
-                        if newDrops and getLeagueFromID(newDrops[-1]["leagueID"]):
-                            self.stats.update(self.account, len(newDrops), liveMatchesMsg, getLeagueFromID(newDrops[-1]["leagueID"]))
+                        if newDrops and getLeagueFromID(newDrops[-1]["leagueID"]) and \
+                                newDrops[-1]["inventory"][0]["localizedInventory"]["title"]["en_US"]:
+                            self.stats.update(self.account, len(newDrops), liveMatchesMsg,
+                                              getLeagueFromID(newDrops[-1]["leagueID"]),
+                                              newDrops[-1]["inventory"][0]["localizedInventory"]["title"]["en_US"])
+                        elif getLeagueFromID(newDrops[-1]["leagueID"]):
+                            self.stats.update(self.account, 0, liveMatchesMsg,
+                                              getLeagueFromID(newDrops[-1]["leagueID"]))
                         else:
                             self.stats.update(self.account, 0, liveMatchesMsg)
                     except (IndexError, KeyError):
