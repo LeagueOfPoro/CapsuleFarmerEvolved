@@ -25,22 +25,10 @@ def init() -> tuple[logging.Logger, Config]:
                         help='Path to a custom config file')
     args = parser.parse_args()
 
-    print("*********************************************************")
-    print(f"*   Thank you for using Capsule Farmer Evolved v{str(CURRENT_VERSION)}!    *")
-    print("* [steel_blue1]Please consider supporting League of Poro on YouTube.[/] *")
-    print("*    If you need help with the app, join our Discord    *")
-    print("*             https://discord.gg/ebm5MJNvHU             *")
-    print(f"*                 Started: [green]{strftime('%b %d, %H:%M', localtime())}[/]                *")
-    print("*********************************************************")
-    print()
-
     Path("./logs/").mkdir(parents=True, exist_ok=True)
     Path("./sessions/").mkdir(parents=True, exist_ok=True)
     config = Config(args.configPath)
     log = Logger.createLogger(config.debug, CURRENT_VERSION)
-    if not VersionManager.isLatestVersion(CURRENT_VERSION):
-        log.warning("!!! NEW VERSION AVAILABLE !!! Download it from: https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest")
-        print("[bold red]!!! NEW VERSION AVAILABLE !!!\nDownload it from: https://github.com/LeagueOfPoro/CapsuleFarmerEvolved/releases/latest\n")
 
     return log, config
 
@@ -58,7 +46,7 @@ def main(log: logging.Logger, config: Config):
     restarter = Restarter(stats)
 
     log.info(f"Starting a GUI thread.")
-    guiThread = GuiThread(log, config, stats, locks)
+    guiThread = GuiThread(log, config, stats, locks, CURRENT_VERSION)
     guiThread.daemon = True
     guiThread.start()
 
