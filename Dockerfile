@@ -1,4 +1,4 @@
-FROM python:3.10-slim-buster as base
+FROM python:3.10-alpine as base
 
 # Setup env
 ENV LANG C.UTF-8
@@ -6,24 +6,22 @@ ENV LC_ALL C.UTF-8
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONFAULTHANDLER 1
 
-FROM base AS python-deps
-
 # Install pipenv and compilation dependencies
-RUN pip install pipenv
-RUN apt-get update && apt-get install -y --no-install-recommends gcc
+RUN apk add --no-cache gcc musl-dev && pip install pipenv
 
 # Install python dependencies in /.venv
-COPY Pipfile .
-RUN PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy
+COPY Pipfile* /
+RUN PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy --ignore-pipfile
 
-FROM base AS runtime
+FROM python:3.10-alpine as runtime
 
-# Copy virtual env from python-deps stage
-COPY --from=python-deps /.venv /.venv
+# Copy virtual env from base stage
+COPY --from=base /.venv /.venv
 ENV PATH="/.venv/bin:$PATH"
 
 # Install application into container
-COPY . .
+COPY . /app
+WORKDIR /app
 
 # Run the application
 ENTRYPOINT ["python", "src/main.py"]
