@@ -13,8 +13,10 @@ Are you tired of watching professional League of Legends games? Do you watch onl
 
 This is a successor to the old [EsportsCapsuleFarmer](https://github.com/LeagueOfPoro/EsportsCapsuleFarmer) which relied on a web browser to watch videos. *Capsule Farmer Evolved* simulates traffic to lolesports.com servers and tricks it into thinking the account is watching a stream. This approach drastically lowers the hardware requirements.
 
-# RIOT TOOK ACTION AGAINST CAPSULE FARMER EVOLVED! IT STILL WORKS BUT YOUR ACCOUNT MIGHT GET SHADOWBANNED.
+# ⚠️⚠️⚠️ 15/3/23: RIOT TOOK ACTION AGAINST CAPSULE FARMER EVOLVED! IT STILL WORKS BUT YOUR ACCOUNT MIGHT GET SHADOWBANNED.
 ![Screenshot 2023-03-14 220953](https://user-images.githubusercontent.com/95635582/225154524-427c863c-c374-48fd-a097-6a00143194fb.png)
+
+Use this tool at your OWN risk. Watch this video for details: https://www.youtube.com/watch?v=DeKE3a8EV5c
 
 [More information about Drops From Riot Games.](https://lolesports.com/article/drops-information-for-lol-esports-season-2023/blt15759d60486d16cc)
 
