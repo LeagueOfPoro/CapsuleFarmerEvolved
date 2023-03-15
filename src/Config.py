@@ -4,8 +4,6 @@ from rich import print
 from pathlib import Path
 
 from Exceptions.InvalidCredentialsException import InvalidCredentialsException
-
-
 class Config:
     """
     A class that loads and stores the configuration
@@ -14,7 +12,7 @@ class Config:
     REMOTE_BEST_STREAMS_URL = "https://raw.githubusercontent.com/LeagueOfPoro/CapsuleFarmerEvolved/master/config/bestStreams.txt"
     RIOT_API_KEY = "0TvQnueqKa5mxJntVWt0w4LpLfEkrV1Ta8rQBb9Z"
 
-    def __init__(self, configPath: str) -> None:
+    def __init__(self, configPath: str, rootPath: str) -> None:
         """
         Loads the configuration file into the Config object
 
@@ -22,6 +20,7 @@ class Config:
         """
         
         self.accounts = {}
+        self.rootPath = rootPath
         try:
             configPath = self.__findConfig(configPath)
             with open(configPath, "r", encoding='utf-8') as f:
@@ -45,7 +44,7 @@ class Config:
                 self.connectorDrops = config.get("connectorDropsUrl", "")
                 self.showHistoricalDrops = config.get("showHistoricalDrops", True)
         except FileNotFoundError as ex:
-            print(f"[red]CRITICAL ERROR: The configuration file cannot be found at {configPath}\nHave you extacted the ZIP archive and edited the configuration file?")
+            print(f"[red]CRITICAL ERROR: The configuration file cannot be found at {configPath} nor at {rootPath}.\nHave you extacted the ZIP archive and edited the configuration file?")
             print("Press any key to exit...")
             input()
             raise ex
@@ -88,6 +87,8 @@ class Config:
         configPath = Path(configPath)
         if configPath.exists():
             return configPath
+        if (Path(self.rootPath) / Path("config/config.yaml")).exists():
+            return Path(self.rootPath) / Path("config/config.yaml")
         if Path("../config/config.yaml").exists():
             return Path("../config/config.yaml")
         if Path("config/config.yaml").exists():

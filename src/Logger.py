@@ -7,14 +7,14 @@ BACKUP_COUNT = 5  # keep up to 5 files
 
 class Logger:
     @staticmethod
-    def createLogger(debug: bool, version: float):
+    def createLogger(debug: bool, version: float, rootPath: str):
         if debug:
             level = logging.DEBUG
         else:
             level = logging.WARNING
 
         fileHandler = RotatingFileHandler(
-            "./logs/capsulefarmer.log",
+            f"{rootPath}/logs/capsulefarmer.log",
             mode="a+",
             maxBytes=FILE_SIZE,
             backupCount=BACKUP_COUNT,
