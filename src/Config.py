@@ -44,6 +44,7 @@ class Config:
                 self.debug = config.get("debug", False)
                 self.connectorDrops = config.get("connectorDropsUrl", "")
                 self.showHistoricalDrops = config.get("showHistoricalDrops", True)
+                self.clearConsoleWhenResized = config.get('clearConsoleWhenResized', False)
         except FileNotFoundError as ex:
             print(f"[red]CRITICAL ERROR: The configuration file cannot be found at {configPath}\nHave you extacted the ZIP archive and edited the configuration file?")
             print("Press any key to exit...")
