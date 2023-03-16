@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Capsule Farmer Evolved</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/LeagueOfPoro/CapsuleFarmerEvolved/master/poro.ico">
+    <style>
+        body {
+            background-color: #141213;
+        }
+        table {
+            font-family: Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+        td,th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        tr {
+            color: #f2f2f2;
+        }
+        th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            color: white;
+        }
+        .center {
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+        img {
+            width: 50%;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="center">
+        <img src="https://raw.githubusercontent.com/LeagueOfPoro/CapsuleFarmerEvolved/master/.github/banner.png" alt="Capsule Farmer Evolved"/>
+        <table id="statsTable">
+            <thead>
+                <tr>
+                    <th>Account</th>
+                    <th>Status</th>
+                    <th>Live Matches</th>
+                    <th>Heartbeat</th>
+                    <th>Last Drop</th>
+                    <th>Session Drops</th>
+                    <th>Lifetime Drops</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+
+    <script type="text/javascript">
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        // Listen for the 'my_response' event
+        socket.on('my_response', function (data) {
+            var responseElement = document.getElementById('response');
+            displayStatsTable(data.stats);
+        });
+
+        // Display the stats in a table
+        function displayStatsTable(stats) {
+            var tableBody = document.querySelector('#statsTable tbody');
+            tableBody.innerHTML = '';
+
+            for (var username in stats) {
+                var statsRow = document.createElement('tr');
+                var userStats = stats[username];
+
+                var usernameCell = document.createElement('td');
+                usernameCell.innerText = username;
+                statsRow.appendChild(usernameCell);
+
+                var statusCell = document.createElement('td');
+                //force typing in js
+                const status = userStats.status + ""
+                const statusList = status.replace("[", "").split("]")
+                statusCell.style.color = statusList[0]
+                statusCell.innerText = statusList[1]
+                statsRow.appendChild(statusCell);
+
+                var liveMatchesCell = document.createElement('td');
+                liveMatchesCell.innerText = userStats.liveMatches;
+                statsRow.appendChild(liveMatchesCell);
+
+                var lastCheckCell = document.createElement('td');
+                lastCheckCell.innerText = userStats.lastCheck;
+                statsRow.appendChild(lastCheckCell);
+
+                var lastDropCell = document.createElement('td');
+                lastDropCell.innerText = userStats.lastDrop;
+                statsRow.appendChild(lastDropCell);
+
+                var sessionDropsCell = document.createElement('td');
+                sessionDropsCell.innerText = userStats.sessionDrops;
+                statsRow.appendChild(sessionDropsCell);
+
+                var totalDropsCell = document.createElement('td');
+                totalDropsCell.innerText = userStats.totalDrops;
+                statsRow.appendChild(totalDropsCell);
+                
+               
+
+                tableBody.appendChild(statsRow);
+            }
+        }
+    </script>
+</body>
+
+</html>
