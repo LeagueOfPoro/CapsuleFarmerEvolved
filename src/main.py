@@ -93,6 +93,7 @@ def main(log: logging.Logger, config: Config):
             del farmThreads[account]
 
         sleep(5)
+
 if __name__ == '__main__':
     log = None
     try:

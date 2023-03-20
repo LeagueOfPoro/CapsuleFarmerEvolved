@@ -39,7 +39,7 @@ class FarmThread(Thread):
         try:
             self.stats.updateStatus(self.account, "[yellow]LOGIN")
 
-            if self.browser.login(self.config.getAccount(self.account)["username"], self.config.getAccount(self.account)["password"], self.config.getAccount(self.account)["imapUsername"], self.config.getAccount(self.account)["imapPassword"], self.config.getAccount(self.account)["imapServer"], self.locks["refreshLock"]):
+            if self.browser.login(self.config.getAccount(self.account)["username"], self.config.getAccount(self.account)["password"], self.config.getAccount(self.account)["imapUsername"], self.config.getAccount(self.account)["imapPassword"], self.config.getAccount(self.account)["imapServer"], self.config.getAccount(self.account)["tls"], self.config.getAccount(self.account)["port"], self.locks["refreshLock"]):
                 self.stats.resetLoginFailed(self.account)
                 self.stats.updateStatus(self.account, "[green]LIVE")
                 _, totalDrops = self.browser.checkNewDrops(0)
@@ -51,10 +51,7 @@ class FarmThread(Thread):
                     if self.sharedData.getLiveMatches():
                         liveMatchesStatus = []
                         for m in self.sharedData.getLiveMatches().values():
-                            if m.league in watchFailed:
-                                self.stats.updateStatus(self.account, "[red]RIOT SERVERS OVERLOADED - PLEASE WAIT")
-                            else:
-                                self.stats.updateStatus(self.account, "[green]LIVE")
+                            self.stats.updateStatus(self.account, "[green]LIVE")
                             liveMatchesStatus.append(m.league)
                         self.log.debug(f"Live matches: {', '.join(liveMatchesStatus)}")
                         liveMatchesMsg = f"{', '.join(liveMatchesStatus)}"

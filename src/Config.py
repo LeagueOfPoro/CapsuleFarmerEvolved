@@ -38,6 +38,8 @@ class Config:
                         "imapUsername": accs[account].get("imapUsername", ""),
                         "imapPassword": accs[account].get("imapPassword", ""),
                         "imapServer": accs[account].get("imapServer", ""),
+                        "tls": accs[account].get("tls", False),
+                        "port": accs[account].get("port", 993),
                         }
                 if not self.accounts:
                     raise InvalidCredentialsException                    

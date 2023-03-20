@@ -20,6 +20,7 @@ from pathlib import Path
 import jwt
 from IMAP import IMAP # Added to automate 2FA
 import imaplib2
+import ssl
 
 from SharedData import SharedData
 
@@ -52,7 +53,7 @@ class Browser:
         self.sharedData = sharedData
         self.ref = "Referer"
 
-    def login(self, username: str, password: str, imapusername: str, imappassword: str, imapserver: str, refreshLock) -> bool:
+    def login(self, username: str, password: str, imapusername: str, imappassword: str, imapserver: str, tls: bool, port: int, refreshLock) -> bool:
         """
         Login to the website using given credentials. Obtain necessary tokens.
 
@@ -80,7 +81,7 @@ class Browser:
                 if (imapserver != ""):
                     refreshLock.release()
                     #Handles all IMAP requests
-                    req = self.IMAPHook(imapusername, imappassword, imapserver)
+                    req = self.IMAPHook(imapusername, imappassword, imapserver, tls, port)
 
                     self.stats.updateStatus(self.account, f"[green]FETCHED 2FA CODE")
 
@@ -141,11 +142,16 @@ class Browser:
                 return True
         return False
 
-    def IMAPHook(self, usern, passw, server):
+    def IMAPHook(self, usern, passw, server, tls, port):
         try:
-            M = imaplib2.IMAP4_SSL(server)
-            M.login(usern, passw)
-            M.select("INBOX")
+            M = imaplib2.IMAP4_SSL(host=server, port=port)
+            if tls:
+                M.starttls(ssl_context=ssl.create_default_context())
+                M.login(usern, passw)
+                M.select("INBOX")
+            else:
+                M.login(usern, passw)
+                M.select("INBOX")
             idler = IMAP(M)
             idler.start()
             idler.join()
